@@ -62,7 +62,7 @@ definePageMeta({ layout: false })
           <span class="inline-flex items-center gap-1.5 px-2.5 h-6 rounded-full bg-[var(--brand-teal)] text-[11.5px] font-bold text-[var(--brand-lime)]">
             Option B · alternate
           </span>
-          <span class="text-[12.5px] text-[var(--brand-text-quiet)]">Workspace switcher, grouped sections, badges, user card — 240 px.</span>
+          <span class="text-[12.5px] text-[var(--brand-text-quiet)]">Deep-teal icon-only rail with lime-pill active state — 72 px.</span>
         </div>
         <div class="rounded-[14px] border border-[var(--brand-border-light)] bg-[var(--brand-canvas)] overflow-hidden shadow-[0_1px_2px_rgba(0,0,0,0.03)]">
           <div class="flex h-[640px]">
@@ -71,12 +71,12 @@ definePageMeta({ layout: false })
               <div class="text-[12px] font-semibold uppercase tracking-[0.08em] text-[var(--brand-text-quiet)] mb-2">Preview content</div>
               <div class="text-[15px] font-bold text-[var(--brand-text)] mb-4">Main content area</div>
               <ul class="space-y-2 text-[13.5px] text-[var(--brand-text-secondary)] list-disc pl-5">
-                <li>Workspace pill at the top (multi-tenant ready)</li>
-                <li>Inline ⌘K search built into the sidebar</li>
-                <li>4 grouped sections — MAIN · HIRING · ANALYZE · COMMUNICATION</li>
-                <li>Count badges (Interviews 3, Approvals 5) & live-status dot</li>
-                <li>User card pinned at bottom w/ notifications bell</li>
-                <li>"New job" quick action embedded in the rail</li>
+                <li>Deep-teal (near-black) background — anchors the app visually</li>
+                <li>Fixed 72 px icon rail — no expand/collapse, no labels</li>
+                <li>Lime-pill R logo at the top; matching lime-pill active state</li>
+                <li>Search &amp; user chrome move to the top bar, freeing the rail</li>
+                <li>Settings gear pinned at the bottom with lime-active treatment</li>
+                <li>Higher visual contrast between chrome &amp; content</li>
               </ul>
             </div>
           </div>
