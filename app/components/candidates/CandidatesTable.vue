@@ -18,6 +18,7 @@ import type { Candidate, JobStatus } from '~/types'
 const props = defineProps<{ candidates: Candidate[]; isFetching?: boolean }>()
 
 const router = useRouter()
+const route = useRoute()
 const store = useCandidatesStore()
 const { orderedVisible } = useCandidateColumns()
 const { key: sortKey, dir: sortDir, set: setSort } = useCandidateSort()
@@ -159,7 +160,7 @@ onBeforeUnmount(onResizeEnd)
         ]"
         @click="(e: MouseEvent) => {
           if ((e.target as HTMLElement).closest('button, a, input, label')) return
-          router.push(`/candidates/${c.id}`)
+          router.push({ path: `/candidates/${c.id}`, query: { from: route.fullPath } })
         }"
       >
         <TableCell class="align-middle py-3">

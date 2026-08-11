@@ -2,6 +2,7 @@
 import AppSidebar from '~/components/layout/AppSidebar.vue'
 import AppHeader from '~/components/layout/AppHeader.vue'
 import TrialBanner from '~/components/layout/TrialBanner.vue'
+import { BrandToast } from '~/components/brand'
 </script>
 
 <template>
@@ -20,5 +21,6 @@ import TrialBanner from '~/components/layout/TrialBanner.vue'
         <slot />
       </main>
     </div>
+    <BrandToast />
   </div>
 </template>

@@ -8,27 +8,21 @@ import { BrandButton } from '~/components/brand'
 
 definePageMeta({ layout: 'settings' })
 
-const enabled = ref(true)
 const activeTab = ref<'domains' | 'forms'>('domains')
 
 // ─────────────── Tab 1 · Company email domains ───────────────
-// People who sign up with an email at one of these domains are recognized as
-// employees and can open the app through the company.
-const domainSelfServe = ref(true)
-const domains = ref<string[]>(['icareer.ai'])
+// Shared with the public /careers "For Employees" verification (useEmployeeHub())
+// so a domain added here immediately unlocks internal access on the career site.
+const { state: hub, addDomain: addHubDomain, removeDomain } = useEmployeeHub()
+const { enabled, domainSelfServe, domains } = toRefs(hub)
 const newDomain = ref('')
 const domainError = ref('')
 
 function addDomain() {
-  const d = newDomain.value.trim().toLowerCase().replace(/^@/, '').replace(/^https?:\/\//, '').replace(/\/.*$/, '')
-  domainError.value = ''
-  if (!d) return
-  if (!/^[a-z0-9-]+(\.[a-z0-9-]+)+$/.test(d)) { domainError.value = 'Enter a valid domain, e.g. company.com'; return }
-  if (domains.value.includes(d)) { domainError.value = 'That domain is already added.'; return }
-  domains.value = [...domains.value, d]
-  newDomain.value = ''
+  const { ok, error } = addHubDomain(newDomain.value)
+  domainError.value = error
+  if (ok) newDomain.value = ''
 }
-function removeDomain(d: string) { domains.value = domains.value.filter(x => x !== d) }
 
 // ─────────────── Tab 2 · Customize form (white / blue collar) ───────────────
 type Requirement = 'required' | 'optional'

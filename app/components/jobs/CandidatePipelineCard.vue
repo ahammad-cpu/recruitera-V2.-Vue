@@ -32,6 +32,8 @@ const props = defineProps<{
   selected: boolean
   /** true when this card is the one being dragged — parent uses drag state for opacity. */
   dragging: boolean
+  /** Smart Distribute ownership (E2) — omit/null when the job has it off or the candidate is unassigned. */
+  assignedRecruiter?: { name: string; initials: string; bg: string; color: string } | null
 }>()
 
 const emit = defineEmits<{
@@ -39,6 +41,7 @@ const emit = defineEmits<{
   'move':          [id: string, fromKey: string, toKey: string]
   'drag-start':    [id: string, fromKey: string, event: DragEvent]
   'drag-end':      []
+  'open-profile':  [id: string]
 }>()
 
 function onDragStart(e: DragEvent) {
@@ -58,6 +61,7 @@ function onDragStart(e: DragEvent) {
     ]"
     @dragstart="onDragStart"
     @dragend="emit('drag-end')"
+    @click="emit('open-profile', props.candidate.id)"
   >
     <div class="flex items-start gap-[11px] pt-[13px] pb-[11px] px-3.5">
       <!-- Avatar ↔ checkbox swap. Idle: avatar. Hover: checkbox replaces
@@ -148,11 +152,28 @@ function onDragStart(e: DragEvent) {
       </DropdownMenu>
     </div>
 
-    <div v-if="props.candidate.location" class="border-t border-[var(--brand-border-fade)] px-3.5 py-[9px] flex items-center gap-[14px] text-[12.5px] text-[var(--brand-text-quiet)]">
-      <span class="inline-flex items-center gap-1.5">
-        <MapPin class="w-[14px] h-[14px]" stroke-width="1.5" />
+    <div
+      v-if="props.candidate.location || props.assignedRecruiter !== undefined"
+      class="border-t border-[var(--brand-border-fade)] px-3.5 py-[9px] flex items-center justify-between gap-[14px] text-[12.5px] text-[var(--brand-text-quiet)]"
+    >
+      <span v-if="props.candidate.location" class="inline-flex items-center gap-1.5 min-w-0 truncate">
+        <MapPin class="w-[14px] h-[14px] shrink-0" stroke-width="1.5" />
         {{ props.candidate.location }}
       </span>
+      <span v-else />
+      <span
+        v-if="props.assignedRecruiter"
+        class="inline-flex items-center gap-1 shrink-0 rounded-full pl-[3px] pr-2 py-[2px]"
+        :style="{ background: 'var(--brand-lime-tint)' }"
+        :title="`Assigned to ${props.assignedRecruiter.name}`"
+      >
+        <span
+          class="w-4 h-4 rounded-full inline-flex items-center justify-center text-[8px] font-bold"
+          :style="{ background: props.assignedRecruiter.bg, color: props.assignedRecruiter.color }"
+        >{{ props.assignedRecruiter.initials }}</span>
+        <span class="text-[10.5px] font-bold text-[var(--brand-teal-secondary)] truncate max-w-[80px]">{{ props.assignedRecruiter.name }}</span>
+      </span>
+      <span v-else-if="props.assignedRecruiter === null" class="text-[10.5px] font-semibold text-[var(--brand-text-faint)] shrink-0">Unassigned</span>
     </div>
   </article>
 </template>

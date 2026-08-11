@@ -97,6 +97,25 @@
   --brand-badge-settings-bg: #eef1ea;             /* settings table count badge (jobs, etc) */
   --brand-badge-settings-text: #3a5c2e;
 
+  /* Talent-pool category identity — the 34px icon tile and the category pill share
+     one colour per category (ground truth: Recruitera Talent Pools.html) */
+  --brand-category-general-bg: #e9edf7;
+  --brand-category-general-text: #3a5a9e;
+  --brand-category-department-bg: #eaf1e4;
+  --brand-category-department-text: #3a5c2e;
+  --brand-category-event-bg: #f2ecfb;
+  --brand-category-event-text: #7040a6;
+  --brand-pin: #c9930a;                           /* pinned-row pin icon */
+
+  /* Candidate stage pills. New and Interview reuse the category pairs above and
+     Offer reuses --brand-success-bg; only these three are additional. */
+  --brand-stage-applied-bg: #fbf5d5;
+  --brand-stage-applied-text: #7a6416;
+  --brand-stage-screened-bg: #e3f1fb;
+  --brand-stage-screened-text: #1d6fa5;
+  --brand-stage-positive-bg: #eafbf1;             /* reference check / offer */
+  --brand-stage-positive-text: #1f8a4c;
+
   /* Settings module — modal / dropdown / toast (ground truth: Recruitera Settings Standalone.html) */
   --brand-settings-danger: #c0392b;               /* delete/remove text + icon */
   --brand-settings-danger-hover-bg: #fff0ee;      /* delete row hover in dropdowns */
@@ -127,6 +146,14 @@
   --brand-status-closed-text: #b02a2a;
   --brand-success: #3aab52;                       /* candidate profile: evaluation score good / sent checkmark */
   --brand-warning: #e8a33d;                        /* candidate profile: evaluation score mid */
+  /* Tinted companions to the two above — confirm-dialog icon tiles (restore / archive).
+     Danger already had --brand-settings-danger-hover-bg; these complete the set. */
+  --brand-success-bg: #e3f6ea;
+  --brand-warning-bg: #fdf3d8;
+  /* BrandToast, success variant. The error variant reuses --brand-settings-toast-bg
+     (same #b91c1c the settings blocking-delete toast already ships). */
+  --brand-toast-success-bg: #0f2e1c;
+  --brand-toast-success-text: #c7f7d8;
   --brand-track: #eceee7;                          /* candidate profile: gauge/progress-bar track */
   --brand-whatsapp: #25D366;                       /* WhatsApp brand green — chat header icon, send button */
   --brand-whatsapp-bubble: #dcf6df;                /* WhatsApp tab: outbound message bubble bg */

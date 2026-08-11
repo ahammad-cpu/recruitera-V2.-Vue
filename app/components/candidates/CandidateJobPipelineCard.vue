@@ -12,10 +12,12 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Popover, PopoverContent, PopoverTrigger } from '~/components/ui/popover'
 import type { CandidateJob } from '~/types'
 
-const props = defineProps<{
+defineProps<{
   job: CandidateJob
   location: string
   assignedDate: string
+  /** E2 — non-owner viewers can see the pipeline but can't move/disqualify/requalify. */
+  readOnly?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -77,10 +79,12 @@ function pickReason(r: string) {
         <XCircle class="w-4 h-4" stroke-width="1.8" />{{ reason }}
       </span>
       <DropdownMenu v-else>
-        <DropdownMenuTrigger as-child>
+        <DropdownMenuTrigger as-child :disabled="readOnly">
           <button
             type="button"
-            class="inline-flex items-center gap-2 mt-1.5 font-semibold text-[14px] text-[var(--brand-text)] bg-[var(--brand-surface-hover)] border border-[var(--brand-border)] rounded-[10px] px-3.5 py-2 cursor-pointer"
+            :disabled="readOnly"
+            :title="readOnly ? 'Read-only — assigned to another recruiter' : undefined"
+            class="inline-flex items-center gap-2 mt-1.5 font-semibold text-[14px] text-[var(--brand-text)] bg-[var(--brand-surface-hover)] border border-[var(--brand-border)] rounded-[10px] px-3.5 py-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
           >
             {{ stage }}
             <ChevronDown class="w-3.5 h-3.5 text-[var(--brand-icon-default)]" stroke-width="2" />
@@ -97,14 +101,23 @@ function pickReason(r: string) {
         Assigned {{ assignedDate }} · {{ location }}
       </div>
       <div v-if="job.disqualified" class="mt-4">
-        <BrandButton variant="outline" size="md" class="w-full !text-[var(--brand-success)] !border-[color-mix(in_srgb,var(--brand-success)_35%,transparent)]" @click="emit('requalify')">
+        <BrandButton
+          variant="outline" size="md" :disabled="readOnly"
+          :title="readOnly ? 'Read-only — assigned to another recruiter' : undefined"
+          class="w-full !text-[var(--brand-success)] !border-[color-mix(in_srgb,var(--brand-success)_35%,transparent)] disabled:opacity-60 disabled:cursor-not-allowed"
+          @click="emit('requalify')"
+        >
           <RotateCcw class="w-4 h-4" stroke-width="1.9" />Requalify
         </BrandButton>
       </div>
       <div v-else class="flex gap-2.5 mt-4">
         <Popover v-model:open="disqPickerOpen">
-          <PopoverTrigger as-child>
-            <BrandButton variant="outline" size="md" class="flex-1 !text-[var(--brand-danger)] !border-[color-mix(in_srgb,var(--brand-danger)_25%,transparent)]">
+          <PopoverTrigger as-child :disabled="readOnly">
+            <BrandButton
+              variant="outline" size="md" :disabled="readOnly"
+              :title="readOnly ? 'Read-only — assigned to another recruiter' : undefined"
+              class="flex-1 !text-[var(--brand-danger)] !border-[color-mix(in_srgb,var(--brand-danger)_25%,transparent)] disabled:opacity-60 disabled:cursor-not-allowed"
+            >
               <XCircle class="w-4 h-4" stroke-width="1.8" />Disqualify
             </BrandButton>
           </PopoverTrigger>
@@ -131,7 +144,12 @@ function pickReason(r: string) {
             </div>
           </PopoverContent>
         </Popover>
-        <BrandButton variant="primary-teal" size="md" class="flex-1" @click="emit('proceed')">
+        <BrandButton
+          variant="primary-teal" size="md" :disabled="readOnly"
+          :title="readOnly ? 'Read-only — assigned to another recruiter' : undefined"
+          class="flex-1 disabled:opacity-60 disabled:cursor-not-allowed"
+          @click="emit('proceed')"
+        >
           Proceed<ArrowRight class="w-4 h-4" stroke-width="2" />
         </BrandButton>
       </div>

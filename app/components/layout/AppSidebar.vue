@@ -21,7 +21,7 @@ const navItems = [
   { label: 'Jobs',         to: '/jobs',         icon: Briefcase },
   { label: 'Talent pools', to: '/talent-pools', icon: BarChart3 },
   { label: 'Calendar',     to: '/interviews',   icon: Calendar },
-  { label: 'Analytics',    to: '/analytics',    icon: TrendingUp },
+  { label: 'Reports',      to: '/reports',      icon: TrendingUp },
 ]
 const bottomItems = [
   { label: 'Settings', to: '/settings', icon: Settings },

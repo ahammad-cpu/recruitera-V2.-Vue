@@ -13,9 +13,12 @@ import { Filter as FilterIcon } from 'lucide-vue-next'
 import { useFilterRegistry } from '~/composables/useFilterRegistry'
 import type { FilterOperator } from '~/types/candidate-filter.types'
 
+const props = defineProps<{
+  assignedRecruiterOptions?: { value: string; label: string }[]
+}>()
 const emit = defineEmits<{ add: [id: string, op: FilterOperator] }>()
 
-const { catalog } = useFilterRegistry()
+const { catalog } = useFilterRegistry(computed(() => props.assignedRecruiterOptions))
 
 const open = ref(false)
 const step = ref<'catalog' | 'operator'>('catalog')

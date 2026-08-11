@@ -45,6 +45,10 @@ export interface FilterCatalogEntry {
   operators: { value: FilterOperator; label: string }[]
   /** Static option list for checkbox-multi and dropdown filters. */
   options?: { value: string; label: string; count?: number }[]
+  /** has-tag only: show a checkbox per option and render selections as
+   * removable chips in the trigger instead of a comma-joined label list —
+   * opt-in per entry so filters like Job/Stage/Tag keep their current look. */
+  chips?: boolean
 }
 
 export interface ActiveFilter {

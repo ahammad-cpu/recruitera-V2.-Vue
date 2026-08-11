@@ -1,11 +1,10 @@
+<!-- "Analytics" was renamed "Reports" and moved to /reports — kept as a
+     redirect in case anything still links to the old path. -->
 <script setup lang="ts">
-definePageMeta({ layout: "default" })
+definePageMeta({ layout: 'default' })
+await navigateTo('/reports')
 </script>
 
 <template>
-  <div class="p-6">
-    <div class="flex items-center justify-center h-64 rounded-lg border border-dashed border-[var(--brand-border)]">
-      <p class="text-sm text-[var(--brand-text-quiet)]">Coming soon</p>
-    </div>
-  </div>
+  <div />
 </template>

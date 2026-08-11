@@ -13,41 +13,16 @@ import {
   LayoutTemplate,
   Lock,
   MapPin,
-  MessageSquare,
   Monitor,
   Palette,
   Pencil,
   Play,
   Quote,
   Smartphone,
-  Target,
   Trash2,
   Upload,
+  X,
   Youtube,
-  Rocket,
-  Heart,
-  Shield,
-  Zap,
-  Users,
-  Award,
-  Star,
-  ThumbsUp,
-  Lightbulb,
-  Handshake,
-  TrendingUp,
-  Sparkles,
-  Compass,
-  Flag,
-  Trophy,
-  Leaf,
-  Scale,
-  Eye,
-  Smile,
-  Anchor,
-  Feather,
-  Puzzle,
-  Gauge,
-  Hexagon,
 } from 'lucide-vue-next'
 import { onBeforeRouteLeave } from 'vue-router'
 import { BrandButton, BrandStatusBadge } from '~/components/brand'
@@ -55,14 +30,38 @@ import { Switch } from '~/components/ui/switch'
 import { Input } from '~/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/ui/select'
 import { Dialog, DialogScrollContent, DialogHeader, DialogTitle, DialogFooter } from '~/components/ui/dialog'
+import SettingsConfirmDialog from '~/components/settings/SettingsConfirmDialog.vue'
+import { CAREER_SITE_VALUE_ICONS } from '~/composables/useCareerSite'
+import type { CareerSiteTestimonial, CareerSiteValue } from '~/composables/useCareerSite'
 
 definePageMeta({ layout: 'settings' })
 
-// ─────────────── Toggles ───────────────
-const generalApplicationOn = ref(false)
-const forEmployeesOn = ref(true)
-// Single source of truth for publish state (was: publishedOn + liveOn + a badge).
-const published = ref(true)
+// Shared with the public /careers/* site and this preview — editing here is
+// what "live site reflects branding immediately" (PRD UC-01) means in a
+// no-backend prototype: there's one copy of the config, not a draft + a fetch.
+const site = useCareerSite()
+const {
+  generalApplicationOn, forEmployeesOn, published,
+  primaryColor, headerColor, btnColor, ctaColor, font,
+  headline, intro, videoUrl, values, testimonials, subdomain, coverUrl,
+} = toRefs(site)
+
+const { data: companyData } = useCompany()
+const companyName = computed(() => companyData.value?.name || 'Your Company')
+const companyInitials = computed(() => companyName.value.trim().split(/\s+/).map(p => p[0]).slice(0, 2).join('').toUpperCase() || '?')
+
+function onCoverChange(e: Event) {
+  const file = (e.target as HTMLInputElement).files?.[0]
+  if (!file) return
+  const reader = new FileReader()
+  reader.onload = () => { coverUrl.value = String(reader.result) }
+  reader.readAsDataURL(file)
+}
+const removeCoverConfirmOpen = ref(false)
+function confirmRemoveCover() {
+  coverUrl.value = ''
+  removeCoverConfirmOpen.value = false
+}
 
 // ─────────────── Accordions ───────────────
 type AccordionKey = 'branding' | 'hero' | 'video' | 'values' | 'testimonials' | 'employees' | 'publish'
@@ -89,15 +88,6 @@ const SECTIONS: { key: AccordionKey, label: string, icon: any }[] = [
   { key: 'publish', label: 'Publish & URL', icon: Globe },
 ]
 
-// ─────────────── Colors ───────────────
-/* eslint-disable local/no-hex-colors -- default values for the customer's own
-   career-site theme picker, intentionally independent of Recruitera's brand tokens */
-const primaryColor = ref('#4d7c0f')
-const headerColor = ref('#0f172a')
-const btnColor = ref('#4d7c0f')
-const ctaColor = ref('#4d7c0f')
-/* eslint-enable local/no-hex-colors */
-
 function onPrimaryChange(v: string) {
   primaryColor.value = v
   ctaColor.value = v
@@ -111,35 +101,16 @@ function hexInput(v: string, setter: (v: string) => void) {
 }
 
 const FONTS = ['Geist', 'Inter', 'Lato', 'Manrope', 'DM Sans', 'Plus Jakarta Sans']
-const font = ref('Geist')
-
-// ─────────────── Hero copy ───────────────
-const headline = ref('Build the future of hiring with us')
-const intro = ref('We help teams hire better and faster. Join a team that values craft, ownership, and candor — and do the best work of your career.')
-
-// ─────────────── Culture video ───────────────
-const videoUrl = ref('')
 
 // ─────────────── Values ───────────────
-interface ValueItem { icon: number, name: string, desc: string }
-const VALUE_ICONS = [
-  Target, Gem, MessageSquare, Palette, Globe, IdCard, Youtube, Quote,
-  Rocket, Heart, Shield, Zap, Users, Award, Star, ThumbsUp, Lightbulb,
-  Handshake, TrendingUp, Sparkles, Compass, Flag, Trophy, Leaf, Scale,
-  Eye, Smile, Anchor, Feather, Puzzle, Gauge, Hexagon,
-]
-const values = ref<ValueItem[]>([
-  { icon: 0, name: 'Ownership', desc: 'We take end-to-end ownership of outcomes, not tasks.' },
-  { icon: 1, name: 'Craft', desc: 'We sweat the details and ship work we are proud of.' },
-  { icon: 2, name: 'Candor', desc: 'We speak honestly and assume good intent from each other.' },
-])
+const VALUE_ICONS = CAREER_SITE_VALUE_ICONS
 function removeValue(i: number) {
   values.value.splice(i, 1)
 }
 // Add/Edit Value — pop-up dialog
 const valueModalOpen = ref(false)
 const editingValueIndex = ref<number | null>(null)
-const valueDraft = reactive<ValueItem>({ icon: 0, name: '', desc: '' })
+const valueDraft = reactive<CareerSiteValue>({ icon: 0, name: '', desc: '' })
 const valueValid = computed(() => valueDraft.name.trim().length > 0)
 function openAddValue() {
   editingValueIndex.value = null
@@ -153,25 +124,20 @@ function openEditValue(i: number) {
 }
 function saveValue() {
   if (!valueValid.value) return
-  const v: ValueItem = { icon: valueDraft.icon, name: valueDraft.name.trim(), desc: valueDraft.desc.trim() }
+  const v: CareerSiteValue = { icon: valueDraft.icon, name: valueDraft.name.trim(), desc: valueDraft.desc.trim() }
   if (editingValueIndex.value === null) values.value.push(v)
   else values.value[editingValueIndex.value] = v
   valueModalOpen.value = false
 }
 
 // ─────────────── Testimonials ───────────────
-interface TestimonialItem { name: string, role: string, quote: string, photo?: string }
-const testimonials = ref<TestimonialItem[]>([
-  { name: 'Mariam Adel', role: 'Senior Engineer', quote: 'The best team I have worked with — real autonomy and real impact from day one.' },
-  { name: 'Omar Khaled', role: 'Product Designer', quote: 'Culture of craft is not a slogan here. It shows up in every review and ship.' },
-])
 function removeTestimonial(i: number) {
   testimonials.value.splice(i, 1)
 }
 // Add/Edit Testimonial — pop-up dialog
 const testimonialModalOpen = ref(false)
 const editingTestimonialIndex = ref<number | null>(null)
-const testimonialDraft = reactive<TestimonialItem>({ name: '', role: '', quote: '', photo: '' })
+const testimonialDraft = reactive<CareerSiteTestimonial>({ name: '', role: '', quote: '', photo: '' })
 const testimonialValid = computed(() => testimonialDraft.name.trim().length > 0 && testimonialDraft.quote.trim().length > 0)
 function openAddTestimonial() {
   editingTestimonialIndex.value = null
@@ -192,7 +158,7 @@ function onTestimonialPhoto(e: Event) {
 }
 function saveTestimonial() {
   if (!testimonialValid.value) return
-  const t: TestimonialItem = { name: testimonialDraft.name.trim(), role: testimonialDraft.role.trim(), quote: testimonialDraft.quote.trim(), photo: testimonialDraft.photo || '' }
+  const t: CareerSiteTestimonial = { name: testimonialDraft.name.trim(), role: testimonialDraft.role.trim(), quote: testimonialDraft.quote.trim(), photo: testimonialDraft.photo || '' }
   if (editingTestimonialIndex.value === null) testimonials.value.push(t)
   else testimonials.value[editingTestimonialIndex.value] = t
   testimonialModalOpen.value = false
@@ -202,15 +168,20 @@ function initials(name: string) {
 }
 
 // ─────────────── Employees domain ───────────────
+// Cosmetic here — the real, multi-domain source of truth for "For Employees"
+// verification lives in Settings → Employee Hub (useEmployeeHub()).
 const employeeDomain = ref('acme.co')
 
 // ─────────────── Publish & URL ───────────────
-const subdomain = ref('acme')
+// Cosmetic marketing text shown inside the browser-chrome mockup. The real
+// "Visit site" / "Copy link" targets are the in-app /careers route below —
+// there's no DNS in this prototype to resolve a real subdomain.
 const previewDomain = computed(() => `${subdomain.value}.recruitera.ai`)
+const publicSiteUrl = computed(() => `${typeof window !== 'undefined' ? window.location.origin : ''}/careers`)
 
 const copied = ref(false)
 async function copyLink() {
-  try { await navigator.clipboard.writeText(`https://${previewDomain.value}`) } catch {}
+  try { await navigator.clipboard.writeText(publicSiteUrl.value) } catch {}
   copied.value = true
   setTimeout(() => { copied.value = false }, 2000)
 }
@@ -244,7 +215,7 @@ function snapshot() {
   return JSON.stringify({
     g: generalApplicationOn.value, fe: forEmployeesOn.value, pub: published.value,
     pc: primaryColor.value, hc: headerColor.value, bc: btnColor.value, cc: ctaColor.value,
-    font: font.value, hl: headline.value, intro: intro.value, video: videoUrl.value,
+    font: font.value, hl: headline.value, intro: intro.value, video: videoUrl.value, cover: coverUrl.value,
     values: values.value, testimonials: testimonials.value, ed: employeeDomain.value, sub: subdomain.value,
   })
 }
@@ -263,7 +234,7 @@ function discardChanges() {
   const s = JSON.parse(savedSnapshot.value)
   generalApplicationOn.value = s.g; forEmployeesOn.value = s.fe; published.value = s.pub
   primaryColor.value = s.pc; headerColor.value = s.hc; btnColor.value = s.bc; ctaColor.value = s.cc
-  font.value = s.font; headline.value = s.hl; intro.value = s.intro; videoUrl.value = s.video
+  font.value = s.font; headline.value = s.hl; intro.value = s.intro; videoUrl.value = s.video; coverUrl.value = s.cover ?? ''
   values.value = JSON.parse(JSON.stringify(s.values)); testimonials.value = JSON.parse(JSON.stringify(s.testimonials))
   employeeDomain.value = s.ed; subdomain.value = s.sub
 }
@@ -278,20 +249,28 @@ onMounted(() => {
 onBeforeUnmount(() => window.removeEventListener('beforeunload', beforeUnload))
 
 // ─────────────── Preview device (mobile-first) ───────────────
-const previewMode = ref<'desktop' | 'mobile'>('mobile')
+const previewMode = ref<'desktop' | 'mobile'>('desktop')
 
-// ─────────────── Jobs (preview mockup content) ───────────────
-interface JobItem { title: string, type: 'white' | 'blue', desc: string, location: string, posted: string, employment: string }
-const JOBS: JobItem[] = [
-  { title: 'Senior Frontend Engineer', type: 'white', desc: 'Own the candidate-facing experience end to end with Vue and TypeScript.', location: 'Cairo, EG', posted: '2d ago', employment: 'Full-time' },
-  { title: 'Product Designer', type: 'white', desc: 'Shape flows and design systems across the hiring product.', location: 'Remote', posted: '5d ago', employment: 'Full-time' },
-  { title: 'Warehouse Operative', type: 'blue', desc: 'Join our logistics team keeping fulfilment fast and accurate.', location: '6th of October, EG', posted: '1d ago', employment: 'Shift Based' },
-  { title: 'Data Scientist', type: 'white', desc: 'Turn hiring data into models that help teams decide faster.', location: 'Cairo, EG', posted: '8d ago', employment: 'Full-time' },
-  { title: 'Customer Support Specialist', type: 'white', desc: 'Be the friendly, sharp first line for our customers.', location: 'Remote', posted: '3d ago', employment: 'Full-time' },
-  { title: 'Field Technician', type: 'blue', desc: 'Install and maintain equipment on client sites across Greater Cairo.', location: 'Giza, EG', posted: '6d ago', employment: 'Shift Based' },
-]
+// ─────────────── Jobs — same published jobs the public site shows ───────────────
+// Pulls from the real Jobs module (useJobs) rather than an invented list, so this
+// preview and the public /careers site can never drift from what recruiters see.
+const { jobs: allJobs } = useJobs()
+function daysAgo(iso: string) {
+  const d = Math.max(0, Math.round((Date.now() - new Date(iso).getTime()) / 86400000))
+  return d === 0 ? 'Today' : d === 1 ? '1d ago' : `${d}d ago`
+}
+const publishedJobs = computed(() => allJobs.value
+  .filter(j => j.status === 'published')
+  .map(j => ({
+    title: j.title,
+    type: j.collar as 'white' | 'blue',
+    desc: j.description ?? '',
+    location: j.location ?? 'Remote',
+    posted: daysAgo(j.createdAt),
+    employment: j.employmentType ?? 'Full-time',
+  })))
 const jobFilter = ref<'all' | 'white' | 'blue'>('all')
-const filteredJobs = computed(() => jobFilter.value === 'all' ? JOBS : JOBS.filter(j => j.type === jobFilter.value))
+const filteredJobs = computed(() => jobFilter.value === 'all' ? publishedJobs.value : publishedJobs.value.filter(j => j.type === jobFilter.value))
 
 // ─────────────── Preview computed styles ───────────────
 const heroBackground = computed(() => `linear-gradient(135deg, ${primaryColor.value} 0%, ${headerColor.value} 130%)`)
@@ -318,7 +297,7 @@ const testimonialsGridClass = computed(() => (previewMode.value === 'desktop' ? 
         </div>
         <div class="flex gap-2">
           <a
-            :href="`https://${previewDomain}`"
+            :href="publicSiteUrl"
             target="_blank"
             rel="noopener"
             class="inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-[10px] border border-[var(--brand-border)] bg-[var(--brand-surface-white)] text-[13.5px] font-semibold text-[var(--brand-text)] no-underline hover:bg-[var(--brand-lime-tint)] transition-colors"
@@ -379,14 +358,28 @@ const testimonialsGridClass = computed(() => (previewMode.value === 'desktop' ? 
               </div>
               <div class="flex-1 space-y-1.5">
                 <div class="text-[12px] font-semibold text-[var(--brand-text-secondary)]">Cover image <span class="text-[var(--brand-text-faint)] font-normal">(4:1)</span></div>
-                <label class="group relative flex h-16 w-full cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg border border-[var(--brand-border)] bg-[var(--brand-canvas)] transition-colors hover:border-[var(--brand-teal)]/60">
-                  <Upload class="w-[15px] h-[15px] text-[var(--brand-icon-muted)]" />
-                  <span class="text-[13px] text-[var(--brand-text-muted)]">Upload cover</span>
-                  <div class="absolute inset-0 grid place-items-center bg-black/45 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <Upload class="w-[16px] h-[16px] text-white" />
-                  </div>
-                  <input type="file" accept="image/png,image/jpeg" class="sr-only">
-                </label>
+                <div class="relative">
+                  <label class="group relative flex h-16 w-full cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg border border-[var(--brand-border)] bg-[var(--brand-canvas)] transition-colors hover:border-[var(--brand-teal)]/60">
+                    <img v-if="coverUrl" :src="coverUrl" alt="" class="absolute inset-0 h-full w-full object-cover">
+                    <template v-else>
+                      <Upload class="w-[15px] h-[15px] text-[var(--brand-icon-muted)]" />
+                      <span class="text-[13px] text-[var(--brand-text-muted)]">Upload cover</span>
+                    </template>
+                    <div class="absolute inset-0 grid place-items-center bg-black/45 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Upload class="w-[16px] h-[16px] text-white" />
+                    </div>
+                    <input type="file" accept="image/png,image/jpeg" class="sr-only" @change="onCoverChange">
+                  </label>
+                  <button
+                    v-if="coverUrl"
+                    type="button"
+                    class="absolute -right-1.5 -top-1.5 grid size-5 place-items-center rounded-full bg-white text-[var(--brand-settings-danger)] shadow-[0_1px_4px_rgba(0,20,18,0.25)] hover:bg-[var(--brand-settings-danger-hover-bg)]"
+                    aria-label="Remove cover image"
+                    @click="removeCoverConfirmOpen = true"
+                  >
+                    <X class="w-3 h-3" :stroke-width="2.5" />
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -631,8 +624,8 @@ const testimonialsGridClass = computed(() => (previewMode.value === 'desktop' ? 
             <!-- Header -->
             <header class="flex items-center justify-between border-b border-black/5 px-6 py-3.5">
               <div class="flex items-center gap-2.5">
-                <div class="grid size-8 shrink-0 place-items-center rounded-lg text-[11px] font-bold text-white" :style="{ background: primaryColor }">AT</div>
-                <span class="text-[15px] font-semibold" :style="{ color: headerColor }">Acme Talent</span>
+                <div class="grid size-8 shrink-0 place-items-center rounded-lg text-[11px] font-bold text-white" :style="{ background: primaryColor }">{{ companyInitials }}</div>
+                <span class="text-[15px] font-semibold" :style="{ color: headerColor }">{{ companyName }}</span>
               </div>
               <nav v-if="previewMode === 'desktop'" class="flex items-center gap-6 text-[13px] font-medium">
                 <span class="text-[var(--brand-preview-text-heading)]">Home</span>
@@ -648,11 +641,13 @@ const testimonialsGridClass = computed(() => (previewMode.value === 'desktop' ? 
             </header>
 
             <!-- Hero -->
-            <section class="relative flex flex-col items-start justify-center gap-4 overflow-hidden px-6" style="padding-top:56px;padding-bottom:56px;min-height:300px" :style="{ background: heroBackground }">
-              <span class="bg-white/15 backdrop-blur text-white text-[11.5px] font-semibold px-3 py-1 rounded-full">We're hiring · {{ JOBS.length }} open roles</span>
-              <h1 class="font-extrabold text-white leading-[1.18] max-w-[560px]" style="font-size:34px">{{ headline }}</h1>
-              <p class="text-white/85 max-w-[440px] leading-[1.7]" style="font-size:14px">{{ intro }}</p>
-              <button type="button" class="text-white rounded-xl px-5 py-2.5 text-[13.5px] font-bold shadow-lg" :style="{ background: ctaColor }">View open roles →</button>
+            <section class="relative flex flex-col items-start justify-center gap-4 overflow-hidden px-6" style="padding-top:56px;padding-bottom:56px;min-height:300px">
+              <img v-if="coverUrl" :src="coverUrl" alt="" class="absolute inset-0 h-full w-full object-cover">
+              <div class="absolute inset-0" :style="{ background: heroBackground, opacity: coverUrl ? 0.82 : 1 }" />
+              <span class="relative bg-white/15 backdrop-blur text-white text-[11.5px] font-semibold px-3 py-1 rounded-full">We're hiring · {{ publishedJobs.length }} open roles</span>
+              <h1 class="relative font-extrabold text-white leading-[1.18] max-w-[560px]" style="font-size:34px">{{ headline }}</h1>
+              <p class="relative text-white/85 max-w-[440px] leading-[1.7]" style="font-size:14px">{{ intro }}</p>
+              <button type="button" class="relative text-white rounded-xl px-5 py-2.5 text-[13.5px] font-bold shadow-lg" :style="{ background: ctaColor }">View open roles →</button>
             </section>
 
             <!-- Opportunities -->
@@ -708,7 +703,7 @@ const testimonialsGridClass = computed(() => (previewMode.value === 'desktop' ? 
 
             <!-- Culture video -->
             <section class="px-6 pb-8">
-              <div class="font-extrabold text-[var(--brand-preview-text-heading)] mb-3" style="font-size:22px">Life at Acme Talent</div>
+              <div class="font-extrabold text-[var(--brand-preview-text-heading)] mb-3" style="font-size:22px">Life at {{ companyName }}</div>
               <div class="relative grid aspect-video w-full place-items-center overflow-hidden rounded-2xl" :style="{ background: videoBackground }">
                 <div class="grid size-14 place-items-center rounded-full bg-white/90 shadow-xl">
                   <Play class="w-[22px] h-[22px] text-[var(--brand-preview-text-heading)] fill-current" />
@@ -762,7 +757,7 @@ const testimonialsGridClass = computed(() => (previewMode.value === 'desktop' ? 
 
             <!-- Footer -->
             <footer class="border-t border-black/5 px-6 py-5 text-center">
-              <div class="text-[13px] font-medium" :style="{ color: headerColor }">Acme Talent</div>
+              <div class="text-[13px] font-medium" :style="{ color: headerColor }">{{ companyName }}</div>
               <div class="text-[11.5px] text-[var(--brand-preview-text-muted)]">{{ previewDomain }} · © 2026 · Powered by Recruitera</div>
             </footer>
           </div>
@@ -860,5 +855,13 @@ const testimonialsGridClass = computed(() => (previewMode.value === 'desktop' ? 
         </DialogFooter>
       </DialogScrollContent>
     </Dialog>
+
+    <SettingsConfirmDialog
+      v-model:open="removeCoverConfirmOpen"
+      title="Remove cover image?"
+      description="The career site hero will fall back to your brand colors until you upload a new one."
+      confirm-label="Remove"
+      @confirm="confirmRemoveCover"
+    />
   </div>
 </template>

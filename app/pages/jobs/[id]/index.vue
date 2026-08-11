@@ -38,6 +38,7 @@ import CandidatesFilters from '~/components/candidates/CandidatesFilters.vue'
 import CandidatePipelineCard from '~/components/jobs/CandidatePipelineCard.vue'
 import PipelineScreeningView from '~/components/jobs/pipeline/PipelineScreeningView.vue'
 import ErrorBoundary from '~/components/ErrorBoundary.vue'
+import JobReportsTab from '~/components/reports/JobReportsTab.vue'
 import { BrandPageTitle, BrandSearchBar } from '~/components/brand'
 import { useJobs } from '~/composables/useJobs'
 import { useJobPipeline } from '~/composables/useJobPipeline'
@@ -45,6 +46,11 @@ import { useJobActivity, type JobActivityKind } from '~/composables/useJobActivi
 import { useJobNotes, type NoteVisibility } from '~/composables/useJobNotes'
 import { useJobReferrals, REFERRAL_SOURCE_TAGS } from '~/composables/useJobReferrals'
 import { useCandidates } from '~/composables/useCandidates'
+import { useTeamMembers } from '~/composables/useTeam'
+import { useSmartDistributeConfig } from '~/composables/useSmartDistribute'
+import { useActiveFilters } from '~/composables/useActiveFilters'
+import CandidatesBulkAssignModal from '~/components/candidates/CandidatesBulkAssignModal.vue'
+import { usePreviewRoleStore } from '~/stores/previewRole.store'
 import { refDebounced, useLocalStorage } from '@vueuse/core'
 import type { Job, PipelineStage } from '~/types'
 
@@ -212,7 +218,11 @@ async function copyReferralLink(id: string, url: string) {
 function sourceTagLabel(v: string) {
   return REFERRAL_SOURCE_TAGS.find(t => t.value === v)?.label ?? v
 }
-const sharedOn = ref(false)
+// Both default ON — matches how the board always looked before this toggle
+// had a real effect (everyone visible). A recruiter narrows to just their
+// own by turning "Shared with me" off, rather than opening a job and
+// finding an empty board because ownership doesn't happen to include them.
+const sharedOn = ref(true)
 
 // Share popover state — computed job URL and copy-to-clipboard flag.
 const jobUrl = computed(() =>
@@ -237,11 +247,105 @@ const debouncedSearch = refDebounced(searchInput, 250)
 const filtersPage = ref(1)
 const filtersPerPage = ref(30)
 
+// Shared Smart Distribute context — the Assigned Recruiter filter catalog
+// entry (Filters tab), the bulk-assign button + badges (Pipeline tab) all
+// need "who's in this job's pool" and "is Auto-Distribute even on".
+const { data: teamData, isLoading: teamPending } = useTeamMembers()
+const { data: distConfig, isLoading: distConfigPending } = useSmartDistributeConfig(jobId)
+const previewRoleStore = usePreviewRoleStore()
+const poolRecruiters = computed(() => {
+  const roster = teamData.value?.data ?? []
+  return (distConfig.value?.recruiters ?? [])
+    .map(r => roster.find(m => m.id === r.teamMemberId))
+    .filter((m): m is NonNullable<typeof m> => !!m)
+})
+const smartDistributeOn = computed(() => !!distConfig.value?.enabled)
+const assignedRecruiterOptions = computed(() => poolRecruiters.value.map(r => ({ value: r.id, label: r.name })))
+// CandidatesFilters seeds "Assigned Recruiter" into the active filter set
+// once, in its own onMounted — it needs the pool to already be final at
+// that point (a second push after an async prop update was observed to
+// race the URL and get silently dropped), so its mount waits here.
+const filtersPanelReady = computed(() => !teamPending.value && !distConfigPending.value)
+
+// Assigned Recruiter filter (E2) now lives in the normal filter-catalog
+// panel (CandidatesFilters.vue seeds it into the active set once the pool
+// is known) instead of a bespoke control — read its live value here to
+// build the actual query.
+const activeFilters = useActiveFilters()
+const assignedRecruiterActiveFilter = computed(() => activeFilters.get('assigned-recruiter'))
+watch(() => assignedRecruiterActiveFilter.value?.values, () => { filtersPage.value = 1 })
+
+// Lightweight, unpaginated fetch of this job's candidates purely to read
+// assignedRecruiterId — the Pipeline board's own PipelineCandidate fixture
+// doesn't carry ownership, but ids match real candidate rows (see
+// useJobPipeline.ts), so a cheap cross-reference is enough for badges.
+const { data: allJobCandidatesData } = useCandidates(computed(() => ({ job: job.value?.title, perPage: 999 })))
+const assignedRecruiterIdByCandidateId = computed(() => {
+  const map: Record<string, string | null | undefined> = {}
+  for (const c of allJobCandidatesData.value?.data ?? []) map[c.id] = c.assignedRecruiterId
+  return map
+})
+function assignedRecruiterFor(candidateId: string) {
+  if (!smartDistributeOn.value) return undefined
+  const recruiterId = assignedRecruiterIdByCandidateId.value[candidateId]
+  if (!recruiterId) return null
+  const m = poolRecruiters.value.find(r => r.id === recruiterId)
+    ?? (teamData.value?.data ?? []).find(r => r.id === recruiterId)
+  if (!m) return null
+  const parts = m.name.trim().split(/\s+/)
+  const initials = ((parts[0]?.[0] ?? '') + (parts.length > 1 ? parts[parts.length - 1]![0] : '')).toUpperCase()
+  return { name: m.name, initials, bg: m.avatarBg, color: m.avatarText }
+}
+
+// Recruiter Focus Mode (E2) — "My candidates" / "Shared with me" toggles
+// existed as decorative UI before; wire them to the same ownership data the
+// filters/badges above already use. Only meaningful once Smart Distribute is
+// on for the job — otherwise there's no ownership to focus on, so every
+// candidate stays visible regardless of toggle state. The Pipeline board's
+// PipelineCandidate fixture only cross-references ALL_CANDIDATES by id for
+// jobs where the two happen to overlap (see assignedRecruiterFor above) — a
+// candidate id absent from that map is "unresolvable," not "not mine," so it
+// always stays visible rather than silently emptying the whole board.
+const visibleStages = computed(() => {
+  if (!smartDistributeOn.value) return stages.value
+  return stages.value.map(s => ({
+    ...s,
+    candidates: s.candidates.filter((c) => {
+      const recruiterId = assignedRecruiterIdByCandidateId.value[c.id]
+      if (recruiterId === undefined) return true
+      const isMine = recruiterId === previewRoleStore.viewerTeamMemberId
+      return (myOn.value && isMine) || (sharedOn.value && !isMine)
+    }),
+  }))
+})
+
+// Bulk "Assign to recruiters" from the Pipeline board's own selection —
+// lives in the "More…" menu (matching CandidatesToolbar.vue's placement)
+// rather than a standalone button, so it stays visible-but-disabled with
+// an explanation instead of silently vanishing when gated off.
+const pipelineBulkAssignOpen = ref(false)
+const pipelineAssignToast = ref<string | null>(null)
+const pipelineCanBulkAssign = computed(() => smartDistributeOn.value && previewRoleStore.canManageSmartDistribute)
+const pipelineBulkAssignDisabledReason = computed(() => {
+  if (!smartDistributeOn.value) return 'Auto-Distribute is off for this job'
+  if (!previewRoleStore.canManageSmartDistribute) return "You don't have permission to manage Smart Distribute"
+  return ''
+})
+function onPipelineBulkAssigned() {
+  const n = selectedCount.value
+  pipelineBulkAssignOpen.value = false
+  clearSelection()
+  pipelineAssignToast.value = `${n} candidate${n === 1 ? '' : 's'} assigned`
+  setTimeout(() => { pipelineAssignToast.value = null }, 2600)
+}
+
 const candidatesFilters = computed<Record<string, string | number | undefined>>(() => ({
-  job:     job.value?.title,
-  search:  debouncedSearch.value || undefined,
-  page:    filtersPage.value,
-  perPage: filtersPerPage.value,
+  job:          job.value?.title,
+  search:       debouncedSearch.value || undefined,
+  assignedTo:   assignedRecruiterActiveFilter.value?.values?.length ? assignedRecruiterActiveFilter.value.values.join(',') : undefined,
+  assignedToOp: assignedRecruiterActiveFilter.value?.op,
+  page:         filtersPage.value,
+  perPage:      filtersPerPage.value,
 }))
 
 const { data: candidatesData, isFetching: candidatesFetching } = useCandidates(candidatesFilters)
@@ -454,6 +558,15 @@ function clearSelection() { selectedIds.value = new Set() }
                   <Download class="w-4 h-4 text-[var(--brand-teal)]" stroke-width="1.7" />
                   Export As CSV
                 </DropdownMenuItem>
+                <DropdownMenuItem
+                  class="flex items-center gap-3 px-3 py-2 text-[14px] cursor-pointer"
+                  :disabled="!pipelineCanBulkAssign"
+                  :title="pipelineBulkAssignDisabledReason"
+                  @click="pipelineCanBulkAssign && (pipelineBulkAssignOpen = true)"
+                >
+                  <UserPlus class="w-4 h-4 text-[var(--brand-teal)]" stroke-width="1.7" />
+                  Assign to recruiters
+                </DropdownMenuItem>
                 <DropdownMenuItem class="flex items-center gap-3 px-3 py-2 text-[14px] cursor-pointer">
                   <Ban class="w-4 h-4 text-[var(--brand-teal)]" stroke-width="1.7" />
                   Disqualify
@@ -593,7 +706,7 @@ function clearSelection() { selectedIds.value = new Set() }
         <div v-if="activeTab === 'Pipeline' && pipelineViewMode === 'kanban'" class="flex-1 min-h-0 flex gap-4 overflow-x-auto overflow-y-hidden pb-4 items-stretch">
 
           <!-- Collapsed rail — 40px, rotated label + dot + count -->
-          <template v-for="stage in stages" :key="stage.key">
+          <template v-for="stage in visibleStages" :key="stage.key">
             <section
               v-if="collapsedStages.has(stage.key)"
               class="flex-none w-10 flex flex-col items-center gap-2 rounded-[14px] py-3 min-h-[420px] bg-[var(--brand-surface-listview)]"
@@ -711,10 +824,12 @@ function clearSelection() { selectedIds.value = new Set() }
                   :move-targets="moveTargetsFor(stage.key)"
                   :selected="isSelected(cand.id)"
                   :dragging="drag?.id === cand.id"
+                  :assigned-recruiter="assignedRecruiterFor(cand.id)"
                   @toggle-select="toggleCandidate"
                   @move="(id, fromKey, toKey) => onMove(id, fromKey, toKey)"
                   @drag-start="(id, fromKey, e) => onDragStart(id, fromKey, e)"
                   @drag-end="onDragEnd"
+                  @open-profile="(id) => navigateTo({ path: `/candidates/${id}`, query: { from: route.fullPath } })"
                 />
 
                 <div v-if="!stage.candidates.length" class="text-center text-[12.5px] text-[var(--brand-text-faint)] py-8">
@@ -734,7 +849,7 @@ function clearSelection() { selectedIds.value = new Set() }
           :disqualified-count="disqualifiedCount"
           @toggle-select="toggleCandidate"
           @move="(id, from, to) => onMove(id, from, to)"
-          @open-full="(id) => navigateTo(`/candidates/${id}`)"
+          @open-full="(id) => navigateTo({ path: `/candidates/${id}`, query: { from: route.fullPath } })"
         />
 
         <!-- ─────────── FILTERS TAB — candidates scoped to this job ─────────── -->
@@ -746,7 +861,11 @@ function clearSelection() { selectedIds.value = new Set() }
              propagate automatically. -->
         <div v-else-if="activeTab === 'Filters'" class="flex-1 min-h-0 flex overflow-hidden -mx-7 -mb-6">
           <ErrorBoundary>
-            <CandidatesFilters />
+            <CandidatesFilters
+              v-if="filtersPanelReady"
+              :assigned-recruiter-options="smartDistributeOn ? assignedRecruiterOptions : undefined"
+            />
+            <div v-else class="w-[288px] shrink-0 h-full rounded-tl-[22px] bg-white border-t border-l border-r border-[var(--brand-border)]" />
           </ErrorBoundary>
 
           <div class="flex-1 flex flex-col min-w-0 overflow-hidden bg-[var(--brand-surface-white)] border-t border-[var(--brand-border)]">
@@ -769,6 +888,7 @@ function clearSelection() { selectedIds.value = new Set() }
                 :current-page="filtersPage"
                 :total-pages="totalPages"
                 :per-page="filtersPerPage"
+                :job-id="jobId"
                 @page-change="onFiltersPageChange"
               />
             </div>
@@ -1143,11 +1263,36 @@ function clearSelection() { selectedIds.value = new Set() }
           </Dialog>
         </div>
 
+        <!-- ─────────── REPORTS TAB ─────────── -->
+        <JobReportsTab v-else-if="activeTab === 'Reports'" :job-id="jobId" />
+
         <!-- Other tabs — placeholder while we build them -->
         <div v-else class="flex-1 flex items-center justify-center text-[13.5px] text-[var(--brand-text-quiet)]">
           {{ activeTab }} — coming soon
         </div>
       </template>
     </div>
+
+    <!-- Bulk "Assign to recruiters" from the Pipeline board (E5) -->
+    <CandidatesBulkAssignModal
+      v-model:open="pipelineBulkAssignOpen"
+      :job-id="jobId"
+      :candidate-ids="Array.from(selectedIds)"
+      @assigned="onPipelineBulkAssigned"
+    />
+    <Transition
+      enter-active-class="transition duration-200 ease-out"
+      enter-from-class="opacity-0 translate-y-2"
+      leave-active-class="transition duration-150 ease-in"
+      leave-to-class="opacity-0 translate-y-2"
+    >
+      <div
+        v-if="pipelineAssignToast"
+        class="fixed bottom-7 left-1/2 -translate-x-1/2 z-[1000] flex items-center gap-2.5 rounded-[12px] px-5 py-3.5 text-[13.5px] font-semibold shadow-[0_8px_32px_rgba(0,0,0,0.22)]"
+        style="background: var(--brand-toast-success-bg); color: var(--brand-toast-success-text)"
+      >
+        {{ pipelineAssignToast }}
+      </div>
+    </Transition>
   </div>
 </template>

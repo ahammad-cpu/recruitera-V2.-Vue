@@ -24,7 +24,10 @@ import SortByDropdown from './SortByDropdown.vue'
 import CandidatesColumnToggle from './CandidatesColumnToggle.vue'
 import AddCandidatesModal from './AddCandidatesModal.vue'
 import CandidateBulkEmailModal from './CandidateBulkEmailModal.vue'
+import CandidatesBulkAssignModal from './CandidatesBulkAssignModal.vue'
 import { useCandidatesStore } from '~/stores/candidates.store'
+import { useSmartDistributeConfig } from '~/composables/useSmartDistribute'
+import { usePreviewRoleStore } from '~/stores/previewRole.store'
 
 const props = defineProps<{
   pageIds: string[]      // ids of rows currently on the page
@@ -32,11 +35,39 @@ const props = defineProps<{
   currentPage: number
   totalPages: number
   perPage: number
+  /** Job context (E5's "Assign to recruiters" only applies inside a job
+   * with Smart Distribute on — omit on the global /candidates page). */
+  jobId?: string | null
 }>()
 
 const emit = defineEmits<{ pageChange: [n: number] }>()
 
 const store = useCandidatesStore()
+
+// "Assign to recruiters" (E5) — only meaningful with a job context whose
+// Auto-Distribute is on. useSmartDistributeConfig always needs a jobId, so
+// fall back to a harmless placeholder when there isn't one; the computed
+// below is what actually gates visibility.
+const { data: smartDistributeConfig } = useSmartDistributeConfig(computed(() => props.jobId ?? '__none__'))
+const previewRoleStore = usePreviewRoleStore()
+const canBulkAssign = computed(() =>
+  !!props.jobId && !!smartDistributeConfig.value?.enabled && previewRoleStore.canManageSmartDistribute,
+)
+const bulkAssignDisabledReason = computed(() => {
+  if (!props.jobId) return 'Only available on a job with Auto-Distribute on'
+  if (!smartDistributeConfig.value?.enabled) return 'Auto-Distribute is off for this job'
+  if (!previewRoleStore.canManageSmartDistribute) return "You don't have permission to manage Smart Distribute"
+  return ''
+})
+const bulkAssignOpen = ref(false)
+const assignToast = ref<string | null>(null)
+function onBulkAssigned() {
+  const n = store.selectedCount
+  bulkAssignOpen.value = false
+  store.clearSelection()
+  assignToast.value = `${n} candidate${n === 1 ? '' : 's'} assigned`
+  setTimeout(() => { assignToast.value = null }, 2600)
+}
 
 const allOnPageSelected = computed(() =>
   props.pageIds.length > 0 && props.pageIds.every(id => store.selectedIds.includes(id)),
@@ -110,7 +141,11 @@ const bulkEmailOpen = ref(false)
           <DropdownMenuItem><RotateCcw class="w-3.5 h-3.5 mr-2" />Requalify</DropdownMenuItem>
           <DropdownMenuItem @click="bulkEmailOpen = true"><Mail class="w-3.5 h-3.5 mr-2" />Send email</DropdownMenuItem>
           <DropdownMenuItem><MessageCircle class="w-3.5 h-3.5 mr-2" />Send WhatsApp</DropdownMenuItem>
-          <DropdownMenuItem><UserPlus class="w-3.5 h-3.5 mr-2" />Assign</DropdownMenuItem>
+          <DropdownMenuItem
+            :disabled="!canBulkAssign"
+            :title="bulkAssignDisabledReason"
+            @click="canBulkAssign && (bulkAssignOpen = true)"
+          ><UserPlus class="w-3.5 h-3.5 mr-2" />Assign to recruiters</DropdownMenuItem>
           <DropdownMenuItem><Minus class="w-3.5 h-3.5 mr-2" />Remove</DropdownMenuItem>
           <DropdownMenuItem><ArrowUpRight class="w-3.5 h-3.5 mr-2" />Add source</DropdownMenuItem>
           <DropdownMenuItem><Bookmark class="w-3.5 h-3.5 mr-2" />Follow</DropdownMenuItem>
@@ -175,5 +210,30 @@ const bulkEmailOpen = ref(false)
 
     <!-- Bulk email composer (shared EmailComposer) -->
     <CandidateBulkEmailModal v-model:open="bulkEmailOpen" :count="store.selectedCount" @sent="store.clearSelection()" />
+
+    <!-- Bulk "Assign to recruiters" (E5) -->
+    <CandidatesBulkAssignModal
+      v-if="jobId"
+      v-model:open="bulkAssignOpen"
+      :job-id="jobId"
+      :candidate-ids="store.selectedIds"
+      @assigned="onBulkAssigned"
+    />
+
+    <Transition
+      enter-active-class="transition duration-200 ease-out"
+      enter-from-class="opacity-0 translate-y-2"
+      leave-active-class="transition duration-150 ease-in"
+      leave-to-class="opacity-0 translate-y-2"
+    >
+      <div
+        v-if="assignToast"
+        class="fixed bottom-7 left-1/2 -translate-x-1/2 z-[1000] flex items-center gap-2.5 rounded-[12px] px-5 py-3.5 text-[13.5px] font-semibold shadow-[0_8px_32px_rgba(0,0,0,0.22)]"
+        style="background: var(--brand-toast-success-bg); color: var(--brand-toast-success-text)"
+      >
+        <CheckSquare class="w-4 h-4 shrink-0" stroke-width="2.5" />
+        {{ assignToast }}
+      </div>
+    </Transition>
   </div>
 </template>

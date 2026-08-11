@@ -2,7 +2,7 @@ import { http, HttpResponse } from 'msw'
 
 const stubRoutes = [
   '/api/jobs', '/api/interviews', '/api/offers',
-  '/api/talent-pools', '/api/evaluations', '/api/questionnaires',
+  '/api/evaluations', '/api/questionnaires',
   '/api/approvals', '/api/requisitions', '/api/workforce',
   '/api/referrals', '/api/distribution', '/api/analytics',
   '/api/whatsapp', '/api/conflicts', '/api/career-site',

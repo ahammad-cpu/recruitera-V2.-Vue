@@ -1,6 +1,9 @@
 <!--
-  Round initials avatar. Defaults to the brand teal/lime combo; pass `bg`/`color`
+  Round initials avatar. Teal ground with white initials by default; pass `bg`/`color`
   to override per-instance (e.g. a per-member palette in a team table).
+
+  Initials are white, not lime: lime on deep teal is low-contrast at avatar sizes and
+  reads as a smudge rather than two letters. The prototypes use white throughout.
 -->
 <script setup lang="ts">
 withDefaults(defineProps<{
@@ -27,7 +30,7 @@ const sizeClasses: Record<string, string> = {
     :class="sizeClasses[size]"
     :style="{
       background: bg ?? 'var(--brand-teal)',
-      color: color ?? 'var(--brand-lime)',
+      color: color ?? 'var(--brand-avatar-text)',
     }"
   >
     {{ initials }}

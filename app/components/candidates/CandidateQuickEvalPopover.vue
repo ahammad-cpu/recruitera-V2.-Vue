@@ -8,7 +8,7 @@ import { ThumbsUp, Star } from 'lucide-vue-next'
 import { Popover, PopoverContent, PopoverTrigger } from '~/components/ui/popover'
 import { BrandButton } from '~/components/brand'
 
-const props = defineProps<{ candidateName: string }>()
+const props = defineProps<{ candidateName: string; disabled?: boolean }>()
 
 const open = ref(false)
 const rating = ref(0)
@@ -32,8 +32,12 @@ watch(open, (v) => { if (!v) { rating.value = 0; hover.value = 0; comment.value 
 
 <template>
   <Popover v-model:open="open">
-    <PopoverTrigger as-child>
-      <BrandButton variant="ghost" size="md" class="!text-[var(--brand-text)] !text-[15px] !font-medium !px-3 !h-10">
+    <PopoverTrigger as-child :disabled="props.disabled">
+      <BrandButton
+        variant="ghost" size="md" :disabled="props.disabled"
+        :title="props.disabled ? 'Read-only — assigned to another recruiter' : undefined"
+        class="!text-[var(--brand-text)] !text-[15px] !font-medium !px-3 !h-10 disabled:opacity-60 disabled:cursor-not-allowed"
+      >
         <ThumbsUp class="!w-[18px] !h-[18px] text-[var(--brand-text)]" stroke-width="1.6" />Evaluate
       </BrandButton>
     </PopoverTrigger>

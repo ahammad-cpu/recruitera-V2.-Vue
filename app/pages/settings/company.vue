@@ -2,6 +2,7 @@
 import { Image, Pencil, Upload } from 'lucide-vue-next'
 import { useCompany } from '~/composables/useCompany'
 import SettingsPageHeader from '~/components/settings/SettingsPageHeader.vue'
+import SettingsConfirmDialog from '~/components/settings/SettingsConfirmDialog.vue'
 import { BrandButton } from '~/components/brand'
 import type { CompanyInfo } from '~/types'
 
@@ -54,6 +55,11 @@ function onLogoChange(e: Event) {
   const file = (e.target as HTMLInputElement).files?.[0]
   if (!file || !company.value) return
   company.value.logoUrl = URL.createObjectURL(file)
+}
+const removeLogoConfirmOpen = ref(false)
+function confirmRemoveLogo() {
+  if (company.value) company.value.logoUrl = null
+  removeLogoConfirmOpen.value = false
 }
 
 // ─────────────── Default SEO image upload (also unwired in ground truth) ───────────────
@@ -195,11 +201,21 @@ function onSeoImageChange(e: Event) {
           <Image v-else class="w-7 h-7 text-[var(--brand-border-mid)]" />
         </div>
         <div>
-          <label class="inline-flex items-center gap-1.5 mb-1.5 px-3.5 py-2 rounded-[9px] border border-[var(--brand-border)] bg-[var(--brand-surface-white)] text-[13.5px] font-semibold text-[var(--brand-text)] outline-none cursor-pointer hover:bg-[var(--brand-lime-tint-hover)] transition-colors">
-            <Upload class="w-3.5 h-3.5" />
-            Upload logo
-            <input type="file" accept="image/png,image/jpeg,image/svg+xml" class="hidden" @change="onLogoChange">
-          </label>
+          <div class="mb-1.5 flex items-center gap-2">
+            <label class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-[9px] border border-[var(--brand-border)] bg-[var(--brand-surface-white)] text-[13.5px] font-semibold text-[var(--brand-text)] outline-none cursor-pointer hover:bg-[var(--brand-lime-tint-hover)] transition-colors">
+              <Upload class="w-3.5 h-3.5" />
+              Upload logo
+              <input type="file" accept="image/png,image/jpeg,image/svg+xml" class="hidden" @change="onLogoChange">
+            </label>
+            <button
+              v-if="company.logoUrl"
+              type="button"
+              class="text-[13px] font-semibold text-[var(--brand-settings-danger)] hover:underline"
+              @click="removeLogoConfirmOpen = true"
+            >
+              Remove
+            </button>
+          </div>
           <div class="text-[12px] text-[var(--brand-text-quiet)]">PNG, JPG or SVG · max 5 MB</div>
         </div>
       </div>
@@ -238,5 +254,13 @@ function onSeoImageChange(e: Event) {
         </div>
       </div>
     </template>
+
+    <SettingsConfirmDialog
+      v-model:open="removeLogoConfirmOpen"
+      title="Remove company logo?"
+      description="Navigation across Recruitera products and your Career Site will fall back to your company's initials until you upload a new one."
+      confirm-label="Remove"
+      @confirm="confirmRemoveLogo"
+    />
   </div>
 </template>
