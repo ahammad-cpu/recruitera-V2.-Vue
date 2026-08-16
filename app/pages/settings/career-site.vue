@@ -55,6 +55,7 @@ import { Switch } from '~/components/ui/switch'
 import { Input } from '~/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/ui/select'
 import { Dialog, DialogScrollContent, DialogHeader, DialogTitle, DialogFooter } from '~/components/ui/dialog'
+import { useCareerSite } from '~/composables/useCareerSite'
 
 definePageMeta({ layout: 'settings' })
 
@@ -223,11 +224,11 @@ function _rgb(hex: string): [number, number, number] {
   return [(n >> 16) & 255, (n >> 8) & 255, n & 255]
 }
 function _lum(hex: string) {
-  const a = _rgb(hex).map((v) => {
+  const [r, g, b] = _rgb(hex).map((v) => {
     const x = v / 255
     return x <= 0.03928 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4
-  })
-  return 0.2126 * a[0] + 0.7152 * a[1] + 0.0722 * a[2]
+  }) as [number, number, number]
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b
 }
 function contrast(a: string, b: string) {
   if (!/^#[0-9a-fA-F]{6}$/.test(a) || !/^#[0-9a-fA-F]{6}$/.test(b)) return 0
@@ -237,6 +238,27 @@ function contrast(a: string, b: string) {
 const cPrimaryOnWhite = computed(() => contrast(primaryColor.value, '#ffffff'))
 const cHeaderOnWhite = computed(() => contrast(headerColor.value, '#ffffff'))
 const cLabelOnBtn = computed(() => contrast('#ffffff', btnColor.value))
+
+// Sync builder edits → shared career-site store so the public career pages
+// (Home / Opportunities / Job) reflect changes made here live.
+const _cs = useCareerSite()
+watchEffect(() => {
+  _cs.primaryColor.value = primaryColor.value
+  _cs.headerColor.value = headerColor.value
+  _cs.btnColor.value = btnColor.value
+  _cs.ctaColor.value = ctaColor.value
+  _cs.font.value = font.value
+  _cs.headline.value = headline.value
+  _cs.intro.value = intro.value
+  _cs.videoUrl.value = videoUrl.value
+  _cs.values.value = values.value.map(v => ({ ...v }))
+  _cs.testimonials.value = testimonials.value.map(t => ({ ...t }))
+  _cs.employeeDomain.value = employeeDomain.value
+  _cs.subdomain.value = subdomain.value
+  _cs.forEmployeesOn.value = forEmployeesOn.value
+  _cs.generalApplicationOn.value = generalApplicationOn.value
+  _cs.published.value = published.value
+})
 const cBtnOnHero = computed(() => contrast(btnColor.value, primaryColor.value))
 
 // ─────────────── Save / dirty / discard ───────────────
