@@ -259,6 +259,19 @@ watchEffect(() => {
   _cs.generalApplicationOn.value = generalApplicationOn.value
   _cs.published.value = published.value
 })
+// Logo / cover uploads write straight to the shared store (data URLs).
+const ccLogo = _cs.logoUrl
+const ccCover = _cs.coverUrl
+function onLogoUpload(e: Event) {
+  const f = (e.target as HTMLInputElement).files?.[0]
+  if (!f) return
+  const r = new FileReader(); r.onload = () => { ccLogo.value = String(r.result) }; r.readAsDataURL(f)
+}
+function onCoverUpload(e: Event) {
+  const f = (e.target as HTMLInputElement).files?.[0]
+  if (!f) return
+  const r = new FileReader(); r.onload = () => { ccCover.value = String(r.result) }; r.readAsDataURL(f)
+}
 const cBtnOnHero = computed(() => contrast(btnColor.value, primaryColor.value))
 
 // ─────────────── Save / dirty / discard ───────────────
@@ -392,22 +405,26 @@ const testimonialsGridClass = computed(() => (previewMode.value === 'desktop' ? 
               <div class="space-y-1.5">
                 <div class="text-[12px] font-semibold text-[var(--brand-text-secondary)]">Logo</div>
                 <label class="group relative grid size-16 cursor-pointer place-items-center overflow-hidden rounded-lg border border-[var(--brand-border)] bg-[var(--brand-canvas)] transition-colors hover:border-[var(--brand-teal)]/60">
-                  <ImageIcon class="w-[20px] h-[20px] text-[var(--brand-icon-muted)]" />
+                  <img v-if="ccLogo" :src="ccLogo" alt="Logo" class="absolute inset-0 h-full w-full object-contain p-1">
+                  <ImageIcon v-else class="w-[20px] h-[20px] text-[var(--brand-icon-muted)]" />
                   <div class="absolute inset-0 grid place-items-center bg-black/45 opacity-0 group-hover:opacity-100 transition-opacity">
                     <Upload class="w-[16px] h-[16px] text-white" />
                   </div>
-                  <input type="file" accept="image/png,image/jpeg,image/svg+xml" class="sr-only">
+                  <input type="file" accept="image/png,image/jpeg,image/svg+xml" class="sr-only" @change="onLogoUpload">
                 </label>
               </div>
               <div class="flex-1 space-y-1.5">
                 <div class="text-[12px] font-semibold text-[var(--brand-text-secondary)]">Cover image <span class="text-[var(--brand-text-faint)] font-normal">(4:1)</span></div>
                 <label class="group relative flex h-16 w-full cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg border border-[var(--brand-border)] bg-[var(--brand-canvas)] transition-colors hover:border-[var(--brand-teal)]/60">
-                  <Upload class="w-[15px] h-[15px] text-[var(--brand-icon-muted)]" />
-                  <span class="text-[13px] text-[var(--brand-text-muted)]">Upload cover</span>
+                  <img v-if="ccCover" :src="ccCover" alt="Cover" class="absolute inset-0 h-full w-full object-cover">
+                  <template v-else>
+                    <Upload class="w-[15px] h-[15px] text-[var(--brand-icon-muted)]" />
+                    <span class="text-[13px] text-[var(--brand-text-muted)]">Upload cover</span>
+                  </template>
                   <div class="absolute inset-0 grid place-items-center bg-black/45 opacity-0 group-hover:opacity-100 transition-opacity">
                     <Upload class="w-[16px] h-[16px] text-white" />
                   </div>
-                  <input type="file" accept="image/png,image/jpeg" class="sr-only">
+                  <input type="file" accept="image/png,image/jpeg" class="sr-only" @change="onCoverUpload">
                 </label>
               </div>
             </div>

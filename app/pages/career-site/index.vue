@@ -55,9 +55,9 @@ function scrollToJobs() { document.getElementById('jobs')?.scrollIntoView({ beha
         <div class="rounded-[22px] bg-white border border-[#eceef1] shadow-[0_28px_70px_rgba(15,23,42,0.12)] p-7 md:p-10">
           <div class="flex flex-wrap items-end justify-between gap-4">
             <div>
-              <div class="text-[13px] font-extrabold uppercase tracking-[0.12em]" :style="{ color: 'var(--cc-primary)' }">{{ companyName }}</div>
-              <h2 class="mt-1.5 text-[clamp(1.7rem,3.5vw,2.4rem)] font-extrabold tracking-[-0.02em]" :style="{ color: 'var(--cc-header)' }">Discover our featured jobs</h2>
-              <p class="mt-1 text-[14px] text-[#8a919c]">Handpicked roles — find your next career move. {{ openRoles.length }} open now.</p>
+              <div class="text-[clamp(1.3rem,2.8vw,1.7rem)] font-bold tracking-[-0.01em]" :style="{ color: 'var(--cc-primary)' }">{{ companyName }}</div>
+              <h2 class="mt-2 text-[clamp(1.35rem,3vw,1.9rem)] font-semibold" :style="{ color: 'var(--cc-header)' }">Discover our featured jobs</h2>
+              <p class="mt-2 text-[14.5px] text-[#6b7280] max-w-[490px]">Handpicked opportunities that match top talent with exciting roles — find your next career move here.</p>
             </div>
             <NuxtLink to="/career-site/opportunities" class="inline-flex items-center gap-1.5 h-10 px-4 rounded-[11px] border-[1.5px] text-[13.5px] font-semibold transition hover:bg-[color-mix(in_srgb,var(--cc-primary)_8%,white)]" :style="{ borderColor: 'var(--cc-primary)', color: 'var(--cc-primary)' }">View all <ArrowRight class="w-4 h-4" stroke-width="2" /></NuxtLink>
           </div>
@@ -97,8 +97,9 @@ function scrollToJobs() { document.getElementById('jobs')?.scrollIntoView({ beha
       </div>
       <div class="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <div v-for="(v, i) in values" :key="i" class="rounded-[18px] border border-[#eceef1] bg-white p-7 text-center transition hover:shadow-[0_16px_40px_rgba(15,23,42,0.06)]">
-          <div class="w-14 h-14 mx-auto rounded-[16px] grid place-items-center" :style="{ background: 'color-mix(in srgb, var(--cc-primary) 12%, white)', color: 'var(--cc-primary)' }">
-            <component :is="valueIcon(v.icon)" class="w-6 h-6" stroke-width="1.8" />
+          <div class="w-[62px] h-[64px] mx-auto relative grid place-items-center">
+            <svg class="absolute inset-0 w-full h-full" viewBox="0 0 90.96 93.4" xmlns="http://www.w3.org/2000/svg"><path d="M73.11,12.33C51.41-9.1,32.93.65,29.72,17S-3.37,36.57.31,55.85s43.87,7.84,43.87,25.32,46.46,16.87,46.46-6S94.81,33.77,73.11,12.33Z" :fill="'var(--cc-primary)'" /></svg>
+            <component :is="valueIcon(v.icon)" class="relative w-6 h-6 text-white" stroke-width="1.9" />
           </div>
           <h3 class="mt-4 text-[17px] font-bold" :style="{ color: 'var(--cc-header)' }">{{ v.name }}</h3>
           <p class="mt-1.5 text-[14px] leading-relaxed text-[#6b7280]">{{ v.desc }}</p>
