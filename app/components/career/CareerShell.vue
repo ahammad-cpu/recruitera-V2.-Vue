@@ -9,7 +9,7 @@ import { Globe } from 'lucide-vue-next'
 import { useCareerSite } from '~/composables/useCareerSite'
 import { useCompany } from '~/composables/useCompany'
 
-const { companyName: nameProp } = defineProps<{ companyName?: string }>()
+const { companyName: nameProp, heroOverlap = false } = defineProps<{ companyName?: string; heroOverlap?: boolean }>()
 const { themeVars, forEmployeesOn, logoUrl } = useCareerSite()
 const { data: company } = useCompany()
 const companyName = computed(() => nameProp || company.value?.name || 'Your Company')
@@ -18,9 +18,10 @@ const isHome = computed(() => route.path === '/career-site')
 </script>
 
 <template>
-  <div class="cc-root min-h-screen bg-white text-[color-mix(in_srgb,var(--cc-header)_92%,transparent)]" :style="themeVars">
-    <!-- Header — floating bar in the company primary color -->
-    <header class="sticky top-0 z-40 pt-3 bg-white">
+  <div class="cc-root relative min-h-screen bg-white text-[color-mix(in_srgb,var(--cc-header)_92%,transparent)]" :style="themeVars">
+    <!-- Header — floating bar in the company primary color.
+         heroOverlap: sits transparently over a full-bleed hero (cover shows behind). -->
+    <header class="z-40 pt-3" :class="heroOverlap ? 'absolute inset-x-0 top-0' : 'sticky top-0 bg-white'">
       <div class="mx-auto max-w-[1160px] px-3">
         <div class="rounded-[14px] px-5 md:px-7 h-[68px] flex items-center gap-8 shadow-[0_8px_24px_rgba(0,0,0,0.16)]" :style="{ background: 'var(--cc-primary)' }">
           <NuxtLink to="/career-site" class="flex items-center gap-2.5 shrink-0">
