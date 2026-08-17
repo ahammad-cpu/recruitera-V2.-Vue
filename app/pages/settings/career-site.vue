@@ -242,6 +242,24 @@ const cLabelOnBtn = computed(() => contrast('#ffffff', btnColor.value))
 // Sync builder edits → shared career-site store so the public career pages
 // (Home / Opportunities / Job) reflect changes made here live.
 const _cs = useCareerSite()
+// Load persisted config (from the shared store / localStorage) INTO the builder
+// before wiring the sync — otherwise the builder's defaults overwrite saved edits.
+primaryColor.value = _cs.primaryColor.value
+headerColor.value = _cs.headerColor.value
+btnColor.value = _cs.btnColor.value
+ctaColor.value = _cs.ctaColor.value
+font.value = _cs.font.value
+headline.value = _cs.headline.value
+intro.value = _cs.intro.value
+videoUrl.value = _cs.videoUrl.value
+if (_cs.values.value.length) values.value = _cs.values.value.map(v => ({ ...v }))
+if (_cs.testimonials.value.length) testimonials.value = _cs.testimonials.value.map(t => ({ ...t }))
+employeeDomain.value = _cs.employeeDomain.value
+subdomain.value = _cs.subdomain.value
+forEmployeesOn.value = _cs.forEmployeesOn.value
+generalApplicationOn.value = _cs.generalApplicationOn.value
+published.value = _cs.published.value
+// Keep the store in sync with builder edits (→ persists → public /careers page).
 watchEffect(() => {
   _cs.primaryColor.value = primaryColor.value
   _cs.headerColor.value = headerColor.value

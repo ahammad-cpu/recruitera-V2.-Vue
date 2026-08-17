@@ -94,6 +94,13 @@ function hydrateCareerSite() {
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)) }
     catch { /* ignore quota */ }
   }, { deep: true })
+  // Live-update other tabs (e.g. the /careers page while editing in Settings).
+  window.addEventListener('storage', (e) => {
+    if (e.key === STORAGE_KEY && e.newValue) {
+      try { Object.assign(state, JSON.parse(e.newValue)) }
+      catch { /* ignore */ }
+    }
+  })
 }
 
 /** CSS custom properties to theme a public career page with the company colors. */
