@@ -59,8 +59,8 @@ function scrollToJobs() { document.getElementById('jobs')?.scrollIntoView({ beha
       <div class="absolute inset-0" :style="{ background: (heroIsVideo || heroImage) ? 'linear-gradient(90deg, rgba(8,14,22,.82), rgba(8,14,22,.45))' : 'transparent' }" />
       <!-- Content — identical for video / image / gradient -->
       <div class="relative mx-auto max-w-[1160px] px-6 pt-28 pb-40 md:pt-36 md:pb-48 text-white">
-        <h1 class="text-[clamp(2.5rem,6.5vw,4.8rem)] font-extrabold leading-[1.02] tracking-[-0.035em] max-w-[17ch] text-balance">{{ headline }}</h1>
-        <p class="mt-6 text-[17px] md:text-[19px] leading-relaxed text-white/85 max-w-[58ch]">{{ intro }}</p>
+        <h1 class="text-[clamp(2.1rem,5.4vw,4rem)] font-extrabold leading-[1.04] tracking-[-0.03em] max-w-[18ch] text-balance">{{ headline }}</h1>
+        <p class="mt-5 text-[15.5px] md:text-[17px] leading-relaxed text-white/85 max-w-[56ch]">{{ intro }}</p>
         <div class="mt-9 flex flex-wrap gap-3">
           <button type="button" class="inline-flex items-center gap-2 h-12 px-6 rounded-[13px] bg-white text-[15px] font-bold transition hover:brightness-95" :style="{ color: 'var(--cc-primary)' }" @click="scrollToJobs">View openings <ArrowRight class="w-[18px] h-[18px]" stroke-width="2.2" /></button>
         </div>
