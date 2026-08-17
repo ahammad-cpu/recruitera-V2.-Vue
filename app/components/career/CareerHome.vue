@@ -51,7 +51,7 @@ function scrollToJobs() { document.getElementById('jobs')?.scrollIntoView({ beha
         <video v-else class="absolute inset-0 w-full h-full object-cover" :src="coverVideoUrl" autoplay muted loop playsinline />
       </div>
       <div class="absolute inset-0" style="background:linear-gradient(to top, rgba(8,14,22,.86) 0%, rgba(8,14,22,.42) 42%, rgba(8,14,22,.12) 100%)" />
-      <div class="relative w-full mx-auto max-w-[1160px] px-6 pb-36 md:pb-44 text-white">
+      <div class="relative w-full px-6 sm:px-10 lg:px-16 pb-36 md:pb-44 text-white">
         <h1 class="text-[clamp(2.7rem,7vw,5.4rem)] font-extrabold leading-[1.0] tracking-[-0.035em] max-w-[16ch] text-balance">{{ headline }}</h1>
         <p v-if="intro" class="mt-5 text-[17px] md:text-[19px] leading-relaxed text-white/85 max-w-[52ch]">{{ intro }}</p>
         <button type="button" class="mt-8 inline-flex items-center gap-2 h-12 px-6 rounded-[13px] bg-white text-[15px] font-bold transition hover:brightness-95" :style="{ color: 'var(--cc-primary)' }" @click="scrollToJobs">View openings <ArrowRight class="w-[18px] h-[18px]" stroke-width="2.2" /></button>
