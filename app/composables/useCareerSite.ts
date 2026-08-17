@@ -78,6 +78,24 @@ const state = reactive<CareerState>({
   subdomain: 'acme',
 })
 
+// Persist the config to localStorage so edits in Settings → Career Site reflect
+// on the public /careers page (across reloads and tabs on the same browser).
+const STORAGE_KEY = 'cc-career-site'
+let _hydrated = false
+function hydrateCareerSite() {
+  if (_hydrated || !import.meta.client) return
+  _hydrated = true
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY)
+    if (saved) Object.assign(state, JSON.parse(saved))
+  }
+  catch { /* ignore corrupt storage */ }
+  watch(state, () => {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)) }
+    catch { /* ignore quota */ }
+  }, { deep: true })
+}
+
 /** CSS custom properties to theme a public career page with the company colors. */
 const themeVars = computed(() => ({
   '--cc-primary': state.primaryColor,
@@ -92,6 +110,7 @@ export function valueIcon(index: number): Component {
 }
 
 export function useCareerSite() {
+  hydrateCareerSite()
   return {
     ...toRefs(state),
     state,
