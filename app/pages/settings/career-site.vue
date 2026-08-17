@@ -357,6 +357,8 @@ const jobFilter = ref<'all' | 'white' | 'blue'>('all')
 const filteredJobs = computed(() => jobFilter.value === 'all' ? JOBS : JOBS.filter(j => j.type === jobFilter.value))
 
 // ─────────────── Preview computed styles ───────────────
+const coverYtId = computed(() => ccCoverVideo.value.match(/(?:youtu\.be\/|[?&]v=|embed\/)([\w-]{11})/)?.[1] ?? '')
+const heroHasCover = computed(() => !!ccCoverVideo.value || !!ccCover.value)
 const heroBackground = computed(() => `linear-gradient(135deg, ${primaryColor.value} 0%, ${headerColor.value} 130%)`)
 const videoBackground = computed(() => `linear-gradient(135deg, ${headerColor.value}, ${primaryColor.value})`)
 const previewWidth = computed(() => (previewMode.value === 'desktop' ? '1200px' : '320px'))
@@ -739,11 +741,17 @@ const testimonialsGridClass = computed(() => (previewMode.value === 'desktop' ? 
             </header>
 
             <!-- Hero -->
-            <section class="relative flex flex-col items-start justify-center gap-4 overflow-hidden px-6" style="padding-top:56px;padding-bottom:56px;min-height:300px" :style="{ background: heroBackground }">
-              <span class="bg-white/15 backdrop-blur text-white text-[11.5px] font-semibold px-3 py-1 rounded-full">We're hiring · {{ JOBS.length }} open roles</span>
-              <h1 class="font-extrabold text-white leading-[1.18] max-w-[560px]" style="font-size:34px">{{ headline }}</h1>
-              <p class="text-white/85 max-w-[440px] leading-[1.7]" style="font-size:14px">{{ intro }}</p>
-              <button type="button" class="text-white rounded-xl px-5 py-2.5 text-[13.5px] font-bold shadow-lg" :style="{ background: ctaColor }">View open roles →</button>
+            <section class="relative flex flex-col items-start justify-center gap-4 overflow-hidden px-6" style="padding-top:56px;padding-bottom:56px;min-height:300px" :style="heroHasCover ? {} : { background: heroBackground }">
+              <!-- Cover background: video > image > gradient -->
+              <template v-if="ccCoverVideo">
+                <iframe v-if="coverYtId" class="absolute inset-0 h-full w-full pointer-events-none" :src="`https://www.youtube.com/embed/${coverYtId}?autoplay=1&mute=1&loop=1&playlist=${coverYtId}&controls=0&modestbranding=1&rel=0&playsinline=1`" frameborder="0" allow="autoplay; encrypted-media" />
+                <video v-else class="absolute inset-0 h-full w-full object-cover" :src="ccCoverVideo" autoplay muted loop playsinline />
+              </template>
+              <img v-else-if="ccCover" :src="ccCover" alt="" class="absolute inset-0 h-full w-full object-cover">
+              <div v-if="heroHasCover" class="absolute inset-0" style="background:linear-gradient(90deg, rgba(8,14,22,.82), rgba(8,14,22,.45))" />
+              <h1 class="relative font-extrabold text-white leading-[1.18] max-w-[560px]" style="font-size:34px">{{ headline }}</h1>
+              <p class="relative text-white/85 max-w-[440px] leading-[1.7]" style="font-size:14px">{{ intro }}</p>
+              <button type="button" class="relative text-white rounded-xl px-5 py-2.5 text-[13.5px] font-bold shadow-lg" :style="{ background: ctaColor }">View openings →</button>
             </section>
 
             <!-- Opportunities -->
