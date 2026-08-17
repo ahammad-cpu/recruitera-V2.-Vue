@@ -57,7 +57,7 @@ function scrollToJobs() { document.getElementById('jobs')?.scrollIntoView({ beha
             <div>
               <div class="text-[clamp(1.3rem,2.8vw,1.7rem)] font-bold tracking-[-0.01em]" :style="{ color: 'var(--cc-primary)' }">{{ companyName }}</div>
               <h2 class="mt-2 text-[clamp(1.35rem,3vw,1.9rem)] font-semibold" :style="{ color: 'var(--cc-header)' }">Discover our featured jobs</h2>
-              <p class="mt-2 text-[14.5px] text-[#6b7280] max-w-[490px]">Handpicked opportunities that match top talent with exciting roles — find your next career move here.</p>
+              <p class="mt-2 text-[14.5px] leading-relaxed text-[#6b7280] max-w-[500px]">The roles we're most excited about right now at {{ companyName }} — standout positions where you can grow fast and make real impact from day one.</p>
             </div>
             <button type="button" class="inline-flex items-center gap-1.5 h-10 px-4 rounded-[11px] border-[1.5px] text-[13.5px] font-semibold transition hover:bg-[color-mix(in_srgb,var(--cc-primary)_8%,white)]" :style="{ borderColor: 'var(--cc-primary)', color: 'var(--cc-primary)' }" @click="emit('view-all')">View all <ArrowRight class="w-4 h-4" stroke-width="2" /></button>
           </div>
