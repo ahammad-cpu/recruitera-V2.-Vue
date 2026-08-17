@@ -56,6 +56,8 @@ export default defineNuxtConfig({
   },
 
   routeRules: {
+    // Legacy public career route → the single career page.
+    '/career-site': { redirect: '/careers' },
     // ── Security headers on every response ──
     '/**': {
       headers: {
@@ -83,7 +85,7 @@ export default defineNuxtConfig({
     '/talent-pools':   { ssr: false },
     '/analytics':      { ssr: false },
     '/whatsapp':       { ssr: false },
-    '/career-site':    { ssr: false },
+    '/careers':        { ssr: false },
   },
 
   experimental: {
