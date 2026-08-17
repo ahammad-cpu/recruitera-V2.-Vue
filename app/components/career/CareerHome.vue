@@ -38,7 +38,6 @@ function scrollToJobs() { document.getElementById('jobs')?.scrollIntoView({ beha
         <p class="mt-6 text-[17px] md:text-[19px] leading-relaxed text-white/85 max-w-[58ch]">{{ intro }}</p>
         <div class="mt-9 flex flex-wrap gap-3">
           <button type="button" class="inline-flex items-center gap-2 h-12 px-6 rounded-[13px] bg-white text-[15px] font-bold transition hover:brightness-95" :style="{ color: 'var(--cc-primary)' }" @click="scrollToJobs">View openings <ArrowRight class="w-[18px] h-[18px]" stroke-width="2.2" /></button>
-          <button type="button" class="inline-flex items-center h-12 px-6 rounded-[13px] border-[1.5px] border-white/40 text-[15px] font-semibold text-white hover:bg-white/10 transition" @click="emit('view-all')">Browse all roles</button>
         </div>
       </div>
     </section>
