@@ -42,8 +42,9 @@ function scrollToJobs() { document.getElementById('jobs')?.scrollIntoView({ beha
 
 <template>
   <div>
-    <!-- Hero — one layout; background is video > image > gradient (SC1 positions) -->
-    <section class="relative overflow-hidden">
+    <!-- Hero — one layout; background is video > image > gradient (SC1 positions).
+         Video takes more of the screen (taller) so it reads like a showcase. -->
+    <section class="relative overflow-hidden" :class="heroIsVideo ? 'min-h-[88vh]' : ''">
       <!-- Video background -->
       <div v-if="heroIsVideo" class="absolute inset-0 overflow-hidden bg-black">
         <iframe v-if="coverYtId" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[177.78vh] min-w-full h-[56.25vw] min-h-full pointer-events-none"
@@ -59,8 +60,8 @@ function scrollToJobs() { document.getElementById('jobs')?.scrollIntoView({ beha
       <div class="absolute inset-0" :style="{ background: (heroIsVideo || heroImage) ? 'linear-gradient(90deg, rgba(8,14,22,.82), rgba(8,14,22,.45))' : 'transparent' }" />
       <!-- Content — identical for video / image / gradient -->
       <div class="relative mx-auto max-w-[1160px] px-6 pt-28 pb-40 md:pt-36 md:pb-48 text-white">
-        <h1 class="text-[clamp(2.5rem,6.5vw,4.8rem)] font-extrabold leading-[1.02] tracking-[-0.035em] max-w-[17ch] text-balance">{{ headline }}</h1>
-        <p class="mt-6 text-[17px] md:text-[19px] leading-relaxed text-white/85 max-w-[58ch]">{{ intro }}</p>
+        <h1 class="text-[clamp(2rem,5vw,3.6rem)] font-extrabold leading-[1.05] tracking-[-0.03em] max-w-[18ch] text-balance">{{ headline }}</h1>
+        <p class="mt-5 text-[15px] md:text-[16.5px] leading-relaxed text-white/85 max-w-[56ch]">{{ intro }}</p>
         <div class="mt-9 flex flex-wrap gap-3">
           <button type="button" class="inline-flex items-center gap-2 h-12 px-6 rounded-[13px] bg-white text-[15px] font-bold transition hover:brightness-95" :style="{ color: 'var(--cc-primary)' }" @click="scrollToJobs">View openings <ArrowRight class="w-[18px] h-[18px]" stroke-width="2.2" /></button>
         </div>
