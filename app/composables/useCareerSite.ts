@@ -97,9 +97,15 @@ function hydrateCareerSite() {
     if (saved) Object.assign(state, JSON.parse(saved))
   }
   catch { /* ignore corrupt storage */ }
+  // Debounced write — the state can hold large base64 data-URLs (logo/cover),
+  // so stringifying + writing on every keystroke would freeze the UI.
+  let saveTimer: ReturnType<typeof setTimeout> | undefined
   watch(state, () => {
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)) }
-    catch { /* ignore quota */ }
+    if (saveTimer) clearTimeout(saveTimer)
+    saveTimer = setTimeout(() => {
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)) }
+      catch { /* ignore quota */ }
+    }, 400)
   }, { deep: true })
   // Live-update other tabs (e.g. the /careers page while editing in Settings).
   window.addEventListener('storage', (e) => {

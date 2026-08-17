@@ -7,7 +7,7 @@ import { ArrowRight, MapPin, Clock, Briefcase, Quote as QuoteIcon } from 'lucide
 import { useCareerSite, valueIcon } from '~/composables/useCareerSite'
 import { useCompany } from '~/composables/useCompany'
 import { useJobs } from '~/composables/useJobs'
-import { ccEmploymentType, ccWorkLabel, ccDaysAgo, ccBlurb } from '~/utils/careerJob'
+import { ccEmploymentType, ccWorkLabel, ccDaysAgo, ccBlurb, ccIsVideoFile } from '~/utils/careerJob'
 
 const emit = defineEmits<{ 'open-job': [id: string]; 'view-all': [] }>()
 
@@ -30,7 +30,9 @@ const gridColsClass = computed(() => {
 const ytId = computed(() => videoUrl.value.match(/(?:youtu\.be\/|[?&]v=|embed\/)([\w-]{11})/)?.[1] ?? '')
 // Cover video: YouTube link → embedded loop; anything else → treated as a video file (mp4/webm).
 const coverYtId = computed(() => coverVideoUrl.value.match(/(?:youtu\.be\/|[?&]v=|embed\/)([\w-]{11})/)?.[1] ?? '')
-const hasCoverMedia = computed(() => !!coverVideoUrl.value || !!coverUrl.value)
+const coverIsFile = computed(() => ccIsVideoFile(coverVideoUrl.value))
+const coverHasVideo = computed(() => !!coverYtId.value || coverIsFile.value)
+const hasCoverMedia = computed(() => coverHasVideo.value || !!coverUrl.value)
 function initials(name: string) { return name.trim().split(/\s+/).map(p => p[0]).slice(0, 2).join('').toUpperCase() || '?' }
 function scrollToJobs() { document.getElementById('jobs')?.scrollIntoView({ behavior: 'smooth' }) }
 </script>
@@ -39,8 +41,8 @@ function scrollToJobs() { document.getElementById('jobs')?.scrollIntoView({ beha
   <div>
     <!-- Hero -->
     <section class="relative overflow-hidden">
-      <!-- Cover background: video > image > gradient -->
-      <div v-if="coverVideoUrl" class="absolute inset-0 overflow-hidden bg-black">
+      <!-- Cover background: video (resolved YouTube ID or real file only) > image > gradient -->
+      <div v-if="coverHasVideo" class="absolute inset-0 overflow-hidden bg-black">
         <iframe v-if="coverYtId" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[177.78vh] min-w-full h-[56.25vw] min-h-full pointer-events-none"
           :src="`https://www.youtube.com/embed/${coverYtId}?autoplay=1&mute=1&loop=1&playlist=${coverYtId}&controls=0&showinfo=0&modestbranding=1&rel=0&playsinline=1`"
           title="Cover video" frameborder="0" allow="autoplay; encrypted-media" />

@@ -3,6 +3,11 @@
 // synthesized from the role. Swap for real job fields when the API provides them.
 import type { Job } from '~/types'
 
+/** True when a URL points at a directly-playable video file (not a YouTube page). */
+export function ccIsVideoFile(url: string): boolean {
+  return /\.(mp4|webm|ogg|ogv|mov|m4v)(\?|#|$)/i.test(url) || url.startsWith('data:video/') || url.startsWith('blob:')
+}
+
 export function ccEmploymentType(job: Job): string {
   return job.collar === 'blue' ? 'Shift Based' : 'Full-time'
 }

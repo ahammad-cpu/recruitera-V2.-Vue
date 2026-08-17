@@ -56,6 +56,7 @@ import { Input } from '~/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/ui/select'
 import { Dialog, DialogScrollContent, DialogHeader, DialogTitle, DialogFooter } from '~/components/ui/dialog'
 import { useCareerSite } from '~/composables/useCareerSite'
+import { ccIsVideoFile } from '~/utils/careerJob'
 
 definePageMeta({ layout: 'settings' })
 
@@ -358,7 +359,8 @@ const filteredJobs = computed(() => jobFilter.value === 'all' ? JOBS : JOBS.filt
 
 // ─────────────── Preview computed styles ───────────────
 const coverYtId = computed(() => ccCoverVideo.value.match(/(?:youtu\.be\/|[?&]v=|embed\/)([\w-]{11})/)?.[1] ?? '')
-const heroHasCover = computed(() => !!ccCoverVideo.value || !!ccCover.value)
+const coverHasVideo = computed(() => !!coverYtId.value || ccIsVideoFile(ccCoverVideo.value))
+const heroHasCover = computed(() => coverHasVideo.value || !!ccCover.value)
 const heroBackground = computed(() => `linear-gradient(135deg, ${primaryColor.value} 0%, ${headerColor.value} 130%)`)
 const videoBackground = computed(() => `linear-gradient(135deg, ${headerColor.value}, ${primaryColor.value})`)
 const previewWidth = computed(() => (previewMode.value === 'desktop' ? '1200px' : '320px'))
@@ -742,8 +744,8 @@ const testimonialsGridClass = computed(() => (previewMode.value === 'desktop' ? 
 
             <!-- Hero -->
             <section class="relative flex flex-col items-start justify-center gap-4 overflow-hidden px-6" style="padding-top:56px;padding-bottom:56px;min-height:300px" :style="heroHasCover ? {} : { background: heroBackground }">
-              <!-- Cover background: video > image > gradient -->
-              <template v-if="ccCoverVideo">
+              <!-- Cover background: video (resolved YouTube ID or real file only) > image > gradient -->
+              <template v-if="coverHasVideo">
                 <iframe v-if="coverYtId" class="absolute inset-0 h-full w-full pointer-events-none" :src="`https://www.youtube.com/embed/${coverYtId}?autoplay=1&mute=1&loop=1&playlist=${coverYtId}&controls=0&modestbranding=1&rel=0&playsinline=1`" frameborder="0" allow="autoplay; encrypted-media" />
                 <video v-else class="absolute inset-0 h-full w-full object-cover" :src="ccCoverVideo" autoplay muted loop playsinline />
               </template>
