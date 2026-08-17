@@ -33,7 +33,7 @@ function scrollToJobs() { document.getElementById('jobs')?.scrollIntoView({ beha
         ? { backgroundImage: `url(${coverUrl})`, backgroundSize: 'cover', backgroundPosition: 'center' }
         : { background: 'linear-gradient(135deg, var(--cc-primary), color-mix(in srgb, var(--cc-primary) 45%, #0b1220))' }" />
       <div class="absolute inset-0" :style="{ background: coverUrl ? 'linear-gradient(90deg, rgba(8,14,22,.82), rgba(8,14,22,.45))' : 'transparent' }" />
-      <div class="relative mx-auto max-w-[1160px] px-6 pt-16 pb-40 md:pt-20 md:pb-48 text-white">
+      <div class="relative mx-auto max-w-[1160px] px-6 pt-28 pb-40 md:pt-36 md:pb-48 text-white">
         <span class="inline-flex items-center gap-2 h-8 px-3.5 rounded-full bg-white/15 backdrop-blur text-[13px] font-semibold"><span class="w-1.5 h-1.5 rounded-full bg-[var(--cc-primary)] ring-2 ring-white/30" /> We're hiring · {{ openRoles.length }} open {{ openRoles.length === 1 ? 'role' : 'roles' }}</span>
         <h1 class="mt-6 text-[clamp(2.5rem,6.5vw,4.8rem)] font-extrabold leading-[1.02] tracking-[-0.035em] max-w-[17ch] text-balance">{{ headline }}</h1>
         <p class="mt-6 text-[17px] md:text-[19px] leading-relaxed text-white/85 max-w-[58ch]">{{ intro }}</p>
