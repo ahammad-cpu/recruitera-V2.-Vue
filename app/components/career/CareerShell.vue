@@ -21,7 +21,7 @@ const isHome = computed(() => active === 'home')
   <div class="cc-root relative min-h-screen bg-white text-[color-mix(in_srgb,var(--cc-header)_92%,transparent)]" :style="themeVars">
     <!-- Header — floating bar in the company primary color.
          heroOverlap: sits transparently over a full-bleed hero (cover shows behind). -->
-    <header class="z-40 pt-3" :class="heroOverlap ? 'absolute inset-x-0 top-0' : 'sticky top-0 bg-white'">
+    <header class="sticky top-0 z-40 pt-3" :class="heroOverlap ? '-mb-[80px]' : 'bg-white'">
       <div class="mx-auto max-w-[1160px] px-3">
         <div class="rounded-[14px] px-5 md:px-7 h-[68px] flex items-center gap-8 shadow-[0_8px_24px_rgba(0,0,0,0.16)]" :style="{ background: 'var(--cc-primary)' }">
           <button type="button" class="flex items-center gap-2.5 shrink-0" @click="emit('navigate', 'home')">
