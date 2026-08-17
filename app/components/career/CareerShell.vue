@@ -9,12 +9,12 @@ import { Globe } from 'lucide-vue-next'
 import { useCareerSite } from '~/composables/useCareerSite'
 import { useCompany } from '~/composables/useCompany'
 
-const { companyName: nameProp, heroOverlap = false } = defineProps<{ companyName?: string; heroOverlap?: boolean }>()
+const { companyName: nameProp, heroOverlap = false, active = 'home' } = defineProps<{ companyName?: string; heroOverlap?: boolean; active?: 'home' | 'opportunities' }>()
+const emit = defineEmits<{ navigate: [view: 'home' | 'opportunities'] }>()
 const { themeVars, forEmployeesOn, logoUrl } = useCareerSite()
 const { data: company } = useCompany()
 const companyName = computed(() => nameProp || company.value?.name || 'Your Company')
-const route = useRoute()
-const isHome = computed(() => route.path === '/career-site')
+const isHome = computed(() => active === 'home')
 </script>
 
 <template>
@@ -24,16 +24,16 @@ const isHome = computed(() => route.path === '/career-site')
     <header class="z-40 pt-3" :class="heroOverlap ? 'absolute inset-x-0 top-0' : 'sticky top-0 bg-white'">
       <div class="mx-auto max-w-[1160px] px-3">
         <div class="rounded-[14px] px-5 md:px-7 h-[68px] flex items-center gap-8 shadow-[0_8px_24px_rgba(0,0,0,0.16)]" :style="{ background: 'var(--cc-primary)' }">
-          <NuxtLink to="/career-site" class="flex items-center gap-2.5 shrink-0">
+          <button type="button" class="flex items-center gap-2.5 shrink-0" @click="emit('navigate', 'home')">
             <img v-if="logoUrl" :src="logoUrl" alt="" class="h-10 max-w-[150px] object-contain">
             <template v-else>
               <span class="w-9 h-9 rounded-[10px] inline-flex items-center justify-center font-extrabold text-[15px] bg-white/20 text-white">{{ companyName.charAt(0) }}</span>
               <span class="text-[17px] font-bold text-white tracking-[-0.01em]">{{ companyName }}</span>
             </template>
-          </NuxtLink>
+          </button>
           <nav class="hidden sm:flex items-center gap-7 text-[15px] font-semibold">
-            <NuxtLink to="/career-site" class="transition" :class="isHome ? 'text-white' : 'text-white/70 hover:text-white'">Home</NuxtLink>
-            <NuxtLink to="/career-site/opportunities" class="transition" :class="!isHome ? 'text-white' : 'text-white/70 hover:text-white'">Opportunities</NuxtLink>
+            <button type="button" class="transition" :class="isHome ? 'text-white' : 'text-white/70 hover:text-white'" @click="emit('navigate', 'home')">Home</button>
+            <button type="button" class="transition" :class="!isHome ? 'text-white' : 'text-white/70 hover:text-white'" @click="emit('navigate', 'opportunities')">Opportunities</button>
           </nav>
           <div class="ml-auto flex items-center gap-2.5">
             <button v-if="forEmployeesOn" type="button" class="h-10 px-4 rounded-[11px] bg-white text-[13.5px] font-semibold transition hover:brightness-95" :style="{ color: 'var(--cc-primary)' }">For Employees</button>
