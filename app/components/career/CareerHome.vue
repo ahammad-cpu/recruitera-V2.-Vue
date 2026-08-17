@@ -42,28 +42,22 @@ function scrollToJobs() { document.getElementById('jobs')?.scrollIntoView({ beha
 
 <template>
   <div>
-    <!-- Hero — VIDEO: full-bleed, headline anchored bottom-left (Vodafone-style) -->
-    <section v-if="heroIsVideo" class="relative overflow-hidden min-h-[94vh] flex items-end bg-black">
-      <div class="absolute inset-0 overflow-hidden">
+    <!-- Hero — one layout; background is video > image > gradient (SC1 positions) -->
+    <section class="relative overflow-hidden">
+      <!-- Video background -->
+      <div v-if="heroIsVideo" class="absolute inset-0 overflow-hidden bg-black">
         <iframe v-if="coverYtId" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[177.78vh] min-w-full h-[56.25vw] min-h-full pointer-events-none"
           :src="`https://www.youtube.com/embed/${coverYtId}?autoplay=1&mute=1&loop=1&playlist=${coverYtId}&controls=0&showinfo=0&modestbranding=1&rel=0&playsinline=1`"
           title="Cover video" frameborder="0" allow="autoplay; encrypted-media" />
         <video v-else class="absolute inset-0 w-full h-full object-cover" :src="coverVideoUrl" autoplay muted loop playsinline />
       </div>
-      <div class="absolute inset-0" style="background:linear-gradient(to top, rgba(8,14,22,.86) 0%, rgba(8,14,22,.42) 42%, rgba(8,14,22,.12) 100%)" />
-      <div class="relative w-full px-6 sm:px-10 lg:px-16 pb-36 md:pb-44 text-white">
-        <h1 class="text-[clamp(2.7rem,7vw,5.4rem)] font-extrabold leading-[1.0] tracking-[-0.035em] max-w-[16ch] text-balance">{{ headline }}</h1>
-        <p v-if="intro" class="mt-5 text-[17px] md:text-[19px] leading-relaxed text-white/85 max-w-[52ch]">{{ intro }}</p>
-        <button type="button" class="mt-8 inline-flex items-center gap-2 h-12 px-6 rounded-[13px] bg-white text-[15px] font-bold transition hover:brightness-95" :style="{ color: 'var(--cc-primary)' }" @click="scrollToJobs">View openings <ArrowRight class="w-[18px] h-[18px]" stroke-width="2.2" /></button>
-      </div>
-    </section>
-
-    <!-- Hero — IMAGE / GRADIENT: content top-left, jobs card overlaps below -->
-    <section v-else class="relative overflow-hidden">
-      <div class="absolute inset-0" :style="heroImage
+      <!-- Image / gradient background -->
+      <div v-else class="absolute inset-0" :style="heroImage
         ? { backgroundImage: `url(${coverUrl})`, backgroundSize: 'cover', backgroundPosition: 'center' }
         : { background: 'linear-gradient(135deg, var(--cc-primary), color-mix(in srgb, var(--cc-primary) 45%, #0b1220))' }" />
-      <div class="absolute inset-0" :style="{ background: heroImage ? 'linear-gradient(90deg, rgba(8,14,22,.82), rgba(8,14,22,.45))' : 'transparent' }" />
+      <!-- Legibility overlay when there is media -->
+      <div class="absolute inset-0" :style="{ background: (heroIsVideo || heroImage) ? 'linear-gradient(90deg, rgba(8,14,22,.82), rgba(8,14,22,.45))' : 'transparent' }" />
+      <!-- Content — identical for video / image / gradient -->
       <div class="relative mx-auto max-w-[1160px] px-6 pt-28 pb-40 md:pt-36 md:pb-48 text-white">
         <h1 class="text-[clamp(2.5rem,6.5vw,4.8rem)] font-extrabold leading-[1.02] tracking-[-0.035em] max-w-[17ch] text-balance">{{ headline }}</h1>
         <p class="mt-6 text-[17px] md:text-[19px] leading-relaxed text-white/85 max-w-[58ch]">{{ intro }}</p>
@@ -73,8 +67,8 @@ function scrollToJobs() { document.getElementById('jobs')?.scrollIntoView({ beha
       </div>
     </section>
 
-    <!-- Featured jobs — overlaps the hero (image or video) -->
-    <section id="jobs" class="relative z-10" :class="heroIsVideo ? '-mt-20 md:-mt-28' : '-mt-28 md:-mt-32'">
+    <!-- Featured jobs — overlaps the hero (same for image or video) -->
+    <section id="jobs" class="relative z-10 -mt-28 md:-mt-32">
       <div class="mx-auto max-w-[1160px] px-6">
         <div class="rounded-[22px] bg-white border border-[#eceef1] shadow-[0_28px_70px_rgba(15,23,42,0.12)] p-7 md:p-10">
           <div class="flex flex-wrap items-end justify-between gap-4">

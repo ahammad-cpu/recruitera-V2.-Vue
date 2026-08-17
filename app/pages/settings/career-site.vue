@@ -776,22 +776,18 @@ const testimonialsGridClass = computed(() => (previewMode.value === 'desktop' ? 
               </span>
             </header>
 
-            <!-- Hero — video: full-bleed, text bottom-left; else image/gradient centered.
-                 Cover video uses a thumbnail so the builder stays light. -->
-            <section
-              class="relative flex flex-col gap-3 overflow-hidden px-6"
-              :class="previewVideo ? 'justify-end' : 'justify-center gap-4'"
-              :style="[{ paddingTop: previewVideo ? '96px' : '56px', paddingBottom: previewVideo ? '28px' : '56px', minHeight: previewVideo ? '440px' : '300px' }, heroHasCover ? {} : { background: heroBackground }]">
+            <!-- Hero — one layout; background is video (thumbnail) / image / gradient -->
+            <section class="relative flex flex-col items-start justify-center gap-4 overflow-hidden px-6" style="padding-top:56px;padding-bottom:56px;min-height:300px" :style="heroHasCover ? {} : { background: heroBackground }">
               <template v-if="previewVideo">
                 <img v-if="coverYtId" :src="`https://img.youtube.com/vi/${coverYtId}/hqdefault.jpg`" alt="" class="absolute inset-0 h-full w-full object-cover">
                 <video v-else class="absolute inset-0 h-full w-full object-cover" :src="ccCoverVideo" muted loop playsinline />
               </template>
               <img v-else-if="previewImage" :src="ccCover" alt="" class="absolute inset-0 h-full w-full object-cover">
               <span v-if="previewVideo" class="absolute top-3 right-3 z-[1] inline-flex items-center gap-1 rounded-full bg-black/55 px-2 py-0.5 text-[10px] font-semibold text-white"><Play class="w-2.5 h-2.5 fill-current" /> Video</span>
-              <div v-if="heroHasCover" class="absolute inset-0" :style="{ background: previewVideo ? 'linear-gradient(to top, rgba(8,14,22,.86), rgba(8,14,22,.15))' : 'linear-gradient(90deg, rgba(8,14,22,.82), rgba(8,14,22,.45))' }" />
-              <h1 class="relative font-extrabold text-white leading-[1.1] max-w-[560px]" :style="{ fontSize: previewVideo ? '40px' : '34px' }">{{ headline }}</h1>
-              <p v-if="!previewVideo || intro" class="relative text-white/85 max-w-[440px] leading-[1.6]" style="font-size:14px">{{ intro }}</p>
-              <button type="button" class="relative w-fit text-white rounded-xl px-5 py-2.5 text-[13.5px] font-bold shadow-lg" :style="{ background: ctaColor }">View openings →</button>
+              <div v-if="heroHasCover" class="absolute inset-0" style="background:linear-gradient(90deg, rgba(8,14,22,.82), rgba(8,14,22,.45))" />
+              <h1 class="relative font-extrabold text-white leading-[1.18] max-w-[560px]" style="font-size:34px">{{ headline }}</h1>
+              <p class="relative text-white/85 max-w-[440px] leading-[1.7]" style="font-size:14px">{{ intro }}</p>
+              <button type="button" class="relative text-white rounded-xl px-5 py-2.5 text-[13.5px] font-bold shadow-lg" :style="{ background: ctaColor }">View openings →</button>
             </section>
 
             <!-- Opportunities -->
