@@ -1,5 +1,5 @@
 <!--
-  Career site — the single public page at /career-site. Home, Opportunities, and
+  Career site — the single public page at /careers. Home, Opportunities, and
   Job detail + Apply are in-page views switched by state (no sub-routes). All
   content + colors come from useCareerSite() (Settings → Career Site).
 -->

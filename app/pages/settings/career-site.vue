@@ -353,7 +353,7 @@ const testimonialsGridClass = computed(() => (previewMode.value === 'desktop' ? 
         </div>
         <div class="flex gap-2">
           <a
-            :href="`https://${previewDomain}`"
+            href="/careers"
             target="_blank"
             rel="noopener"
             class="inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-[10px] border border-[var(--brand-border)] bg-[var(--brand-surface-white)] text-[13.5px] font-semibold text-[var(--brand-text)] no-underline hover:bg-[var(--brand-lime-tint)] transition-colors"
