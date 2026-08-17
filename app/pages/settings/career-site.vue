@@ -289,6 +289,20 @@ watchEffect(() => {
 const ccLogo = _cs.logoUrl
 const ccCover = _cs.coverUrl
 const ccCoverVideo = _cs.coverVideoUrl
+// The video URL uses a LOCAL input ref and commits to the store only after the
+// user stops typing — so keystrokes don't re-render the preview or thrash state.
+const coverVideoInput = ref(ccCoverVideo.value)
+let coverCommitTimer: ReturnType<typeof setTimeout> | undefined
+function onCoverVideoInput(v: string | number) {
+  coverVideoInput.value = String(v)
+  if (coverCommitTimer) clearTimeout(coverCommitTimer)
+  coverCommitTimer = setTimeout(() => { ccCoverVideo.value = coverVideoInput.value.trim() }, 600)
+}
+function clearCoverVideo() {
+  if (coverCommitTimer) clearTimeout(coverCommitTimer)
+  coverVideoInput.value = ''
+  ccCoverVideo.value = ''
+}
 function onLogoUpload(e: Event) {
   const f = (e.target as HTMLInputElement).files?.[0]
   if (!f) return
@@ -459,8 +473,8 @@ const testimonialsGridClass = computed(() => (previewMode.value === 'desktop' ? 
                   <input type="file" accept="image/png,image/jpeg" class="sr-only" @change="onCoverUpload">
                 </label>
                 <div class="flex items-center gap-1.5">
-                  <Input :model-value="ccCoverVideo" placeholder="Cover video URL (YouTube or .mp4) — overrides image" class="h-8 flex-1 text-xs" @update:model-value="v => ccCoverVideo = String(v)" />
-                  <button v-if="ccCoverVideo" type="button" class="shrink-0 h-8 px-2 rounded border border-[var(--brand-border)] text-[11px] text-[var(--brand-text-muted)] hover:bg-[var(--brand-canvas)]" @click="ccCoverVideo = ''">Clear</button>
+                  <Input :model-value="coverVideoInput" placeholder="Cover video URL (YouTube or .mp4) — overrides image" class="h-8 min-w-0 flex-1 text-xs" @update:model-value="onCoverVideoInput" />
+                  <button v-if="coverVideoInput" type="button" class="shrink-0 h-8 px-2 rounded border border-[var(--brand-border)] text-[11px] text-[var(--brand-text-muted)] hover:bg-[var(--brand-canvas)]" @click="clearCoverVideo">Clear</button>
                 </div>
                 <div class="text-[11px] text-[var(--brand-text-faint)]">A video plays as the cover background; leave empty to use the image.</div>
               </div>
@@ -744,12 +758,15 @@ const testimonialsGridClass = computed(() => (previewMode.value === 'desktop' ? 
 
             <!-- Hero -->
             <section class="relative flex flex-col items-start justify-center gap-4 overflow-hidden px-6" style="padding-top:56px;padding-bottom:56px;min-height:300px" :style="heroHasCover ? {} : { background: heroBackground }">
-              <!-- Cover background: video (resolved YouTube ID or real file only) > image > gradient -->
+              <!-- Cover background: video (thumbnail only in preview — the live
+                   page plays it) > image > gradient. A thumbnail keeps the
+                   builder light so editing never freezes. -->
               <template v-if="coverHasVideo">
-                <iframe v-if="coverYtId" class="absolute inset-0 h-full w-full pointer-events-none" :src="`https://www.youtube.com/embed/${coverYtId}?autoplay=1&mute=1&loop=1&playlist=${coverYtId}&controls=0&modestbranding=1&rel=0&playsinline=1`" frameborder="0" allow="autoplay; encrypted-media" />
-                <video v-else class="absolute inset-0 h-full w-full object-cover" :src="ccCoverVideo" autoplay muted loop playsinline />
+                <img v-if="coverYtId" :src="`https://img.youtube.com/vi/${coverYtId}/hqdefault.jpg`" alt="" class="absolute inset-0 h-full w-full object-cover">
+                <video v-else class="absolute inset-0 h-full w-full object-cover" :src="ccCoverVideo" muted loop playsinline />
               </template>
               <img v-else-if="ccCover" :src="ccCover" alt="" class="absolute inset-0 h-full w-full object-cover">
+              <span v-if="coverHasVideo" class="absolute top-3 right-3 z-[1] inline-flex items-center gap-1 rounded-full bg-black/55 px-2 py-0.5 text-[10px] font-semibold text-white"><Play class="w-2.5 h-2.5 fill-current" /> Video</span>
               <div v-if="heroHasCover" class="absolute inset-0" style="background:linear-gradient(90deg, rgba(8,14,22,.82), rgba(8,14,22,.45))" />
               <h1 class="relative font-extrabold text-white leading-[1.18] max-w-[560px]" style="font-size:34px">{{ headline }}</h1>
               <p class="relative text-white/85 max-w-[440px] leading-[1.7]" style="font-size:14px">{{ intro }}</p>
