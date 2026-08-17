@@ -297,7 +297,10 @@ let coverCommitTimer: ReturnType<typeof setTimeout> | undefined
 function onCoverVideoInput(v: string | number) {
   coverVideoInput.value = String(v)
   if (coverCommitTimer) clearTimeout(coverCommitTimer)
-  coverCommitTimer = setTimeout(() => { ccCoverVideo.value = coverVideoInput.value.trim() }, 600)
+  coverCommitTimer = setTimeout(() => {
+    ccCoverVideo.value = coverVideoInput.value.trim()
+    if (ccCoverVideo.value) ccCoverType.value = 'video'
+  }, 600)
 }
 function clearCoverVideo() {
   if (coverCommitTimer) clearTimeout(coverCommitTimer)
@@ -312,7 +315,7 @@ function onLogoUpload(e: Event) {
 function onCoverUpload(e: Event) {
   const f = (e.target as HTMLInputElement).files?.[0]
   if (!f) return
-  const r = new FileReader(); r.onload = () => { ccCover.value = String(r.result) }; r.readAsDataURL(f)
+  const r = new FileReader(); r.onload = () => { ccCover.value = String(r.result); ccCoverType.value = 'image' }; r.readAsDataURL(f)
 }
 const cBtnOnHero = computed(() => contrast(btnColor.value, primaryColor.value))
 

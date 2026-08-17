@@ -96,7 +96,13 @@ function hydrateCareerSite() {
   _hydrated = true
   try {
     const saved = localStorage.getItem(STORAGE_KEY)
-    if (saved) Object.assign(state, JSON.parse(saved))
+    if (saved) {
+      const parsed = JSON.parse(saved)
+      Object.assign(state, parsed)
+      // Back-compat: older saves predate `coverType`. Infer it from content so
+      // an existing cover video keeps using the full-bleed video hero.
+      if (!parsed.coverType) state.coverType = parsed.coverVideoUrl ? 'video' : 'image'
+    }
   }
   catch { /* ignore corrupt storage */ }
   // Debounced write — the state can hold large base64 data-URLs (logo/cover),
