@@ -19,6 +19,13 @@ const companyName = computed(() => company.value?.name || 'Your Company')
 const openRoles = computed(() => jobs.value.filter(j => j.status === 'published'))
 const collar = ref<'all' | 'white' | 'blue'>('all')
 const featured = computed(() => openRoles.value.filter(j => collar.value === 'all' || j.collar === collar.value).slice(0, 6))
+// ≤3 roles sit on a single row; 4–6 wrap into a 3-column grid.
+const gridColsClass = computed(() => {
+  const n = featured.value.length
+  if (n <= 1) return 'grid-cols-1 max-w-[560px]'
+  if (n === 2) return 'grid-cols-1 sm:grid-cols-2'
+  return 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
+})
 
 const ytId = computed(() => videoUrl.value.match(/(?:youtu\.be\/|[?&]v=|embed\/)([\w-]{11})/)?.[1] ?? '')
 function initials(name: string) { return name.trim().split(/\s+/).map(p => p[0]).slice(0, 2).join('').toUpperCase() || '?' }
@@ -63,19 +70,22 @@ function scrollToJobs() { document.getElementById('jobs')?.scrollIntoView({ beha
               @click="collar = c">{{ c === 'all' ? 'All' : c === 'white' ? 'White Collar' : 'Blue Collar' }}</button>
           </div>
 
-          <div class="mt-7 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <div class="mt-7 grid gap-5" :class="gridColsClass">
             <button v-for="job in featured" :key="job.id" type="button"
-              class="group flex flex-col text-left rounded-[16px] border border-[#eceef1] bg-white p-5 transition hover:border-[color:var(--cc-primary)] hover:shadow-[0_16px_40px_rgba(15,23,42,0.08)]"
+              class="group relative flex flex-col text-left rounded-[18px] border border-[#ececf0] bg-white p-5 transition duration-200 hover:-translate-y-1 hover:border-[color:var(--cc-primary)] hover:shadow-[0_20px_46px_rgba(15,23,42,0.10)]"
               @click="emit('open-job', job.id)">
-              <div class="flex items-start justify-between gap-3">
-                <h3 class="text-[16.5px] font-bold leading-snug" :style="{ color: 'var(--cc-primary)' }">{{ job.title }}</h3>
-                <span class="shrink-0 inline-flex items-center h-6 px-2.5 rounded-full border border-[#e3e6ea] text-[11.5px] font-semibold text-[#6b7280]">{{ ccWorkLabel(job.workModel) }}</span>
+              <!-- Top row: department chip + work-mode badge -->
+              <div class="flex items-center justify-between gap-3">
+                <span v-if="job.department" class="inline-flex items-center h-6 px-2.5 rounded-full text-[11.5px] font-semibold" :style="{ background: 'color-mix(in srgb, var(--cc-primary) 11%, white)', color: 'var(--cc-primary)' }">{{ job.department }}</span>
+                <span class="ml-auto inline-flex items-center gap-1.5 h-6 px-2.5 rounded-full border border-[#e6e8ec] text-[11.5px] font-semibold text-[#5b6472]"><span class="w-1.5 h-1.5 rounded-full" :style="{ background: 'var(--cc-primary)' }" />{{ ccWorkLabel(job.workModel) }}</span>
               </div>
-              <p class="mt-2 text-[13.5px] leading-relaxed text-[#6b7280] line-clamp-2 flex-1">{{ ccBlurb(job) }}</p>
-              <div class="mt-4 rounded-[12px] bg-[#f7f8fa] px-3.5 py-3 grid grid-cols-2 gap-y-2 text-[12.5px] text-[#6b7280]">
-                <span class="inline-flex items-center gap-1.5"><Clock class="w-3.5 h-3.5" stroke-width="1.8" />{{ ccDaysAgo(job.createdAt) }}</span>
-                <span class="inline-flex items-center gap-1.5"><Briefcase class="w-3.5 h-3.5" stroke-width="1.8" />{{ ccEmploymentType(job) }}</span>
-                <span v-if="job.location" class="col-span-2 inline-flex items-center gap-1.5"><MapPin class="w-3.5 h-3.5" stroke-width="1.8" />{{ job.location }}</span>
+              <h3 class="mt-3.5 text-[17px] font-bold leading-snug tracking-[-0.01em] transition-colors group-hover:text-[color:var(--cc-primary)]" :style="{ color: 'var(--cc-header)' }">{{ job.title }}</h3>
+              <p class="mt-2 text-[13.5px] leading-relaxed text-[#727a86] line-clamp-2 flex-1">{{ ccBlurb(job) }}</p>
+              <!-- Footer meta -->
+              <div class="mt-5 pt-4 border-t border-[#f0f1f4] flex items-center gap-x-4 gap-y-1.5 flex-wrap text-[12.5px] font-medium text-[#727a86]">
+                <span v-if="job.location" class="inline-flex items-center gap-1.5"><MapPin class="w-3.5 h-3.5" stroke-width="1.9" />{{ job.location }}</span>
+                <span class="inline-flex items-center gap-1.5"><Briefcase class="w-3.5 h-3.5" stroke-width="1.9" />{{ ccEmploymentType(job) }}</span>
+                <span class="ml-auto inline-flex items-center gap-1.5 text-[#9aa1ac]"><Clock class="w-3.5 h-3.5" stroke-width="1.9" />{{ ccDaysAgo(job.createdAt) }}</span>
               </div>
             </button>
           </div>
