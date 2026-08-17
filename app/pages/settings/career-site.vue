@@ -105,10 +105,8 @@ const ctaColor = ref('#4d7c0f')
 /* eslint-enable local/no-hex-colors */
 
 function onPrimaryChange(v: string) {
+  // Buttons/CTA follow the primary color (there is no separate button color).
   primaryColor.value = v
-  ctaColor.value = v
-}
-function onBtnChange(v: string) {
   btnColor.value = v
   ctaColor.value = v
 }
@@ -242,7 +240,6 @@ function contrast(a: string, b: string) {
 }
 const cPrimaryOnWhite = computed(() => contrast(primaryColor.value, '#ffffff'))
 const cHeaderOnWhite = computed(() => contrast(headerColor.value, '#ffffff'))
-const cLabelOnBtn = computed(() => contrast('#ffffff', btnColor.value))
 
 // Sync builder edits → shared career-site store so the public career pages
 // (Home / Opportunities / Job) reflect changes made here live.
@@ -318,7 +315,6 @@ function onCoverUpload(e: Event) {
   if (!f) return
   const r = new FileReader(); r.onload = () => { ccCover.value = String(r.result); ccCoverType.value = 'image' }; r.readAsDataURL(f)
 }
-const cBtnOnHero = computed(() => contrast(btnColor.value, primaryColor.value))
 
 // ─────────────── Save / dirty / discard ───────────────
 function snapshot() {
@@ -524,19 +520,6 @@ const testimonialsGridClass = computed(() => (previewMode.value === 'desktop' ? 
                 <Input :model-value="headerColor" maxlength="7" class="h-8 w-24 font-mono text-xs" @update:model-value="v => hexInput(String(v), (nv) => headerColor = nv)" />
               </div>
             </div>
-            <div class="flex items-center justify-between gap-3">
-              <span class="text-[13px] text-[var(--brand-text)]">Buttons color</span>
-              <div class="flex items-center gap-2">
-                <span
-                  class="inline-flex items-center text-[10px] font-bold px-1.5 py-0.5 rounded shrink-0"
-                  :class="cLabelOnBtn >= 4.5 ? 'bg-[var(--brand-status-approved-bg)] text-[var(--brand-status-approved-text)]' : 'bg-[var(--brand-status-closed-bg)] text-[var(--brand-status-closed-text)]'"
-                  :title="`White label on button: ${cLabelOnBtn.toFixed(1)}:1 · AA needs 4.5:1`"
-                >AA {{ cLabelOnBtn >= 4.5 ? '✓' : '✗' }}</span>
-                <input type="color" :value="btnColor" class="size-8 cursor-pointer rounded border border-[var(--brand-border)]" @input="onBtnChange(($event.target as HTMLInputElement).value)">
-                <Input :model-value="btnColor" maxlength="7" class="h-8 w-24 font-mono text-xs" @update:model-value="v => hexInput(String(v), onBtnChange)" />
-              </div>
-            </div>
-
             <!-- Header layout -->
             <div class="space-y-3 rounded-lg border border-[var(--brand-border)] p-3">
               <div class="text-[12px] font-semibold text-[var(--brand-text-secondary)]">Header layout</div>
@@ -554,15 +537,6 @@ const testimonialsGridClass = computed(() => (previewMode.value === 'desktop' ? 
                 </div>
                 <Switch v-model="headerSticky" class="shrink-0 data-[state=checked]:bg-[var(--brand-teal)]" />
               </div>
-            </div>
-
-            <!-- Button-on-hero contrast warning (CTA can vanish into the hero gradient) -->
-            <div
-              v-if="cBtnOnHero < 3"
-              class="flex items-start gap-2 rounded-lg bg-[var(--brand-status-pending-bg)] px-3 py-2 text-[12px] leading-[1.45] text-[var(--brand-status-pending-text)]"
-            >
-              <span class="shrink-0">⚠</span>
-              <span>The button color blends into the hero background ({{ cBtnOnHero.toFixed(1) }}:1). Pick a lighter or contrasting button color so the CTA stands out.</span>
             </div>
 
             <div class="space-y-1.5">
