@@ -11,7 +11,7 @@ import { useCompany } from '~/composables/useCompany'
 
 const { companyName: nameProp, heroOverlap = false, active = 'home' } = defineProps<{ companyName?: string; heroOverlap?: boolean; active?: 'home' | 'opportunities' }>()
 const emit = defineEmits<{ navigate: [view: 'home' | 'opportunities'] }>()
-const { themeVars, forEmployeesOn, logoUrl } = useCareerSite()
+const { themeVars, forEmployeesOn, logoUrl, headerSticky, headerFullWidth } = useCareerSite()
 const { data: company } = useCompany()
 const companyName = computed(() => nameProp || company.value?.name || 'Your Company')
 const isHome = computed(() => active === 'home')
@@ -19,11 +19,22 @@ const isHome = computed(() => active === 'home')
 
 <template>
   <div class="cc-root relative min-h-screen bg-white text-[color-mix(in_srgb,var(--cc-header)_92%,transparent)]" :style="themeVars">
-    <!-- Header — floating rounded pill (dark bar, primary CTA). Overlaps the
-         hero on home so the cover shows around it; floats on light pages otherwise. -->
-    <header class="sticky top-0 z-40 px-4 pt-4" :class="heroOverlap ? '-mb-[80px]' : ''">
-      <div class="mx-auto max-w-[1200px]">
-        <div class="rounded-[22px] px-5 md:px-7 h-16 flex items-center gap-8 shadow-[0_14px_38px_rgba(10,15,25,0.28)]" :style="{ background: 'var(--cc-header)' }">
+    <!-- Header — full-width bar or floating rounded pill, sticky or static
+         (both driven by Settings). Overlaps the hero on home so the cover
+         shows around/behind it. -->
+    <header
+      class="z-40"
+      :class="[
+        headerSticky ? 'sticky top-0' : 'relative',
+        headerFullWidth ? '' : 'px-4 pt-4',
+        heroOverlap ? (headerFullWidth ? '-mb-16' : '-mb-[80px]') : '',
+      ]">
+      <div
+        :class="headerFullWidth
+          ? 'shadow-[0_2px_16px_rgba(0,0,0,0.14)]'
+          : 'mx-auto max-w-[1200px] rounded-[22px] overflow-hidden shadow-[0_14px_38px_rgba(10,15,25,0.28)]'"
+        :style="{ background: 'var(--cc-header)' }">
+        <div class="mx-auto max-w-[1200px] px-5 md:px-7 h-16 flex items-center gap-8">
           <button type="button" class="flex items-center gap-2.5 shrink-0" @click="emit('navigate', 'home')">
             <img v-if="logoUrl" :src="logoUrl" alt="" class="h-9 max-w-[150px] object-contain">
             <template v-else>

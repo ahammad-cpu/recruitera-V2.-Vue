@@ -62,6 +62,9 @@ definePageMeta({ layout: 'settings' })
 // ─────────────── Toggles ───────────────
 const generalApplicationOn = ref(false)
 const forEmployeesOn = ref(true)
+// Header layout
+const headerSticky = ref(true)
+const headerFullWidth = ref(false)
 // Single source of truth for publish state (was: publishedOn + liveOn + a badge).
 const published = ref(true)
 
@@ -258,6 +261,8 @@ employeeDomain.value = _cs.employeeDomain.value
 subdomain.value = _cs.subdomain.value
 forEmployeesOn.value = _cs.forEmployeesOn.value
 generalApplicationOn.value = _cs.generalApplicationOn.value
+headerSticky.value = _cs.headerSticky.value
+headerFullWidth.value = _cs.headerFullWidth.value
 published.value = _cs.published.value
 // Keep the store in sync with builder edits (→ persists → public /careers page).
 watchEffect(() => {
@@ -275,6 +280,8 @@ watchEffect(() => {
   _cs.subdomain.value = subdomain.value
   _cs.forEmployeesOn.value = forEmployeesOn.value
   _cs.generalApplicationOn.value = generalApplicationOn.value
+  _cs.headerSticky.value = headerSticky.value
+  _cs.headerFullWidth.value = headerFullWidth.value
   _cs.published.value = published.value
 })
 // Logo / cover uploads write straight to the shared store (data URLs).
@@ -296,6 +303,7 @@ const cBtnOnHero = computed(() => contrast(btnColor.value, primaryColor.value))
 function snapshot() {
   return JSON.stringify({
     g: generalApplicationOn.value, fe: forEmployeesOn.value, pub: published.value,
+    hsticky: headerSticky.value, hfull: headerFullWidth.value,
     pc: primaryColor.value, hc: headerColor.value, bc: btnColor.value, cc: ctaColor.value,
     font: font.value, hl: headline.value, intro: intro.value, video: videoUrl.value,
     values: values.value, testimonials: testimonials.value, ed: employeeDomain.value, sub: subdomain.value,
@@ -315,6 +323,7 @@ function discardChanges() {
   if (!savedSnapshot.value) return
   const s = JSON.parse(savedSnapshot.value)
   generalApplicationOn.value = s.g; forEmployeesOn.value = s.fe; published.value = s.pub
+  headerSticky.value = s.hsticky; headerFullWidth.value = s.hfull
   primaryColor.value = s.pc; headerColor.value = s.hc; btnColor.value = s.bc; ctaColor.value = s.cc
   font.value = s.font; headline.value = s.hl; intro.value = s.intro; videoUrl.value = s.video
   values.value = JSON.parse(JSON.stringify(s.values)); testimonials.value = JSON.parse(JSON.stringify(s.testimonials))
@@ -481,6 +490,25 @@ const testimonialsGridClass = computed(() => (previewMode.value === 'desktop' ? 
                 >AA {{ cLabelOnBtn >= 4.5 ? '✓' : '✗' }}</span>
                 <input type="color" :value="btnColor" class="size-8 cursor-pointer rounded border border-[var(--brand-border)]" @input="onBtnChange(($event.target as HTMLInputElement).value)">
                 <Input :model-value="btnColor" maxlength="7" class="h-8 w-24 font-mono text-xs" @update:model-value="v => hexInput(String(v), onBtnChange)" />
+              </div>
+            </div>
+
+            <!-- Header layout -->
+            <div class="space-y-3 rounded-lg border border-[var(--brand-border)] p-3">
+              <div class="text-[12px] font-semibold text-[var(--brand-text-secondary)]">Header layout</div>
+              <div class="flex items-center justify-between gap-3">
+                <div>
+                  <div class="text-[13px] text-[var(--brand-text)]">Full-width bar</div>
+                  <div class="text-[11.5px] text-[var(--brand-text-secondary)]">Off = floating rounded bar · On = edge-to-edge bar</div>
+                </div>
+                <Switch v-model="headerFullWidth" class="shrink-0 data-[state=checked]:bg-[var(--brand-teal)]" />
+              </div>
+              <div class="flex items-center justify-between gap-3">
+                <div>
+                  <div class="text-[13px] text-[var(--brand-text)]">Sticky on scroll</div>
+                  <div class="text-[11.5px] text-[var(--brand-text-secondary)]">Header stays pinned to the top as you scroll</div>
+                </div>
+                <Switch v-model="headerSticky" class="shrink-0 data-[state=checked]:bg-[var(--brand-teal)]" />
               </div>
             </div>
 

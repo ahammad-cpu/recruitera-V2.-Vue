@@ -28,6 +28,9 @@ interface CareerState {
   generalApplicationOn: boolean
   forEmployeesOn: boolean
   published: boolean
+  // Header layout
+  headerSticky: boolean
+  headerFullWidth: boolean
   // Branding
   primaryColor: string
   headerColor: string
@@ -55,6 +58,8 @@ const state = reactive<CareerState>({
   generalApplicationOn: false,
   forEmployeesOn: true,
   published: true,
+  headerSticky: true,
+  headerFullWidth: false,
   primaryColor: '#4d7c0f',
   headerColor: '#0f172a',
   btnColor: '#4d7c0f',
