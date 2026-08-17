@@ -39,6 +39,7 @@ interface CareerState {
   font: string
   logoUrl: string
   coverUrl: string
+  coverVideoUrl: string
   // Hero
   headline: string
   intro: string
@@ -67,6 +68,7 @@ const state = reactive<CareerState>({
   font: 'Geist',
   logoUrl: '',
   coverUrl: '',
+  coverVideoUrl: '',
   headline: 'Build the future of hiring with us',
   intro: 'We help teams hire better and faster. Join a team that values craft, ownership, and candor — and do the best work of your career.',
   videoUrl: '',

@@ -11,7 +11,7 @@ import { ccEmploymentType, ccWorkLabel, ccDaysAgo, ccBlurb } from '~/utils/caree
 
 const emit = defineEmits<{ 'open-job': [id: string]; 'view-all': [] }>()
 
-const { headline, intro, values, testimonials, videoUrl, forEmployeesOn, employeeDomain, coverUrl } = useCareerSite()
+const { headline, intro, values, testimonials, videoUrl, forEmployeesOn, employeeDomain, coverUrl, coverVideoUrl } = useCareerSite()
 const { data: company } = useCompany()
 const { jobs } = useJobs()
 const companyName = computed(() => company.value?.name || 'Your Company')
@@ -28,6 +28,9 @@ const gridColsClass = computed(() => {
 })
 
 const ytId = computed(() => videoUrl.value.match(/(?:youtu\.be\/|[?&]v=|embed\/)([\w-]{11})/)?.[1] ?? '')
+// Cover video: YouTube link → embedded loop; anything else → treated as a video file (mp4/webm).
+const coverYtId = computed(() => coverVideoUrl.value.match(/(?:youtu\.be\/|[?&]v=|embed\/)([\w-]{11})/)?.[1] ?? '')
+const hasCoverMedia = computed(() => !!coverVideoUrl.value || !!coverUrl.value)
 function initials(name: string) { return name.trim().split(/\s+/).map(p => p[0]).slice(0, 2).join('').toUpperCase() || '?' }
 function scrollToJobs() { document.getElementById('jobs')?.scrollIntoView({ behavior: 'smooth' }) }
 </script>
@@ -36,10 +39,17 @@ function scrollToJobs() { document.getElementById('jobs')?.scrollIntoView({ beha
   <div>
     <!-- Hero -->
     <section class="relative overflow-hidden">
-      <div class="absolute inset-0" :style="coverUrl
+      <!-- Cover background: video > image > gradient -->
+      <div v-if="coverVideoUrl" class="absolute inset-0 overflow-hidden bg-black">
+        <iframe v-if="coverYtId" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[177.78vh] min-w-full h-[56.25vw] min-h-full pointer-events-none"
+          :src="`https://www.youtube.com/embed/${coverYtId}?autoplay=1&mute=1&loop=1&playlist=${coverYtId}&controls=0&showinfo=0&modestbranding=1&rel=0&playsinline=1`"
+          title="Cover video" frameborder="0" allow="autoplay; encrypted-media" />
+        <video v-else class="absolute inset-0 w-full h-full object-cover" :src="coverVideoUrl" autoplay muted loop playsinline />
+      </div>
+      <div v-else class="absolute inset-0" :style="coverUrl
         ? { backgroundImage: `url(${coverUrl})`, backgroundSize: 'cover', backgroundPosition: 'center' }
         : { background: 'linear-gradient(135deg, var(--cc-primary), color-mix(in srgb, var(--cc-primary) 45%, #0b1220))' }" />
-      <div class="absolute inset-0" :style="{ background: coverUrl ? 'linear-gradient(90deg, rgba(8,14,22,.82), rgba(8,14,22,.45))' : 'transparent' }" />
+      <div class="absolute inset-0" :style="{ background: hasCoverMedia ? 'linear-gradient(90deg, rgba(8,14,22,.82), rgba(8,14,22,.45))' : 'transparent' }" />
       <div class="relative mx-auto max-w-[1160px] px-6 pt-28 pb-40 md:pt-36 md:pb-48 text-white">
         <h1 class="text-[clamp(2.5rem,6.5vw,4.8rem)] font-extrabold leading-[1.02] tracking-[-0.035em] max-w-[17ch] text-balance">{{ headline }}</h1>
         <p class="mt-6 text-[17px] md:text-[19px] leading-relaxed text-white/85 max-w-[58ch]">{{ intro }}</p>

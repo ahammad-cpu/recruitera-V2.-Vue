@@ -287,6 +287,7 @@ watchEffect(() => {
 // Logo / cover uploads write straight to the shared store (data URLs).
 const ccLogo = _cs.logoUrl
 const ccCover = _cs.coverUrl
+const ccCoverVideo = _cs.coverVideoUrl
 function onLogoUpload(e: Event) {
   const f = (e.target as HTMLInputElement).files?.[0]
   if (!f) return
@@ -453,6 +454,11 @@ const testimonialsGridClass = computed(() => (previewMode.value === 'desktop' ? 
                   </div>
                   <input type="file" accept="image/png,image/jpeg" class="sr-only" @change="onCoverUpload">
                 </label>
+                <div class="flex items-center gap-1.5">
+                  <Input :model-value="ccCoverVideo" placeholder="Cover video URL (YouTube or .mp4) — overrides image" class="h-8 flex-1 text-xs" @update:model-value="v => ccCoverVideo = String(v)" />
+                  <button v-if="ccCoverVideo" type="button" class="shrink-0 h-8 px-2 rounded border border-[var(--brand-border)] text-[11px] text-[var(--brand-text-muted)] hover:bg-[var(--brand-canvas)]" @click="ccCoverVideo = ''">Clear</button>
+                </div>
+                <div class="text-[11px] text-[var(--brand-text-faint)]">A video plays as the cover background; leave empty to use the image.</div>
               </div>
             </div>
 
