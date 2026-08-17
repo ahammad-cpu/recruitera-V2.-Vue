@@ -48,6 +48,7 @@ import {
   Puzzle,
   Gauge,
   Hexagon,
+  X,
 } from 'lucide-vue-next'
 import { onBeforeRouteLeave } from 'vue-router'
 import { BrandButton, BrandStatusBadge } from '~/components/brand'
@@ -486,6 +487,7 @@ const testimonialsGridClass = computed(() => (previewMode.value === 'desktop' ? 
                     </div>
                     <input type="file" accept="image/png,image/jpeg" class="sr-only" @change="onCoverUpload">
                   </label>
+                  <button v-if="ccCover" type="button" class="inline-flex items-center gap-1 text-[11.5px] font-medium text-[var(--brand-text-muted)] hover:text-[var(--brand-status-closed-text)]" @click="ccCover = ''"><X class="w-3 h-3" /> Remove cover image</button>
                 </template>
                 <!-- VIDEO source -->
                 <template v-else>
