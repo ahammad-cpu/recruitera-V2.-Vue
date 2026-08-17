@@ -38,6 +38,7 @@ interface CareerState {
   ctaColor: string
   font: string
   logoUrl: string
+  coverType: 'image' | 'video'
   coverUrl: string
   coverVideoUrl: string
   // Hero
@@ -67,6 +68,7 @@ const state = reactive<CareerState>({
   ctaColor: '#4d7c0f',
   font: 'Geist',
   logoUrl: '',
+  coverType: 'image',
   coverUrl: '',
   coverVideoUrl: '',
   headline: 'Build the future of hiring with us',

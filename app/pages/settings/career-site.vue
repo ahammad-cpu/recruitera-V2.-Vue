@@ -287,6 +287,7 @@ watchEffect(() => {
 })
 // Logo / cover uploads write straight to the shared store (data URLs).
 const ccLogo = _cs.logoUrl
+const ccCoverType = _cs.coverType
 const ccCover = _cs.coverUrl
 const ccCoverVideo = _cs.coverVideoUrl
 // The video URL uses a LOCAL input ref and commits to the store only after the
@@ -373,8 +374,9 @@ const filteredJobs = computed(() => jobFilter.value === 'all' ? JOBS : JOBS.filt
 
 // ─────────────── Preview computed styles ───────────────
 const coverYtId = computed(() => ccCoverVideo.value.match(/(?:youtu\.be\/|[?&]v=|embed\/)([\w-]{11})/)?.[1] ?? '')
-const coverHasVideo = computed(() => !!coverYtId.value || ccIsVideoFile(ccCoverVideo.value))
-const heroHasCover = computed(() => coverHasVideo.value || !!ccCover.value)
+const previewVideo = computed(() => ccCoverType.value === 'video' && (!!coverYtId.value || ccIsVideoFile(ccCoverVideo.value)))
+const previewImage = computed(() => ccCoverType.value === 'image' && !!ccCover.value)
+const heroHasCover = computed(() => previewVideo.value || previewImage.value)
 const heroBackground = computed(() => `linear-gradient(135deg, ${primaryColor.value} 0%, ${headerColor.value} 130%)`)
 const videoBackground = computed(() => `linear-gradient(135deg, ${headerColor.value}, ${primaryColor.value})`)
 const previewWidth = computed(() => (previewMode.value === 'desktop' ? '1200px' : '320px'))
@@ -460,23 +462,36 @@ const testimonialsGridClass = computed(() => (previewMode.value === 'desktop' ? 
                 </label>
               </div>
               <div class="flex-1 space-y-1.5">
-                <div class="text-[12px] font-semibold text-[var(--brand-text-secondary)]">Cover image <span class="text-[var(--brand-text-faint)] font-normal">(4:1)</span></div>
-                <label class="group relative flex h-16 w-full cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg border border-[var(--brand-border)] bg-[var(--brand-canvas)] transition-colors hover:border-[var(--brand-teal)]/60">
-                  <img v-if="ccCover" :src="ccCover" alt="Cover" class="absolute inset-0 h-full w-full object-cover">
-                  <template v-else>
-                    <Upload class="w-[15px] h-[15px] text-[var(--brand-icon-muted)]" />
-                    <span class="text-[13px] text-[var(--brand-text-muted)]">Upload cover</span>
-                  </template>
-                  <div class="absolute inset-0 grid place-items-center bg-black/45 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <Upload class="w-[16px] h-[16px] text-white" />
+                <div class="flex items-center justify-between gap-2">
+                  <div class="text-[12px] font-semibold text-[var(--brand-text-secondary)]">Cover</div>
+                  <!-- Choose one source: image OR video -->
+                  <div class="flex items-center rounded-lg bg-[var(--brand-canvas)] p-0.5 text-[11px] font-semibold">
+                    <button type="button" class="px-2.5 py-1 rounded-md transition-colors" :class="ccCoverType === 'image' ? 'bg-[var(--brand-surface-white)] shadow-sm text-[var(--brand-text)]' : 'text-[var(--brand-text-muted)]'" @click="ccCoverType = 'image'">Image</button>
+                    <button type="button" class="px-2.5 py-1 rounded-md transition-colors" :class="ccCoverType === 'video' ? 'bg-[var(--brand-surface-white)] shadow-sm text-[var(--brand-text)]' : 'text-[var(--brand-text-muted)]'" @click="ccCoverType = 'video'">Video</button>
                   </div>
-                  <input type="file" accept="image/png,image/jpeg" class="sr-only" @change="onCoverUpload">
-                </label>
-                <div class="flex items-center gap-1.5">
-                  <Input :model-value="coverVideoInput" placeholder="Cover video URL (YouTube or .mp4) — overrides image" class="h-8 min-w-0 flex-1 text-xs" @update:model-value="onCoverVideoInput" />
-                  <button v-if="coverVideoInput" type="button" class="shrink-0 h-8 px-2 rounded border border-[var(--brand-border)] text-[11px] text-[var(--brand-text-muted)] hover:bg-[var(--brand-canvas)]" @click="clearCoverVideo">Clear</button>
                 </div>
-                <div class="text-[11px] text-[var(--brand-text-faint)]">A video plays as the cover background; leave empty to use the image.</div>
+                <!-- IMAGE source -->
+                <template v-if="ccCoverType === 'image'">
+                  <label class="group relative flex h-16 w-full cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg border border-[var(--brand-border)] bg-[var(--brand-canvas)] transition-colors hover:border-[var(--brand-teal)]/60">
+                    <img v-if="ccCover" :src="ccCover" alt="Cover" class="absolute inset-0 h-full w-full object-cover">
+                    <template v-else>
+                      <Upload class="w-[15px] h-[15px] text-[var(--brand-icon-muted)]" />
+                      <span class="text-[13px] text-[var(--brand-text-muted)]">Upload cover image <span class="text-[var(--brand-text-faint)]">(4:1)</span></span>
+                    </template>
+                    <div class="absolute inset-0 grid place-items-center bg-black/45 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Upload class="w-[16px] h-[16px] text-white" />
+                    </div>
+                    <input type="file" accept="image/png,image/jpeg" class="sr-only" @change="onCoverUpload">
+                  </label>
+                </template>
+                <!-- VIDEO source -->
+                <template v-else>
+                  <div class="flex items-center gap-1.5">
+                    <Input :model-value="coverVideoInput" placeholder="YouTube link or .mp4 URL" class="h-9 min-w-0 flex-1 text-xs" @update:model-value="onCoverVideoInput" />
+                    <button v-if="coverVideoInput" type="button" class="shrink-0 h-9 px-2 rounded border border-[var(--brand-border)] text-[11px] text-[var(--brand-text-muted)] hover:bg-[var(--brand-canvas)]" @click="clearCoverVideo">Clear</button>
+                  </div>
+                  <div class="text-[11px] text-[var(--brand-text-faint)]">Plays full-screen with the headline over it. Paste a YouTube link or a direct .mp4/.webm URL.</div>
+                </template>
               </div>
             </div>
 
@@ -756,21 +771,22 @@ const testimonialsGridClass = computed(() => (previewMode.value === 'desktop' ? 
               </span>
             </header>
 
-            <!-- Hero -->
-            <section class="relative flex flex-col items-start justify-center gap-4 overflow-hidden px-6" style="padding-top:56px;padding-bottom:56px;min-height:300px" :style="heroHasCover ? {} : { background: heroBackground }">
-              <!-- Cover background: video (thumbnail only in preview — the live
-                   page plays it) > image > gradient. A thumbnail keeps the
-                   builder light so editing never freezes. -->
-              <template v-if="coverHasVideo">
+            <!-- Hero — video: full-bleed, text bottom-left; else image/gradient centered.
+                 Cover video uses a thumbnail so the builder stays light. -->
+            <section
+              class="relative flex flex-col gap-3 overflow-hidden px-6"
+              :class="previewVideo ? 'justify-end' : 'justify-center gap-4'"
+              :style="[{ paddingTop: previewVideo ? '96px' : '56px', paddingBottom: previewVideo ? '28px' : '56px', minHeight: previewVideo ? '440px' : '300px' }, heroHasCover ? {} : { background: heroBackground }]">
+              <template v-if="previewVideo">
                 <img v-if="coverYtId" :src="`https://img.youtube.com/vi/${coverYtId}/hqdefault.jpg`" alt="" class="absolute inset-0 h-full w-full object-cover">
                 <video v-else class="absolute inset-0 h-full w-full object-cover" :src="ccCoverVideo" muted loop playsinline />
               </template>
-              <img v-else-if="ccCover" :src="ccCover" alt="" class="absolute inset-0 h-full w-full object-cover">
-              <span v-if="coverHasVideo" class="absolute top-3 right-3 z-[1] inline-flex items-center gap-1 rounded-full bg-black/55 px-2 py-0.5 text-[10px] font-semibold text-white"><Play class="w-2.5 h-2.5 fill-current" /> Video</span>
-              <div v-if="heroHasCover" class="absolute inset-0" style="background:linear-gradient(90deg, rgba(8,14,22,.82), rgba(8,14,22,.45))" />
-              <h1 class="relative font-extrabold text-white leading-[1.18] max-w-[560px]" style="font-size:34px">{{ headline }}</h1>
-              <p class="relative text-white/85 max-w-[440px] leading-[1.7]" style="font-size:14px">{{ intro }}</p>
-              <button type="button" class="relative text-white rounded-xl px-5 py-2.5 text-[13.5px] font-bold shadow-lg" :style="{ background: ctaColor }">View openings →</button>
+              <img v-else-if="previewImage" :src="ccCover" alt="" class="absolute inset-0 h-full w-full object-cover">
+              <span v-if="previewVideo" class="absolute top-3 right-3 z-[1] inline-flex items-center gap-1 rounded-full bg-black/55 px-2 py-0.5 text-[10px] font-semibold text-white"><Play class="w-2.5 h-2.5 fill-current" /> Video</span>
+              <div v-if="heroHasCover" class="absolute inset-0" :style="{ background: previewVideo ? 'linear-gradient(to top, rgba(8,14,22,.86), rgba(8,14,22,.15))' : 'linear-gradient(90deg, rgba(8,14,22,.82), rgba(8,14,22,.45))' }" />
+              <h1 class="relative font-extrabold text-white leading-[1.1] max-w-[560px]" :style="{ fontSize: previewVideo ? '40px' : '34px' }">{{ headline }}</h1>
+              <p v-if="!previewVideo || intro" class="relative text-white/85 max-w-[440px] leading-[1.6]" style="font-size:14px">{{ intro }}</p>
+              <button type="button" class="relative w-fit text-white rounded-xl px-5 py-2.5 text-[13.5px] font-bold shadow-lg" :style="{ background: ctaColor }">View openings →</button>
             </section>
 
             <!-- Opportunities -->

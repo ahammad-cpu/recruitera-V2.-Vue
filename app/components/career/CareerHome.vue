@@ -11,7 +11,7 @@ import { ccEmploymentType, ccWorkLabel, ccDaysAgo, ccBlurb, ccIsVideoFile } from
 
 const emit = defineEmits<{ 'open-job': [id: string]; 'view-all': [] }>()
 
-const { headline, intro, values, testimonials, videoUrl, forEmployeesOn, employeeDomain, coverUrl, coverVideoUrl } = useCareerSite()
+const { headline, intro, values, testimonials, videoUrl, forEmployeesOn, employeeDomain, coverType, coverUrl, coverVideoUrl } = useCareerSite()
 const { data: company } = useCompany()
 const { jobs } = useJobs()
 const companyName = computed(() => company.value?.name || 'Your Company')
@@ -32,26 +32,38 @@ const ytId = computed(() => videoUrl.value.match(/(?:youtu\.be\/|[?&]v=|embed\/)
 const coverYtId = computed(() => coverVideoUrl.value.match(/(?:youtu\.be\/|[?&]v=|embed\/)([\w-]{11})/)?.[1] ?? '')
 const coverIsFile = computed(() => ccIsVideoFile(coverVideoUrl.value))
 const coverHasVideo = computed(() => !!coverYtId.value || coverIsFile.value)
-const hasCoverMedia = computed(() => coverHasVideo.value || !!coverUrl.value)
+// Video hero (full-bleed, bottom-left text) only when the cover source is set
+// to "video" and a playable video exists. Otherwise the image/gradient hero.
+const heroIsVideo = computed(() => coverType.value === 'video' && coverHasVideo.value)
+const heroImage = computed(() => coverType.value === 'image' && !!coverUrl.value)
 function initials(name: string) { return name.trim().split(/\s+/).map(p => p[0]).slice(0, 2).join('').toUpperCase() || '?' }
 function scrollToJobs() { document.getElementById('jobs')?.scrollIntoView({ behavior: 'smooth' }) }
 </script>
 
 <template>
   <div>
-    <!-- Hero -->
-    <section class="relative overflow-hidden">
-      <!-- Cover background: video (resolved YouTube ID or real file only) > image > gradient -->
-      <div v-if="coverHasVideo" class="absolute inset-0 overflow-hidden bg-black">
+    <!-- Hero — VIDEO: full-bleed, headline anchored bottom-left (Vodafone-style) -->
+    <section v-if="heroIsVideo" class="relative overflow-hidden min-h-[86vh] flex items-end bg-black">
+      <div class="absolute inset-0 overflow-hidden">
         <iframe v-if="coverYtId" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[177.78vh] min-w-full h-[56.25vw] min-h-full pointer-events-none"
           :src="`https://www.youtube.com/embed/${coverYtId}?autoplay=1&mute=1&loop=1&playlist=${coverYtId}&controls=0&showinfo=0&modestbranding=1&rel=0&playsinline=1`"
           title="Cover video" frameborder="0" allow="autoplay; encrypted-media" />
         <video v-else class="absolute inset-0 w-full h-full object-cover" :src="coverVideoUrl" autoplay muted loop playsinline />
       </div>
-      <div v-else class="absolute inset-0" :style="coverUrl
+      <div class="absolute inset-0" style="background:linear-gradient(to top, rgba(8,14,22,.86) 0%, rgba(8,14,22,.42) 42%, rgba(8,14,22,.12) 100%)" />
+      <div class="relative w-full mx-auto max-w-[1160px] px-6 pb-20 md:pb-28 text-white">
+        <h1 class="text-[clamp(2.7rem,7vw,5.4rem)] font-extrabold leading-[1.0] tracking-[-0.035em] max-w-[16ch] text-balance">{{ headline }}</h1>
+        <p v-if="intro" class="mt-5 text-[17px] md:text-[19px] leading-relaxed text-white/85 max-w-[52ch]">{{ intro }}</p>
+        <button type="button" class="mt-8 inline-flex items-center gap-2 h-12 px-6 rounded-[13px] bg-white text-[15px] font-bold transition hover:brightness-95" :style="{ color: 'var(--cc-primary)' }" @click="scrollToJobs">View openings <ArrowRight class="w-[18px] h-[18px]" stroke-width="2.2" /></button>
+      </div>
+    </section>
+
+    <!-- Hero — IMAGE / GRADIENT: content top-left, jobs card overlaps below -->
+    <section v-else class="relative overflow-hidden">
+      <div class="absolute inset-0" :style="heroImage
         ? { backgroundImage: `url(${coverUrl})`, backgroundSize: 'cover', backgroundPosition: 'center' }
         : { background: 'linear-gradient(135deg, var(--cc-primary), color-mix(in srgb, var(--cc-primary) 45%, #0b1220))' }" />
-      <div class="absolute inset-0" :style="{ background: hasCoverMedia ? 'linear-gradient(90deg, rgba(8,14,22,.82), rgba(8,14,22,.45))' : 'transparent' }" />
+      <div class="absolute inset-0" :style="{ background: heroImage ? 'linear-gradient(90deg, rgba(8,14,22,.82), rgba(8,14,22,.45))' : 'transparent' }" />
       <div class="relative mx-auto max-w-[1160px] px-6 pt-28 pb-40 md:pt-36 md:pb-48 text-white">
         <h1 class="text-[clamp(2.5rem,6.5vw,4.8rem)] font-extrabold leading-[1.02] tracking-[-0.035em] max-w-[17ch] text-balance">{{ headline }}</h1>
         <p class="mt-6 text-[17px] md:text-[19px] leading-relaxed text-white/85 max-w-[58ch]">{{ intro }}</p>
@@ -61,8 +73,8 @@ function scrollToJobs() { document.getElementById('jobs')?.scrollIntoView({ beha
       </div>
     </section>
 
-    <!-- Featured jobs — overlapping card -->
-    <section id="jobs" class="relative z-10 -mt-28 md:-mt-32">
+    <!-- Featured jobs — overlaps the image/gradient hero; sits below the video hero -->
+    <section id="jobs" class="relative z-10" :class="heroIsVideo ? 'mt-14 md:mt-20' : '-mt-28 md:-mt-32'">
       <div class="mx-auto max-w-[1160px] px-6">
         <div class="rounded-[22px] bg-white border border-[#eceef1] shadow-[0_28px_70px_rgba(15,23,42,0.12)] p-7 md:p-10">
           <div class="flex flex-wrap items-end justify-between gap-4">
