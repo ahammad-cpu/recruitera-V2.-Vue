@@ -84,7 +84,7 @@ const marqueeStyle = computed(() => ({ animationDuration: `${Math.max(18, values
          margin, rounded 24px) over a heavily blurred copy that fills the rest -->
     <section v-else-if="heroImage" class="relative overflow-hidden">
       <img :src="coverUrl" alt="" aria-hidden="true" class="absolute inset-0 h-full w-full object-cover scale-125 blur-2xl">
-      <div class="relative mx-auto max-w-[1400px] px-3 pt-24 pb-4">
+      <div class="relative mx-auto max-w-[1520px] px-2 pt-[86px] pb-4">
         <img :src="coverUrl" alt="" class="block w-full h-auto rounded-[24px] shadow-[0_16px_50px_rgba(0,0,0,0.28)]">
       </div>
     </section>
