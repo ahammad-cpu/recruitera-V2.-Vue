@@ -84,6 +84,8 @@ const marqueeStyle = computed(() => ({ animationDuration: `${Math.max(18, values
          header (pt clears the header overlap so the top isn't cut off) -->
     <section v-else-if="heroImage" class="relative pt-20">
       <img :src="coverUrl" alt="" class="block w-full h-auto">
+      <!-- subtle black overlay across the gap + photo for depth -->
+      <div class="absolute inset-0 pointer-events-none" style="background:linear-gradient(180deg, rgba(8,14,22,.42), rgba(8,14,22,.24))" />
     </section>
 
     <!-- Hero — GRADIENT (no cover): headline + intro + CTA -->

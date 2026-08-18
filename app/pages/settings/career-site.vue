@@ -755,6 +755,7 @@ const testimonialsGridClass = computed(() => (previewMode.value === 'desktop' ? 
             <!-- Hero — image cover: whole photo at natural aspect (no crop) -->
             <section v-if="previewImage" class="relative">
               <img :src="ccCover" alt="" class="block w-full h-auto">
+              <div class="absolute inset-0 pointer-events-none" style="background:linear-gradient(180deg, rgba(8,14,22,.42), rgba(8,14,22,.24))" />
             </section>
             <!-- Hero — video / gradient: headline + intro + CTA -->
             <section v-else class="relative flex flex-col items-start justify-center gap-4 overflow-hidden px-6" style="padding-top:56px;padding-bottom:56px;min-height:300px" :style="heroHasCover ? {} : { background: heroBackground }">
