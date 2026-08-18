@@ -3,10 +3,10 @@
   card + jobs list. Emits open-job(id). Driven by useJobs() + useCareerSite().
 -->
 <script setup lang="ts">
-import { Search, MapPin } from 'lucide-vue-next'
+import { Search, MapPin, Clock, ArrowRight } from 'lucide-vue-next'
 import { useJobs } from '~/composables/useJobs'
 import { useCareerSite } from '~/composables/useCareerSite'
-import { ccEmploymentType, ccWorkLabel } from '~/utils/careerJob'
+import { ccEmploymentType, ccWorkLabel, ccDaysAgo, ccBlurb } from '~/utils/careerJob'
 
 const emit = defineEmits<{ 'open-job': [id: string] }>()
 
@@ -101,20 +101,22 @@ const selCls = 'w-full h-11 px-3 rounded-[10px] border border-[#e3e6ea] bg-white
 
             <div class="mt-4 flex flex-col gap-4">
               <button v-for="job in results" :key="job.id" type="button"
-                class="flex flex-wrap items-center justify-between gap-x-6 gap-y-4 text-left rounded-[16px] border border-[#eceef1] bg-white px-6 py-5 md:px-7 transition duration-200 hover:-translate-y-0.5 hover:shadow-[0_16px_40px_rgba(15,23,42,0.08)] hover:border-[color:var(--cc-primary)] active:scale-[0.995]" @click="emit('open-job', job.id)">
-                <!-- title + department -->
-                <div class="min-w-0">
-                  <h3 class="text-[18px] font-bold tracking-[-0.01em]" :style="{ color: 'var(--cc-header)' }">{{ job.title }}</h3>
-                  <div v-if="job.department" class="mt-0.5 text-[14px] text-[#8a919c]">{{ job.department }}</div>
+                class="block text-left rounded-[16px] border border-[#eceef1] bg-white p-5 transition duration-200 hover:-translate-y-0.5 hover:shadow-[0_16px_40px_rgba(15,23,42,0.08)] hover:border-[color:var(--cc-primary)] active:scale-[0.995]" @click="emit('open-job', job.id)">
+                <div class="flex items-start justify-between gap-4">
+                  <div class="min-w-0">
+                    <div class="flex flex-wrap items-center gap-2">
+                      <h3 class="text-[17px] font-bold" :style="{ color: 'var(--cc-primary)' }">{{ job.title }}</h3>
+                      <span class="inline-flex items-center h-6 px-2.5 rounded-full text-[11.5px] font-bold" :style="{ background: 'color-mix(in srgb, var(--cc-primary) 12%, white)', color: 'var(--cc-primary)' }">{{ ccEmploymentType(job) }}</span>
+                      <span class="inline-flex items-center h-6 px-2.5 rounded-full border border-[#e6e8ec] text-[11.5px] font-semibold text-[#5b6472]">{{ ccWorkLabel(job.workModel) }}</span>
+                    </div>
+                    <p class="mt-2 text-[13.5px] leading-relaxed text-[#6b7280] line-clamp-2 max-w-[70ch]">{{ ccBlurb(job) }}</p>
+                    <div class="mt-3 flex items-center gap-4 text-[12.5px] text-[#8a919c]">
+                      <span v-if="job.location" class="inline-flex items-center gap-1.5"><MapPin class="w-3.5 h-3.5" stroke-width="1.8" />{{ job.location }}</span>
+                      <span class="inline-flex items-center gap-1.5"><Clock class="w-3.5 h-3.5" stroke-width="1.8" />{{ ccDaysAgo(job.createdAt) }}</span>
+                    </div>
+                  </div>
+                  <span class="shrink-0 inline-flex items-center gap-1.5 h-10 px-4 rounded-[11px] text-white text-[13.5px] font-semibold" :style="{ background: 'var(--cc-primary)' }">View Details <ArrowRight class="w-4 h-4" stroke-width="2" /></span>
                 </div>
-                <!-- meta -->
-                <div class="flex flex-wrap items-center gap-x-7 gap-y-2">
-                  <span v-if="job.location" class="inline-flex items-center gap-1.5 text-[14px] text-[#4b5563]"><MapPin class="w-4 h-4 text-[#9aa1ac]" stroke-width="1.8" />{{ job.location }}</span>
-                  <span class="text-[14px] font-bold" :style="{ color: 'var(--cc-primary)' }">{{ ccEmploymentType(job) }}</span>
-                  <span class="inline-flex items-center h-8 px-3.5 rounded-[9px] border border-[#e3e6ea] text-[13px] font-semibold text-[#374151]">{{ ccWorkLabel(job.workModel) }}</span>
-                </div>
-                <!-- apply -->
-                <span class="shrink-0 inline-flex items-center justify-center h-11 px-6 rounded-[12px] text-white text-[14px] font-bold transition duration-150 group-hover:brightness-110" :style="{ background: 'var(--cc-primary)' }">Apply Now</span>
               </button>
 
               <div v-if="!results.length" class="rounded-[16px] border border-dashed border-[#dfe3e8] bg-[#f7f8fa] px-6 py-16 text-center">
