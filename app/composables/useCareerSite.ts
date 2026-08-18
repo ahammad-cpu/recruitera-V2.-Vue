@@ -31,8 +31,6 @@ interface CareerState {
   // Header layout
   headerSticky: boolean
   headerFullWidth: boolean
-  // Hero
-  showHero: boolean
   // Branding
   primaryColor: string
   headerColor: string
@@ -64,7 +62,6 @@ const state = reactive<CareerState>({
   published: true,
   headerSticky: true,
   headerFullWidth: false,
-  showHero: true,
   primaryColor: '#4d7c0f',
   headerColor: '#0f172a',
   btnColor: '#4d7c0f',
