@@ -103,7 +103,7 @@ const marqueeStyle = computed(() => ({ animationDuration: `${Math.max(18, values
 
     <!-- Featured jobs — overlaps the hero (smaller overlap on the tall video so
          it doesn't cover the bottom-anchored text) -->
-    <section id="jobs" class="relative z-10" :class="heroImage ? '' : (heroIsVideo ? '-mt-14 md:-mt-16' : '-mt-28 md:-mt-32')">
+    <section id="jobs" class="relative z-10" :class="(heroIsVideo || heroImage) ? '-mt-14 md:-mt-16' : '-mt-28 md:-mt-32'">
       <div class="mx-auto max-w-[1160px] px-6">
         <div class="rounded-[22px] bg-white border border-[#eceef1] shadow-[0_28px_70px_rgba(15,23,42,0.12)] p-7 md:p-10">
           <div class="flex flex-wrap items-end justify-between gap-4">
