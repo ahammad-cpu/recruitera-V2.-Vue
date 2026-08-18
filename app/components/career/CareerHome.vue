@@ -140,12 +140,8 @@ const marqueeStyle = computed(() => ({ animationDuration: `${Math.max(18, values
       </div>
     </section>
 
-    <!-- Values + Culture — sticky stack: the light values section pins while the
-         dark culture section scrolls up and overlays it (reveals with a rounded
-         top edge). Only engages when there is a culture section to rise over. -->
-    <div class="relative">
-    <section v-if="values.length" class="bg-white px-6 py-16 md:py-24" :class="videoUrl ? 'lg:sticky lg:top-0 z-0' : ''">
-      <div class="mx-auto max-w-[1160px]">
+    <!-- Values -->
+    <section v-if="values.length" class="mx-auto max-w-[1160px] px-6 py-16 md:py-24">
       <div class="text-center max-w-[46ch] mx-auto">
         <div class="text-[13px] font-extrabold uppercase tracking-[0.14em]" :style="{ color: 'var(--cc-primary)' }">What we stand for</div>
         <h2 class="mt-2 text-[clamp(1.8rem,3.8vw,2.6rem)] font-extrabold tracking-[-0.02em] text-balance" :style="{ color: 'var(--cc-header)' }">The principles behind how we work</h2>
@@ -175,11 +171,10 @@ const marqueeStyle = computed(() => ({ animationDuration: `${Math.max(18, values
           </div>
         </div>
       </div>
-      </div>
     </section>
 
-    <!-- Culture video — dark, rises over the sticky values with a rounded edge -->
-    <section v-if="videoUrl" class="relative z-10 rounded-t-[36px] shadow-[0_-24px_60px_rgba(0,0,0,0.28)]" :style="{ background: 'var(--cc-header)' }">
+    <!-- Culture video — two-column dark block (text left, video right) -->
+    <section v-if="videoUrl" :style="{ background: 'var(--cc-header)' }">
       <div class="mx-auto max-w-[1160px] px-6 py-16 md:py-24 grid gap-10 lg:gap-14 lg:grid-cols-2 lg:items-center">
         <!-- Left: copy -->
         <div>
@@ -203,7 +198,6 @@ const marqueeStyle = computed(() => ({ animationDuration: `${Math.max(18, values
         </div>
       </div>
     </section>
-    </div>
 
     <!-- Testimonials — branded left panel + carousel on the right -->
     <section v-if="testimonials.length" class="mx-auto max-w-[1160px] px-6 py-16 md:py-24">
