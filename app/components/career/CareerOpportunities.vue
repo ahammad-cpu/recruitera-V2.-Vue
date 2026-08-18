@@ -61,12 +61,12 @@ const selCls = 'w-full h-11 px-3 rounded-[10px] border border-[#e3e6ea] bg-white
           <h3 class="text-[18px] font-bold" :style="{ color: 'var(--cc-header)' }">Filters</h3>
           <div class="mt-5 flex flex-col gap-4">
             <div>
-              <label class="block text-[12.5px] font-semibold mb-1.5 text-[#6b7280]">Category</label>
-              <select v-model="fDept" :class="selCls"><option value="">Choose Category</option><option v-for="d in departments" :key="d" :value="d">{{ d }}</option></select>
+              <label class="block text-[12.5px] font-semibold mb-1.5 text-[#6b7280]">Department</label>
+              <select v-model="fDept" :class="selCls"><option value="">Choose Department</option><option v-for="d in departments" :key="d" :value="d">{{ d }}</option></select>
             </div>
             <div>
-              <label class="block text-[12.5px] font-semibold mb-1.5 text-[#6b7280]">Type</label>
-              <select v-model="fWork" :class="selCls"><option value="">Choose Type</option><option value="on-site">On-site</option><option value="remote">Remote</option><option value="hybrid">Hybrid</option></select>
+              <label class="block text-[12.5px] font-semibold mb-1.5 text-[#6b7280]">Work Type</label>
+              <select v-model="fWork" :class="selCls"><option value="">Choose Work Type</option><option value="on-site">On-site</option><option value="remote">Remote</option><option value="hybrid">Hybrid</option></select>
             </div>
             <div>
               <label class="block text-[12.5px] font-semibold mb-1.5 text-[#6b7280]">Job Type</label>
