@@ -66,7 +66,7 @@ const inputCls = 'w-full h-12 px-4 rounded-[11px] border border-[#e3e6ea] bg-whi
               <span>{{ ccWorkLabel(job.workModel) }}</span>
             </div>
           </div>
-          <button v-if="isOpen" type="button" class="w-full sm:w-auto mt-1 sm:mt-0 h-12 px-7 rounded-[13px] text-white text-[15px] font-bold transition duration-150 hover:brightness-110 active:scale-[0.98]" :style="{ background: 'var(--cc-primary)' }" @click="tab = 'application'">Apply Now</button>
+          <button v-if="isOpen && tab === 'overview'" type="button" class="w-full sm:w-auto mt-1 sm:mt-0 h-12 px-7 rounded-[13px] text-white text-[15px] font-bold transition duration-150 hover:brightness-110 active:scale-[0.98]" :style="{ background: 'var(--cc-primary)' }" @click="tab = 'application'">Apply Now</button>
         </div>
 
         <!-- Closed roles: show a message instead of the tabs/form -->

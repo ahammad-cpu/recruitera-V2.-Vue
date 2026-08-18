@@ -38,8 +38,9 @@ let tTimer: ReturnType<typeof setInterval> | undefined
 function startT() { if (testimonials.value.length > 1 && !tTimer) tTimer = setInterval(() => goT(1), 6000) }
 function stopT() { if (tTimer) { clearInterval(tTimer); tTimer = undefined } }
 function onTVisibility() { if (document.hidden) stopT(); else startT() }
-onMounted(() => { document.addEventListener('visibilitychange', onTVisibility); startT() })
-onBeforeUnmount(() => { document.removeEventListener('visibilitychange', onTVisibility); stopT() })
+function updateIsMobile() { isMobile.value = window.innerWidth < 640 }
+onMounted(() => { document.addEventListener('visibilitychange', onTVisibility); startT(); updateIsMobile(); window.addEventListener('resize', updateIsMobile) })
+onBeforeUnmount(() => { document.removeEventListener('visibilitychange', onTVisibility); stopT(); window.removeEventListener('resize', updateIsMobile) })
 // Cover video: YouTube link → embedded loop; anything else → treated as a video file (mp4/webm).
 const coverYtId = computed(() => coverVideoUrl.value.match(/(?:youtu\.be\/|[?&]v=|embed\/)([\w-]{11})/)?.[1] ?? '')
 const coverIsFile = computed(() => ccIsVideoFile(coverVideoUrl.value))
@@ -55,7 +56,11 @@ function scrollToJobs() { document.getElementById('jobs')?.scrollIntoView({ beha
 // scroll continuously and seamlessly (CSS animation, no JS timers). The list is
 // duplicated and the track animates to -50%, so the second copy lands exactly
 // where the first began — a perfect loop. Pauses on hover (CSS). ──
-const valuesLoop = computed(() => values.value.length > 3)
+// Values become an auto-scrolling carousel when there are more than fit in a
+// row — or on mobile whenever there's more than one (a stacked list feels long
+// on phones, per the ICP: candidates browsing on mobile).
+const isMobile = ref(false)
+const valuesLoop = computed(() => values.value.length > 3 || (isMobile.value && values.value.length > 1))
 const marqueeValues = computed(() => [...values.value, ...values.value])
 // Constant speed regardless of count (~6s per card).
 const marqueeStyle = computed(() => ({ animationDuration: `${Math.max(18, values.value.length * 6)}s` }))
