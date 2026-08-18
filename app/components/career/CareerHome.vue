@@ -168,8 +168,8 @@ const marqueeStyle = computed(() => ({ animationDuration: `${Math.max(18, values
         <!-- Left: copy -->
         <div>
           <div class="text-[13px] font-extrabold uppercase tracking-[0.16em]" :style="{ color: 'var(--cc-primary)' }">Inside {{ companyName }}</div>
-          <h2 class="mt-4 text-[clamp(2rem,4.4vw,3.1rem)] font-extrabold leading-[1.08] tracking-[-0.025em] text-white">A day in the life,<br>in 90 seconds</h2>
-          <p class="mt-5 text-[16px] leading-relaxed text-white/65 max-w-[46ch]">Meet the people, the pace, and the problems we're solving together. No corporate gloss — just how we actually work.</p>
+          <h2 class="mt-4 text-[clamp(2rem,4.4vw,3.1rem)] font-extrabold leading-[1.08] tracking-[-0.025em] text-white">A look inside<br>our culture</h2>
+          <p class="mt-5 text-[16px] leading-relaxed text-white/65 max-w-[46ch]">Meet the people, the pace, and the work behind what we do — no gloss, just a real look at life on our team.</p>
         </div>
         <!-- Right: video card with click-to-play -->
         <div class="relative aspect-video rounded-[20px] overflow-hidden shadow-[0_30px_80px_rgba(0,0,0,0.45)] ring-1 ring-white/10">
