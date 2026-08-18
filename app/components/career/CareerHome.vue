@@ -125,13 +125,13 @@ function scrollToJobs() { document.getElementById('jobs')?.scrollIntoView({ beha
         <div class="text-[13px] font-extrabold uppercase tracking-[0.14em]" :style="{ color: 'var(--cc-primary)' }">What we stand for</div>
         <h2 class="mt-2 text-[clamp(1.8rem,3.8vw,2.6rem)] font-extrabold tracking-[-0.02em] text-balance" :style="{ color: 'var(--cc-header)' }">The principles behind how we work</h2>
       </div>
-      <div class="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <div v-for="(v, i) in values" :key="i" class="rounded-[18px] border border-[#eceef1] bg-white p-7 text-center transition hover:shadow-[0_16px_40px_rgba(15,23,42,0.06)]">
-          <div class="w-[62px] h-[64px] mx-auto relative grid place-items-center">
-            <svg class="absolute inset-0 w-full h-full" viewBox="0 0 90.96 93.4" xmlns="http://www.w3.org/2000/svg"><path d="M73.11,12.33C51.41-9.1,32.93.65,29.72,17S-3.37,36.57.31,55.85s43.87,7.84,43.87,25.32,46.46,16.87,46.46-6S94.81,33.77,73.11,12.33Z" :fill="'var(--cc-primary)'" /></svg>
-            <component :is="valueIcon(v.icon)" class="relative w-6 h-6 text-white" stroke-width="1.9" />
+      <div class="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        <div v-for="(v, i) in values" :key="i" class="group rounded-2xl border border-[#ececf0] bg-white p-6 transition duration-200 hover:-translate-y-1 hover:shadow-[0_20px_46px_rgba(15,23,42,0.08)] hover:border-[color:color-mix(in_srgb,var(--cc-primary)_35%,#ececf0)]">
+          <div class="w-12 h-12 grid place-items-center rounded-[14px] transition-transform duration-200 group-hover:scale-105"
+            :style="{ background: 'color-mix(in srgb, var(--cc-primary) 12%, white)', boxShadow: 'inset 0 0 0 1px color-mix(in srgb, var(--cc-primary) 24%, white)' }">
+            <component :is="valueIcon(v.icon)" class="w-[22px] h-[22px]" :style="{ color: 'var(--cc-primary)' }" stroke-width="1.9" />
           </div>
-          <h3 class="mt-4 text-[17px] font-bold" :style="{ color: 'var(--cc-header)' }">{{ v.name }}</h3>
+          <h3 class="mt-5 text-[17px] font-bold" :style="{ color: 'var(--cc-header)' }">{{ v.name }}</h3>
           <p class="mt-1.5 text-[14px] leading-relaxed text-[#6b7280]">{{ v.desc }}</p>
         </div>
       </div>
