@@ -45,7 +45,7 @@ const inputCls = 'w-full h-12 px-4 rounded-[11px] border border-[#e3e6ea] bg-whi
     <section v-else class="pt-[86px] pb-24" style="background:linear-gradient(135deg, var(--cc-primary), color-mix(in srgb, var(--cc-primary) 45%, #0b1220))" />
 
     <!-- Content card overlapping the cover -->
-    <div class="relative z-10 mx-auto max-w-[980px] px-6 -mt-16 pb-16">
+    <div class="relative z-10 mx-auto max-w-[1160px] px-6 -mt-16 pb-16">
       <div class="rounded-[22px] bg-white border border-[#eceef1] shadow-[0_28px_70px_rgba(15,23,42,0.12)] p-7 md:p-10">
         <button type="button" class="inline-flex items-center gap-1.5 text-[14px] font-semibold transition hover:opacity-70" :style="{ color: 'var(--cc-primary)' }" @click="emit('back')"><ArrowLeft class="w-4 h-4" stroke-width="2" /> Back</button>
 
