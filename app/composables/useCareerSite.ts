@@ -91,6 +91,26 @@ const state = reactive<CareerState>({
 // on the public /careers page (across reloads and tabs on the same browser).
 const STORAGE_KEY = 'cc-career-site'
 let _hydrated = false
+
+// Apply a saved snapshot onto the reactive state. Arrays (values/testimonials)
+// are replaced IN PLACE via splice — reassigning them through Object.assign does
+// not reliably trigger reactivity for cross-tab updates, so live edits to
+// testimonials/values wouldn't reach the public page without this.
+// Bumped on every external (cross-tab) apply. Scalar reactivity is reliable, so
+// array-driven sections (values / testimonials) key off this to re-render even
+// when a deep array mutation doesn't propagate on its own.
+const syncRev = ref(0)
+function applyState(src: Record<string, unknown>) {
+  for (const key of Object.keys(src)) {
+    if (!(key in state)) continue
+    const next = src[key]
+    const cur = (state as Record<string, unknown>)[key]
+    if (Array.isArray(cur) && Array.isArray(next)) cur.splice(0, cur.length, ...next)
+    else (state as Record<string, unknown>)[key] = next
+  }
+  syncRev.value++
+}
+
 function hydrateCareerSite() {
   if (_hydrated || !import.meta.client) return
   _hydrated = true
@@ -98,7 +118,7 @@ function hydrateCareerSite() {
     const saved = localStorage.getItem(STORAGE_KEY)
     if (saved) {
       const parsed = JSON.parse(saved)
-      Object.assign(state, parsed)
+      applyState(parsed)
       // Back-compat: older saves predate `coverType`. Infer it from content so
       // an existing cover video keeps using the full-bleed video hero.
       if (!parsed.coverType) state.coverType = parsed.coverVideoUrl ? 'video' : 'image'
@@ -118,7 +138,7 @@ function hydrateCareerSite() {
   // Live-update other tabs (e.g. the /careers page while editing in Settings).
   window.addEventListener('storage', (e) => {
     if (e.key === STORAGE_KEY && e.newValue) {
-      try { Object.assign(state, JSON.parse(e.newValue)) }
+      try { applyState(JSON.parse(e.newValue)) }
       catch { /* ignore */ }
     }
   })
@@ -143,6 +163,7 @@ export function useCareerSite() {
     ...toRefs(state),
     state,
     themeVars,
+    syncRev,
     VALUE_ICONS: CAREER_VALUE_ICONS,
     valueIcon,
   }

@@ -11,7 +11,7 @@ import { ccEmploymentType, ccWorkLabel, ccDaysAgo, ccBlurb, ccIsVideoFile } from
 
 const emit = defineEmits<{ 'open-job': [id: string]; 'view-all': [] }>()
 
-const { headline, intro, values, testimonials, videoUrl, forEmployeesOn, employeeDomain, coverType, coverUrl, coverVideoUrl } = useCareerSite()
+const { headline, intro, values, testimonials, videoUrl, forEmployeesOn, employeeDomain, coverType, coverUrl, coverVideoUrl, syncRev } = useCareerSite()
 const { data: company } = useCompany()
 const { jobs } = useJobs()
 const companyName = computed(() => company.value?.name || 'Your Company')
@@ -141,7 +141,7 @@ const marqueeStyle = computed(() => ({ animationDuration: `${Math.max(18, values
     </section>
 
     <!-- Values -->
-    <section v-if="values.length" class="mx-auto max-w-[1160px] px-6 py-16 md:py-24">
+    <section v-if="values.length" :key="`v-${syncRev}`" class="mx-auto max-w-[1160px] px-6 py-16 md:py-24">
       <div class="text-center max-w-[46ch] mx-auto">
         <div class="text-[13px] font-extrabold uppercase tracking-[0.14em]" :style="{ color: 'var(--cc-primary)' }">What we stand for</div>
         <h2 class="mt-2 text-[clamp(1.8rem,3.8vw,2.6rem)] font-extrabold tracking-[-0.02em] text-balance" :style="{ color: 'var(--cc-header)' }">The principles behind how we work</h2>
@@ -200,7 +200,7 @@ const marqueeStyle = computed(() => ({ animationDuration: `${Math.max(18, values
     </section>
 
     <!-- Testimonials — branded left panel + carousel on the right -->
-    <section v-if="testimonials.length" class="mx-auto max-w-[1160px] px-6 py-16 md:py-24">
+    <section v-if="testimonials.length" :key="`t-${syncRev}`" class="mx-auto max-w-[1160px] px-6 py-16 md:py-24">
       <div class="grid overflow-hidden rounded-[24px] border border-[#ececf0] shadow-[0_24px_64px_rgba(15,23,42,0.07)] lg:grid-cols-[minmax(0,1fr)_minmax(0,1.08fr)]" @mouseenter="stopT" @mouseleave="startT">
         <!-- Left: branded intro -->
         <div class="relative flex flex-col justify-between gap-12 p-9 md:p-14 min-h-[440px] md:min-h-[500px]" :style="{ background: 'color-mix(in srgb, var(--cc-primary) 38%, white)' }">
