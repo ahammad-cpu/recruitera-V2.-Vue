@@ -39,7 +39,17 @@ export function ccOverview(job: Job) {
       'Strong ownership and clear communication',
       'A track record of shipping real outcomes',
     ],
+    benefits: [
+      'Competitive salary',
+      'Medical insurance',
+      'Learning & development opportunities',
+      'Incentives and performance bonuses',
+    ],
   }
+}
+/** Short "About the company" blurb for the job overview. */
+export function ccAbout(company: string): string {
+  return `${company} is a team that values craft, ownership, and candor. We help people do the best work of their careers — and we're growing. Join us and make real impact from day one.`
 }
 export const CC_SCREENING = [
   'How many years of relevant experience do you have?',

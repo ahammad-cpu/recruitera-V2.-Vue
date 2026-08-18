@@ -5,12 +5,15 @@
 <script setup lang="ts">
 import { ArrowLeft, MapPin, Building2, Check, UploadCloud } from 'lucide-vue-next'
 import { useJobs } from '~/composables/useJobs'
-import { ccEmploymentType, ccWorkLabel, ccOverview, CC_SCREENING } from '~/utils/careerJob'
+import { useCompany } from '~/composables/useCompany'
+import { ccEmploymentType, ccWorkLabel, ccOverview, ccAbout, CC_SCREENING } from '~/utils/careerJob'
 
 const { jobId } = defineProps<{ jobId: string }>()
 const emit = defineEmits<{ back: [] }>()
 
 const { jobs } = useJobs()
+const { data: company } = useCompany()
+const companyName = computed(() => company.value?.name || 'Your Company')
 const job = computed(() => jobs.value.find(j => j.id === jobId))
 const overview = computed(() => job.value ? ccOverview(job.value) : null)
 
@@ -56,7 +59,11 @@ const inputCls = 'w-full h-12 px-4 rounded-[11px] border border-[#e3e6ea] bg-whi
 
     <div v-if="tab === 'overview' && overview" class="mt-8 flex flex-col gap-8">
       <div>
-        <h2 class="text-[18px] font-bold" :style="{ color: 'var(--cc-header)' }">Job Description</h2>
+        <h2 class="text-[18px] font-bold" :style="{ color: 'var(--cc-header)' }">About {{ companyName }}</h2>
+        <p class="mt-2 text-[15px] leading-relaxed text-[#374151]">{{ ccAbout(companyName) }}</p>
+      </div>
+      <div>
+        <h2 class="text-[18px] font-bold" :style="{ color: 'var(--cc-header)' }">Job Summary</h2>
         <p class="mt-2 text-[15px] leading-relaxed text-[#374151]">{{ overview.description }}</p>
       </div>
       <div>
@@ -71,6 +78,14 @@ const inputCls = 'w-full h-12 px-4 rounded-[11px] border border-[#e3e6ea] bg-whi
           <li v-for="r in overview.requirements" :key="r" class="flex items-start gap-2.5 text-[15px] text-[#374151]"><Check class="w-4 h-4 mt-1 shrink-0" :style="{ color: 'var(--cc-primary)' }" stroke-width="2.4" />{{ r }}</li>
         </ul>
       </div>
+      <div>
+        <h2 class="text-[18px] font-bold" :style="{ color: 'var(--cc-header)' }">Benefits</h2>
+        <ul class="mt-2 flex flex-col gap-1.5">
+          <li v-for="b in overview.benefits" :key="b" class="flex items-start gap-2.5 text-[15px] text-[#374151]"><Check class="w-4 h-4 mt-1 shrink-0" :style="{ color: 'var(--cc-primary)' }" stroke-width="2.4" />{{ b }}</li>
+        </ul>
+      </div>
+      <!-- Bigger apply button -->
+      <button type="button" class="h-13 py-3.5 rounded-[14px] text-white text-[15.5px] font-bold transition duration-150 hover:brightness-110 active:scale-[0.99]" :style="{ background: 'var(--cc-primary)' }" @click="tab = 'application'">Apply for this job</button>
     </div>
 
     <div v-else-if="tab === 'application'" class="mt-8">
