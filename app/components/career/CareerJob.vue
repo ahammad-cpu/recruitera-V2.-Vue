@@ -3,9 +3,10 @@
   Props: jobId. Emits back. Job from useJobs(); themed by useCareerSite().
 -->
 <script setup lang="ts">
-import { ArrowLeft, MapPin, Building2, Check, UploadCloud } from 'lucide-vue-next'
+import { ArrowLeft, Check, UploadCloud } from 'lucide-vue-next'
 import { useJobs } from '~/composables/useJobs'
 import { useCompany } from '~/composables/useCompany'
+import { useCareerSite } from '~/composables/useCareerSite'
 import { ccEmploymentType, ccWorkLabel, ccOverview, ccAbout, CC_SCREENING } from '~/utils/careerJob'
 
 const { jobId } = defineProps<{ jobId: string }>()
@@ -13,6 +14,7 @@ const emit = defineEmits<{ back: [] }>()
 
 const { jobs } = useJobs()
 const { data: company } = useCompany()
+const { logoUrl } = useCareerSite()
 const companyName = computed(() => company.value?.name || 'Your Company')
 const job = computed(() => jobs.value.find(j => j.id === jobId))
 const overview = computed(() => job.value ? ccOverview(job.value) : null)
@@ -33,28 +35,21 @@ const inputCls = 'w-full h-12 px-4 rounded-[11px] border border-[#e3e6ea] bg-whi
   <div v-if="job" class="mx-auto max-w-[900px] px-6 py-12">
     <button type="button" class="inline-flex items-center gap-1.5 text-[14px] font-semibold transition hover:opacity-70" :style="{ color: 'var(--cc-primary)' }" @click="emit('back')"><ArrowLeft class="w-4 h-4" stroke-width="2" /> Back</button>
 
-    <div class="mt-6 flex flex-wrap items-start justify-between gap-4">
-      <div>
-        <div class="flex items-center gap-2">
-          <span class="inline-flex items-center h-7 px-3 rounded-full text-[12px] font-bold" :style="{ background: 'color-mix(in srgb, var(--cc-primary) 12%, white)', color: 'var(--cc-primary)' }">{{ ccEmploymentType(job) }}</span>
-          <span class="inline-flex items-center h-7 px-3 rounded-full text-[12px] font-bold" :class="job.collar === 'blue' ? 'bg-[#fdecec] text-[#b02a2a]' : 'bg-[#eef2ff] text-[#3b5bdb]'">{{ job.collar === 'blue' ? 'Blue Collar' : 'White Collar' }}</span>
-        </div>
-        <h1 class="mt-3 text-[clamp(1.8rem,4vw,2.6rem)] font-extrabold tracking-[-0.02em]" :style="{ color: 'var(--cc-header)' }">{{ job.title }}</h1>
-        <div class="mt-2 flex flex-wrap items-center gap-4 text-[13.5px] text-[#8a919c]">
-          <span v-if="job.location" class="inline-flex items-center gap-1.5"><MapPin class="w-4 h-4" stroke-width="1.8" />{{ job.location }}</span>
-          <span v-if="job.department" class="inline-flex items-center gap-1.5"><Building2 class="w-4 h-4" stroke-width="1.8" />{{ job.department }}</span>
-          <span>{{ ccWorkLabel(job.workModel) }}</span>
-        </div>
-      </div>
-      <button type="button" class="h-12 px-7 rounded-[13px] text-white text-[15px] font-bold transition hover:brightness-110" :style="{ background: 'var(--cc-primary)' }" @click="tab = 'application'">Apply</button>
+    <!-- Centered cover header (logo · title · work·employment · location) -->
+    <div class="mt-6 text-center">
+      <img v-if="logoUrl" :src="logoUrl" alt="" class="h-14 md:h-16 mx-auto object-contain">
+      <div v-else class="w-16 h-16 mx-auto rounded-2xl grid place-items-center text-white text-[24px] font-extrabold" :style="{ background: 'var(--cc-primary)' }">{{ companyName.charAt(0) }}</div>
+      <h1 class="mt-6 text-[clamp(1.7rem,3.5vw,2.3rem)] font-extrabold tracking-[-0.02em]" :style="{ color: 'var(--cc-header)' }">{{ job.title }}</h1>
+      <div class="mt-2.5 text-[15px] text-[#8a919c]"><span class="font-bold text-[#374151]">{{ ccWorkLabel(job.workModel) }}</span> · {{ ccEmploymentType(job) }}</div>
+      <div v-if="job.location || job.department" class="mt-3 text-[15px] text-[#8a919c]"><span v-if="job.location" class="font-semibold text-[#374151]">{{ job.location }}</span><span v-if="job.location && job.department">, </span>{{ job.department }}</div>
     </div>
 
-    <div class="mt-8 flex items-center gap-7 border-b border-[#eceef1]">
+    <div class="mt-8 flex items-center justify-center gap-8 border-b border-[#eceef1]">
       <button v-for="t in (['overview','application'] as const)" :key="t" type="button"
-        class="pb-3 -mb-px border-b-2 text-[15px] font-semibold transition"
+        class="pb-3 -mb-px border-b-2 text-[14px] font-bold uppercase tracking-[0.06em] transition"
         :style="tab === t ? { borderColor: 'var(--cc-primary)', color: 'var(--cc-primary)' } : {}"
         :class="tab === t ? '' : 'border-transparent text-[#8a919c] hover:text-[#4b5563]'"
-        @click="tab = t">{{ t === 'overview' ? 'Overview' : 'Application Form' }}</button>
+        @click="tab = t">{{ t === 'overview' ? 'Overview' : 'Application' }}</button>
     </div>
 
     <div v-if="tab === 'overview' && overview" class="mt-8 flex flex-col gap-8">
