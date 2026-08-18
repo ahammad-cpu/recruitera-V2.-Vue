@@ -3,10 +3,10 @@
   card + jobs list. Emits open-job(id). Driven by useJobs() + useCareerSite().
 -->
 <script setup lang="ts">
-import { Search, MapPin, Clock, ArrowRight } from 'lucide-vue-next'
+import { Search, MapPin, ArrowRight } from 'lucide-vue-next'
 import { useJobs } from '~/composables/useJobs'
 import { useCareerSite } from '~/composables/useCareerSite'
-import { ccEmploymentType, ccWorkLabel, ccDaysAgo, ccBlurb } from '~/utils/careerJob'
+import { ccEmploymentType, ccWorkLabel, ccBlurb } from '~/utils/careerJob'
 
 const emit = defineEmits<{ 'open-job': [id: string] }>()
 
@@ -104,15 +104,13 @@ const selCls = 'w-full h-11 px-3 rounded-[10px] border border-[#e3e6ea] bg-white
                 class="block text-left rounded-[16px] border border-[#eceef1] bg-white p-5 transition duration-200 hover:-translate-y-0.5 hover:shadow-[0_16px_40px_rgba(15,23,42,0.08)] hover:border-[color:var(--cc-primary)] active:scale-[0.995]" @click="emit('open-job', job.id)">
                 <div class="flex items-start justify-between gap-4">
                   <div class="min-w-0">
-                    <div class="flex flex-wrap items-center gap-2">
-                      <h3 class="text-[17px] font-bold" :style="{ color: 'var(--cc-primary)' }">{{ job.title }}</h3>
+                    <h3 class="text-[17px] font-bold" :style="{ color: 'var(--cc-primary)' }">{{ job.title }}</h3>
+                    <p class="mt-2 text-[13.5px] leading-relaxed text-[#6b7280] line-clamp-2 max-w-[70ch]">{{ ccBlurb(job) }}</p>
+                    <!-- Full-time · On-site · location, all on one line -->
+                    <div class="mt-3 flex flex-wrap items-center gap-2.5">
                       <span class="inline-flex items-center h-6 px-2.5 rounded-full text-[11.5px] font-bold" :style="{ background: 'color-mix(in srgb, var(--cc-primary) 12%, white)', color: 'var(--cc-primary)' }">{{ ccEmploymentType(job) }}</span>
                       <span class="inline-flex items-center h-6 px-2.5 rounded-full border border-[#e6e8ec] text-[11.5px] font-semibold text-[#5b6472]">{{ ccWorkLabel(job.workModel) }}</span>
-                    </div>
-                    <p class="mt-2 text-[13.5px] leading-relaxed text-[#6b7280] line-clamp-2 max-w-[70ch]">{{ ccBlurb(job) }}</p>
-                    <div class="mt-3 flex items-center gap-4 text-[12.5px] text-[#8a919c]">
-                      <span v-if="job.location" class="inline-flex items-center gap-1.5"><MapPin class="w-3.5 h-3.5" stroke-width="1.8" />{{ job.location }}</span>
-                      <span class="inline-flex items-center gap-1.5"><Clock class="w-3.5 h-3.5" stroke-width="1.8" />{{ ccDaysAgo(job.createdAt) }}</span>
+                      <span v-if="job.location" class="inline-flex items-center gap-1.5 text-[12.5px] text-[#8a919c]"><MapPin class="w-3.5 h-3.5" stroke-width="1.8" />{{ job.location }}</span>
                     </div>
                   </div>
                   <span class="shrink-0 inline-flex items-center gap-1.5 h-10 px-4 rounded-[11px] text-white text-[13.5px] font-semibold" :style="{ background: 'var(--cc-primary)' }">View Details <ArrowRight class="w-4 h-4" stroke-width="2" /></span>

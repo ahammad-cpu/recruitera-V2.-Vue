@@ -3,9 +3,9 @@
   Props: jobId. Emits back. Job from useJobs(); themed by useCareerSite().
 -->
 <script setup lang="ts">
-import { ArrowLeft, MapPin, Clock, Building2, Check, UploadCloud } from 'lucide-vue-next'
+import { ArrowLeft, MapPin, Building2, Check, UploadCloud } from 'lucide-vue-next'
 import { useJobs } from '~/composables/useJobs'
-import { ccEmploymentType, ccWorkLabel, ccDaysAgo, ccOverview, CC_SCREENING } from '~/utils/careerJob'
+import { ccEmploymentType, ccWorkLabel, ccOverview, CC_SCREENING } from '~/utils/careerJob'
 
 const { jobId } = defineProps<{ jobId: string }>()
 const emit = defineEmits<{ back: [] }>()
@@ -39,7 +39,6 @@ const inputCls = 'w-full h-12 px-4 rounded-[11px] border border-[#e3e6ea] bg-whi
         <h1 class="mt-3 text-[clamp(1.8rem,4vw,2.6rem)] font-extrabold tracking-[-0.02em]" :style="{ color: 'var(--cc-header)' }">{{ job.title }}</h1>
         <div class="mt-2 flex flex-wrap items-center gap-4 text-[13.5px] text-[#8a919c]">
           <span v-if="job.location" class="inline-flex items-center gap-1.5"><MapPin class="w-4 h-4" stroke-width="1.8" />{{ job.location }}</span>
-          <span class="inline-flex items-center gap-1.5"><Clock class="w-4 h-4" stroke-width="1.8" />{{ ccDaysAgo(job.createdAt) }}</span>
           <span v-if="job.department" class="inline-flex items-center gap-1.5"><Building2 class="w-4 h-4" stroke-width="1.8" />{{ job.department }}</span>
           <span>{{ ccWorkLabel(job.workModel) }}</span>
         </div>

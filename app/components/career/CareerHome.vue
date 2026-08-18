@@ -3,11 +3,11 @@
   Emits open-job / view-all instead of routing. Driven by useCareerSite().
 -->
 <script setup lang="ts">
-import { ArrowRight, MapPin, Clock, Briefcase, Quote as QuoteIcon, Play, ChevronLeft, ChevronRight } from 'lucide-vue-next'
+import { ArrowRight, MapPin, Briefcase, Quote as QuoteIcon, Play, ChevronLeft, ChevronRight } from 'lucide-vue-next'
 import { useCareerSite, valueIcon } from '~/composables/useCareerSite'
 import { useCompany } from '~/composables/useCompany'
 import { useJobs } from '~/composables/useJobs'
-import { ccEmploymentType, ccWorkLabel, ccDaysAgo, ccBlurb, ccIsVideoFile } from '~/utils/careerJob'
+import { ccEmploymentType, ccWorkLabel, ccBlurb, ccIsVideoFile } from '~/utils/careerJob'
 
 const emit = defineEmits<{ 'open-job': [id: string]; 'view-all': [] }>()
 
@@ -138,7 +138,6 @@ const marqueeStyle = computed(() => ({ animationDuration: `${Math.max(18, values
               <div class="mt-5 pt-4 border-t border-[#f0f1f4] flex items-center gap-x-4 gap-y-1.5 flex-wrap text-[12.5px] font-medium text-[#727a86]">
                 <span v-if="job.location" class="inline-flex items-center gap-1.5"><MapPin class="w-3.5 h-3.5" stroke-width="1.9" />{{ job.location }}</span>
                 <span class="inline-flex items-center gap-1.5"><Briefcase class="w-3.5 h-3.5" stroke-width="1.9" />{{ ccEmploymentType(job) }}</span>
-                <span class="ml-auto inline-flex items-center gap-1.5 text-[#9aa1ac]"><Clock class="w-3.5 h-3.5" stroke-width="1.9" />{{ ccDaysAgo(job.createdAt) }}</span>
               </div>
             </button>
           </div>

@@ -4,7 +4,6 @@ import {
   ChevronDown,
   ChevronLeft,
   ChevronRight,
-  Clock,
   Copy,
   ExternalLink,
   Gem,
@@ -817,7 +816,6 @@ const testimonialsGridClass = computed(() => (previewMode.value === 'desktop' ? 
                   <div class="text-[12px] text-[var(--brand-preview-text-secondary)] leading-[1.5] mb-2 line-clamp-2">{{ j.desc }}</div>
                   <div class="flex items-center gap-3 text-[11.5px] text-[var(--brand-preview-text-muted)] border-t border-[var(--brand-preview-surface-alt)] pt-2">
                     <span class="inline-flex items-center gap-1"><MapPin class="w-[11px] h-[11px]" />{{ j.location }}</span>
-                    <span class="inline-flex items-center gap-1"><Clock class="w-[11px] h-[11px]" />{{ j.posted }}</span>
                   </div>
                 </div>
               </div>
