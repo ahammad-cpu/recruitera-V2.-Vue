@@ -38,19 +38,24 @@ const inputCls = 'w-full h-12 px-4 rounded-[11px] border border-[#e3e6ea] bg-whi
 </script>
 
 <template>
-  <div v-if="job" class="mx-auto max-w-[900px] px-6 py-12">
-    <button type="button" class="inline-flex items-center gap-1.5 text-[14px] font-semibold transition hover:opacity-70" :style="{ color: 'var(--cc-primary)' }" @click="emit('back')"><ArrowLeft class="w-4 h-4" stroke-width="2" /> Back</button>
-
-    <!-- Centered cover header (logo · title · work·employment · location) -->
-    <div class="mt-6 text-center">
-      <img v-if="logoUrl" :src="logoUrl" alt="" class="h-14 md:h-16 mx-auto object-contain">
-      <div v-else class="w-16 h-16 mx-auto rounded-2xl grid place-items-center text-white text-[24px] font-extrabold" :style="{ background: 'var(--cc-primary)' }">{{ companyName.charAt(0) }}</div>
-      <h1 class="mt-6 text-[clamp(1.7rem,3.5vw,2.3rem)] font-extrabold tracking-[-0.02em]" :style="{ color: 'var(--cc-header)' }">{{ job.title }}</h1>
-      <div class="mt-2.5 text-[15px] text-[#8a919c]"><span class="font-bold text-[#374151]">{{ ccWorkLabel(job.workModel) }}</span> · {{ ccEmploymentType(job) }}</div>
-      <div v-if="job.location || job.department" class="mt-3 text-[15px] text-[#8a919c]"><span v-if="job.location" class="font-semibold text-[#374151]">{{ job.location }}</span><span v-if="job.location && job.department">, </span>{{ job.department }}</div>
+  <div v-if="job">
+    <!-- Cover header on the brand background (logo shows against the dark cover) -->
+    <div :style="{ background: 'var(--cc-header)' }">
+      <div class="mx-auto max-w-[900px] px-6 pt-8 pb-12">
+        <button type="button" class="inline-flex items-center gap-1.5 text-[14px] font-semibold text-white/80 transition hover:text-white" @click="emit('back')"><ArrowLeft class="w-4 h-4" stroke-width="2" /> Back</button>
+        <div class="mt-8 text-center">
+          <img v-if="logoUrl" :src="logoUrl" alt="" class="h-14 md:h-16 mx-auto object-contain">
+          <div v-else class="w-16 h-16 mx-auto rounded-2xl grid place-items-center text-white text-[24px] font-extrabold" :style="{ background: 'var(--cc-primary)' }">{{ companyName.charAt(0) }}</div>
+          <h1 class="mt-6 text-[clamp(1.7rem,3.5vw,2.3rem)] font-extrabold tracking-[-0.02em] text-white">{{ job.title }}</h1>
+          <div class="mt-2.5 text-[15px] text-white/55"><span class="font-bold text-white/90">{{ ccWorkLabel(job.workModel) }}</span> · {{ ccEmploymentType(job) }}</div>
+          <div v-if="job.location || job.department" class="mt-3 text-[15px] text-white/55"><span v-if="job.location" class="font-semibold text-white/90">{{ job.location }}</span><span v-if="job.location && job.department">, </span>{{ job.department }}</div>
+        </div>
+      </div>
     </div>
 
-    <div class="mt-8 flex items-center justify-center gap-8 border-b border-[#eceef1]">
+    <!-- Tabs + content -->
+    <div class="mx-auto max-w-[900px] px-6 py-10">
+    <div class="flex items-center justify-center gap-8 border-b border-[#eceef1]">
       <button v-for="t in (['overview','application'] as const)" :key="t" type="button"
         class="pb-3 -mb-px border-b-2 text-[14px] font-bold uppercase tracking-[0.06em] transition"
         :style="tab === t ? { borderColor: 'var(--cc-primary)', color: 'var(--cc-primary)' } : {}"
@@ -138,6 +143,7 @@ const inputCls = 'w-full h-12 px-4 rounded-[11px] border border-[#e3e6ea] bg-whi
           <button type="submit" :disabled="!canSubmit" class="h-11 px-6 rounded-[11px] text-white text-[14px] font-bold transition disabled:opacity-50 hover:brightness-110" :style="{ background: 'var(--cc-primary)' }">Submit</button>
         </div>
       </form>
+    </div>
     </div>
   </div>
 
