@@ -247,14 +247,14 @@ const marqueeStyle = computed(() => ({ animationDuration: `${Math.max(18, values
       </div>
     </section>
 
-    <!-- Employee CTA -->
+    <!-- General application CTA -->
     <section v-if="forEmployeesOn" class="mx-auto max-w-[1160px] px-6 pb-16 md:pb-24">
       <div class="rounded-[20px] p-8 md:p-10 flex flex-wrap items-center justify-between gap-5" :style="{ background: 'var(--cc-header)' }">
         <div class="text-white">
-          <div class="text-[20px] font-bold">Already part of the team?</div>
-          <div class="mt-1 text-[14px] text-white/70">Access internal-only roles with your <span class="font-semibold">@{{ employeeDomain }}</span> email.</div>
+          <div class="text-[20px] font-bold">Can't find your desired job?</div>
+          <div class="mt-1 text-[14px] text-white/70">Apply through General Application and join our Talent Pool for future hiring.</div>
         </div>
-        <button type="button" class="h-12 px-6 rounded-[13px] text-[15px] font-bold text-white transition hover:brightness-110" :style="{ background: 'var(--cc-primary)' }">Sign in as employee</button>
+        <button type="button" class="h-12 px-6 rounded-[13px] text-[15px] font-bold text-white transition duration-150 hover:brightness-110 active:scale-[0.97]" :style="{ background: 'var(--cc-primary)' }">Join Talent Pool</button>
       </div>
     </section>
   </div>

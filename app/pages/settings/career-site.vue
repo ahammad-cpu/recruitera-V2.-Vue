@@ -889,10 +889,10 @@ const testimonialsGridClass = computed(() => (previewMode.value === 'desktop' ? 
             <section v-if="forEmployeesOn" class="px-6 pb-8">
               <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between rounded-2xl p-5" :style="{ background: headerColor }">
                 <div>
-                  <div class="text-[15px] font-semibold text-white">Already part of the team?</div>
-                  <div class="text-[12.5px] text-white/70">Access internal-only roles with your <strong>@{{ employeeDomain }}</strong> email.</div>
+                  <div class="text-[15px] font-semibold text-white">Can't find your desired job?</div>
+                  <div class="text-[12.5px] text-white/70">Apply through General Application and join our Talent Pool for future hiring.</div>
                 </div>
-                <button type="button" class="rounded-xl bg-white px-4 py-2.5 text-[13px] font-semibold shrink-0" :style="{ color: headerColor }">For Employees →</button>
+                <button type="button" class="rounded-xl px-4 py-2.5 text-[13px] font-semibold text-white shrink-0" :style="{ background: primaryColor }">Join Talent Pool</button>
               </div>
             </section>
 
