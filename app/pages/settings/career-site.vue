@@ -830,8 +830,8 @@ const testimonialsGridClass = computed(() => (previewMode.value === 'desktop' ? 
             <section class="px-6 py-8" style="background:var(--brand-preview-surface-section)">
               <div class="text-center font-extrabold text-[var(--brand-preview-text-heading)] mb-5" style="font-size:22px">What we stand for</div>
               <div class="grid gap-3.5" :class="valuesGridClass">
-                <div v-for="(v, i) in values" :key="i" class="rounded-2xl border border-[var(--brand-preview-border-card)] bg-white p-4">
-                  <div class="grid size-11 place-items-center rounded-[13px] mb-2.5" :style="{ background: `color-mix(in srgb, ${primaryColor} 12%, white)`, boxShadow: `inset 0 0 0 1px color-mix(in srgb, ${primaryColor} 24%, white)` }">
+                <div v-for="(v, i) in values" :key="i" class="rounded-2xl border border-[var(--brand-preview-border-card)] bg-white p-4 text-center">
+                  <div class="grid size-11 place-items-center rounded-[13px] mb-2.5 mx-auto" :style="{ background: `color-mix(in srgb, ${primaryColor} 12%, white)`, boxShadow: `inset 0 0 0 1px color-mix(in srgb, ${primaryColor} 24%, white)` }">
                     <component :is="VALUE_ICONS[v.icon]" class="w-[19px] h-[19px]" :style="{ color: primaryColor }" />
                   </div>
                   <div class="text-[15px] font-semibold text-[var(--brand-preview-text-heading)] mb-1">{{ v.name || 'Value name' }}</div>
