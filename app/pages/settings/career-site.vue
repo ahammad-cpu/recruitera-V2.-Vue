@@ -856,6 +856,10 @@ const testimonialsGridClass = computed(() => (previewMode.value === 'desktop' ? 
 
             <!-- Testimonials — branded left panel + one testimonial on the right -->
             <section v-if="testimonials.length" class="px-6 py-8">
+              <div class="text-center mb-5">
+                <div class="text-[11px] font-extrabold uppercase tracking-[0.14em]" :style="{ color: primaryColor }">From the team</div>
+                <div class="mt-1 font-extrabold" :style="{ color: headerColor, fontSize: '22px' }">What it's like to work with us</div>
+              </div>
               <div class="grid overflow-hidden rounded-2xl border border-[var(--brand-preview-border-card)] md:grid-cols-2">
                 <div class="relative flex flex-col justify-between gap-8 p-6 min-h-[220px]" :style="{ background: `color-mix(in srgb, ${primaryColor} 38%, white)` }">
                   <Quote class="w-9 h-9 text-white/60" fill="currentColor" stroke-width="0" />

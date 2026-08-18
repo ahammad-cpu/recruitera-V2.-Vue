@@ -207,6 +207,10 @@ const marqueeStyle = computed(() => ({ animationDuration: `${Math.max(18, values
 
     <!-- Testimonials — branded left panel + carousel on the right -->
     <section v-if="testimonials.length" :key="`t-${syncRev}`" class="mx-auto max-w-[1160px] px-6 py-16 md:py-24">
+      <div class="text-center max-w-[46ch] mx-auto mb-12">
+        <div class="text-[13px] font-extrabold uppercase tracking-[0.14em]" :style="{ color: 'var(--cc-primary)' }">From the team</div>
+        <h2 class="mt-2 text-[clamp(1.8rem,3.8vw,2.6rem)] font-extrabold tracking-[-0.02em] text-balance" :style="{ color: 'var(--cc-header)' }">What it's like to work with us</h2>
+      </div>
       <div class="grid overflow-hidden rounded-[24px] border border-[#ececf0] shadow-[0_24px_64px_rgba(15,23,42,0.07)] lg:grid-cols-[minmax(0,1fr)_minmax(0,1.08fr)]" @mouseenter="stopT" @mouseleave="startT">
         <!-- Left: branded intro -->
         <div class="relative flex flex-col justify-between gap-12 p-9 md:p-14 min-h-[440px] md:min-h-[500px]" :style="{ background: 'color-mix(in srgb, var(--cc-primary) 38%, white)' }">
