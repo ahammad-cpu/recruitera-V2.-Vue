@@ -39,24 +39,43 @@ const heroImage = computed(() => coverType.value === 'image' && !!coverUrl.value
 function initials(name: string) { return name.trim().split(/\s+/).map(p => p[0]).slice(0, 2).join('').toUpperCase() || '?' }
 function scrollToJobs() { document.getElementById('jobs')?.scrollIntoView({ behavior: 'smooth' }) }
 
-// ── Values carousel: show `perView` at a time, loop when there are more ──
+// ── Values carousel: shows `perView` at a time and loops seamlessly. We append
+// clones of the first `perView` cards, advance one step at a time, and when we
+// reach the clones we snap back to the start with no transition — so it appears
+// to loop forever with no visible jump. ──
 const GAP_REM = 1.25 // matches gap-5
 const perView = ref(3)
 const valueIndex = ref(0)
+const noTransition = ref(false)
 const valuesLoop = computed(() => values.value.length > perView.value)
-const valueMax = computed(() => Math.max(0, values.value.length - perView.value))
+const displayValues = computed(() => valuesLoop.value ? [...values.value, ...values.value.slice(0, perView.value)] : values.value)
 const cardStyle = computed(() => ({ width: `calc((100% - ${(perView.value - 1) * GAP_REM}rem) / ${perView.value})` }))
 const trackStyle = computed(() => ({ transform: `translateX(calc(${-valueIndex.value} * ((100% - ${(perView.value - 1) * GAP_REM}rem) / ${perView.value} + ${GAP_REM}rem)))` }))
-function goValues(dir: number) {
-  const n = valueIndex.value + dir
-  valueIndex.value = n < 0 ? valueMax.value : n > valueMax.value ? 0 : n
+function snapTo(i: number) {
+  noTransition.value = true
+  valueIndex.value = i
+  requestAnimationFrame(() => requestAnimationFrame(() => { noTransition.value = false }))
 }
+function nextValues() {
+  valueIndex.value++
+  // reached the appended clones → let it finish sliding, then snap to real 0
+  if (valueIndex.value >= values.value.length) setTimeout(() => snapTo(0), 520)
+}
+function prevValues() {
+  if (valueIndex.value <= 0) {
+    noTransition.value = true
+    valueIndex.value = values.value.length
+    requestAnimationFrame(() => requestAnimationFrame(() => { noTransition.value = false; valueIndex.value = values.value.length - 1 }))
+  }
+  else valueIndex.value--
+}
+const activeDot = computed(() => valueIndex.value % Math.max(1, values.value.length))
 let valueTimer: ReturnType<typeof setInterval> | undefined
-function startValues() { if (valuesLoop.value && !valueTimer) valueTimer = setInterval(() => goValues(1), 3800) }
+function startValues() { if (valuesLoop.value && !valueTimer) valueTimer = setInterval(nextValues, 3800) }
 function stopValues() { if (valueTimer) { clearInterval(valueTimer); valueTimer = undefined } }
 function updatePerView() {
-  perView.value = window.innerWidth < 640 ? 1 : window.innerWidth < 1024 ? 2 : 3
-  if (valueIndex.value > valueMax.value) valueIndex.value = valueMax.value
+  const pv = window.innerWidth < 640 ? 1 : window.innerWidth < 1024 ? 2 : 3
+  if (pv !== perView.value) { perView.value = pv; snapTo(0) }
 }
 onMounted(() => { updatePerView(); window.addEventListener('resize', updatePerView); startValues() })
 onBeforeUnmount(() => { window.removeEventListener('resize', updatePerView); stopValues() })
@@ -162,8 +181,8 @@ onBeforeUnmount(() => { window.removeEventListener('resize', updatePerView); sto
       <!-- > perView: carousel (shows perView, auto-loops) -->
       <div v-else class="mt-12 relative" @mouseenter="stopValues" @mouseleave="startValues">
         <div class="overflow-hidden">
-          <div class="flex gap-5 transition-transform duration-500 ease-out" :style="trackStyle">
-            <div v-for="(v, i) in values" :key="i" class="group shrink-0 rounded-2xl border border-[#ececf0] bg-white p-6 text-center transition duration-200 hover:-translate-y-1 hover:shadow-[0_20px_46px_rgba(15,23,42,0.08)] hover:border-[color:color-mix(in_srgb,var(--cc-primary)_35%,#ececf0)]" :style="cardStyle">
+          <div class="flex gap-5 ease-out" :class="noTransition ? '' : 'transition-transform duration-500'" :style="trackStyle">
+            <div v-for="(v, i) in displayValues" :key="i" class="group shrink-0 rounded-2xl border border-[#ececf0] bg-white p-6 text-center transition duration-200 hover:-translate-y-1 hover:shadow-[0_20px_46px_rgba(15,23,42,0.08)] hover:border-[color:color-mix(in_srgb,var(--cc-primary)_35%,#ececf0)]" :style="cardStyle">
               <div class="w-12 h-12 mx-auto grid place-items-center rounded-[14px] transition-transform duration-200 group-hover:scale-105"
                 :style="{ background: 'color-mix(in srgb, var(--cc-primary) 12%, white)', boxShadow: 'inset 0 0 0 1px color-mix(in srgb, var(--cc-primary) 24%, white)' }">
                 <component :is="valueIcon(v.icon)" class="w-[22px] h-[22px]" :style="{ color: 'var(--cc-primary)' }" stroke-width="1.9" />
@@ -174,11 +193,11 @@ onBeforeUnmount(() => { window.removeEventListener('resize', updatePerView); sto
           </div>
         </div>
         <!-- arrows -->
-        <button type="button" aria-label="Previous" class="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 w-10 h-10 rounded-full bg-white border border-[#e6e8ec] shadow-[0_6px_20px_rgba(15,23,42,0.12)] grid place-items-center transition hover:scale-105" @click="goValues(-1)"><ChevronLeft class="w-5 h-5" :style="{ color: 'var(--cc-header)' }" /></button>
-        <button type="button" aria-label="Next" class="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 w-10 h-10 rounded-full bg-white border border-[#e6e8ec] shadow-[0_6px_20px_rgba(15,23,42,0.12)] grid place-items-center transition hover:scale-105" @click="goValues(1)"><ChevronRight class="w-5 h-5" :style="{ color: 'var(--cc-header)' }" /></button>
+        <button type="button" aria-label="Previous" class="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 w-10 h-10 rounded-full bg-white border border-[#e6e8ec] shadow-[0_6px_20px_rgba(15,23,42,0.12)] grid place-items-center transition hover:scale-105" @click="prevValues"><ChevronLeft class="w-5 h-5" :style="{ color: 'var(--cc-header)' }" /></button>
+        <button type="button" aria-label="Next" class="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 w-10 h-10 rounded-full bg-white border border-[#e6e8ec] shadow-[0_6px_20px_rgba(15,23,42,0.12)] grid place-items-center transition hover:scale-105" @click="nextValues"><ChevronRight class="w-5 h-5" :style="{ color: 'var(--cc-header)' }" /></button>
         <!-- dots -->
         <div class="mt-7 flex justify-center gap-2">
-          <button v-for="d in (valueMax + 1)" :key="d" type="button" :aria-label="`Go to slide ${d}`" class="h-2 rounded-full transition-all" :class="valueIndex === d - 1 ? 'w-6' : 'w-2 opacity-30 hover:opacity-60'" :style="{ background: 'var(--cc-primary)' }" @click="valueIndex = d - 1" />
+          <button v-for="d in values.length" :key="d" type="button" :aria-label="`Go to slide ${d}`" class="h-2 rounded-full transition-all" :class="activeDot === d - 1 ? 'w-6' : 'w-2 opacity-30 hover:opacity-60'" :style="{ background: 'var(--cc-primary)' }" @click="valueIndex = d - 1" />
         </div>
       </div>
     </section>
