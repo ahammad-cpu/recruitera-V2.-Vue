@@ -3,7 +3,7 @@
   Props: jobId. Emits back. Job from useJobs(); themed by useCareerSite().
 -->
 <script setup lang="ts">
-import { ArrowLeft, Check, UploadCloud } from 'lucide-vue-next'
+import { ArrowLeft, Check, UploadCloud, Share2 } from 'lucide-vue-next'
 import { useJobs } from '~/composables/useJobs'
 import { useCompany } from '~/composables/useCompany'
 import { useCareerSite } from '~/composables/useCareerSite'
@@ -25,6 +25,12 @@ const answers = ref<string[]>(CC_SCREENING.map(() => ''))
 const submitted = ref(false)
 const canSubmit = computed(() => form.fullName.trim() && form.email.trim() && form.resume)
 function onResume(e: Event) { const f = (e.target as HTMLInputElement).files?.[0]; if (f) form.resume = f.name }
+function shareJob() {
+  if (!import.meta.client) return
+  const url = window.location.href
+  if (navigator.share) navigator.share({ title: job.value?.title, url }).catch(() => {})
+  else navigator.clipboard?.writeText(url).catch(() => {})
+}
 function submit() { if (canSubmit.value) submitted.value = true }
 function clearForm() { Object.assign(form, { fullName: '', gender: '', email: '', phone: '', resume: '', photo: '' }); answers.value = CC_SCREENING.map(() => '') }
 
@@ -52,35 +58,43 @@ const inputCls = 'w-full h-12 px-4 rounded-[11px] border border-[#e3e6ea] bg-whi
         @click="tab = t">{{ t === 'overview' ? 'Overview' : 'Application' }}</button>
     </div>
 
-    <div v-if="tab === 'overview' && overview" class="mt-8 flex flex-col gap-8">
-      <div>
-        <h2 class="text-[18px] font-bold" :style="{ color: 'var(--cc-header)' }">About {{ companyName }}</h2>
-        <p class="mt-2 text-[15px] leading-relaxed text-[#374151]">{{ ccAbout(companyName) }}</p>
+    <div v-if="tab === 'overview' && overview" class="mt-8">
+      <div class="flex items-center justify-between gap-4">
+        <h2 class="text-[20px] font-extrabold tracking-[-0.01em]" :style="{ color: 'var(--cc-header)' }">Description</h2>
+        <button type="button" class="inline-flex items-center gap-1.5 text-[14px] font-semibold transition hover:opacity-70" :style="{ color: 'var(--cc-primary)' }" @click="shareJob">Share this job <Share2 class="w-4 h-4" stroke-width="2" /></button>
       </div>
-      <div>
-        <h2 class="text-[18px] font-bold" :style="{ color: 'var(--cc-header)' }">Job Summary</h2>
-        <p class="mt-2 text-[15px] leading-relaxed text-[#374151]">{{ overview.description }}</p>
+
+      <div class="mt-6 flex flex-col gap-7">
+        <div>
+          <h3 class="text-[17px] font-bold" :style="{ color: 'var(--cc-header)' }">About {{ companyName }}</h3>
+          <p class="mt-2 text-[15px] leading-relaxed text-[#374151]">{{ ccAbout(companyName) }}</p>
+        </div>
+        <div>
+          <h3 class="text-[17px] font-bold" :style="{ color: 'var(--cc-header)' }">Job Summary</h3>
+          <p class="mt-2 text-[15px] leading-relaxed text-[#374151]">{{ overview.description }}</p>
+        </div>
+        <div>
+          <h3 class="text-[17px] font-bold" :style="{ color: 'var(--cc-header)' }">Responsibilities</h3>
+          <ul class="mt-2 flex flex-col gap-1.5">
+            <li v-for="r in overview.responsibilities" :key="r" class="flex items-start gap-2.5 text-[15px] text-[#374151]"><Check class="w-4 h-4 mt-1 shrink-0" :style="{ color: 'var(--cc-primary)' }" stroke-width="2.4" />{{ r }}</li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="text-[17px] font-bold" :style="{ color: 'var(--cc-header)' }">Requirements</h3>
+          <ul class="mt-2 flex flex-col gap-1.5">
+            <li v-for="r in overview.requirements" :key="r" class="flex items-start gap-2.5 text-[15px] text-[#374151]"><Check class="w-4 h-4 mt-1 shrink-0" :style="{ color: 'var(--cc-primary)' }" stroke-width="2.4" />{{ r }}</li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="text-[17px] font-bold" :style="{ color: 'var(--cc-header)' }">Benefits</h3>
+          <ul class="mt-2 flex flex-col gap-1.5">
+            <li v-for="b in overview.benefits" :key="b" class="flex items-start gap-2.5 text-[15px] text-[#374151]"><Check class="w-4 h-4 mt-1 shrink-0" :style="{ color: 'var(--cc-primary)' }" stroke-width="2.4" />{{ b }}</li>
+          </ul>
+        </div>
       </div>
-      <div>
-        <h2 class="text-[18px] font-bold" :style="{ color: 'var(--cc-header)' }">Responsibilities</h2>
-        <ul class="mt-2 flex flex-col gap-1.5">
-          <li v-for="r in overview.responsibilities" :key="r" class="flex items-start gap-2.5 text-[15px] text-[#374151]"><Check class="w-4 h-4 mt-1 shrink-0" :style="{ color: 'var(--cc-primary)' }" stroke-width="2.4" />{{ r }}</li>
-        </ul>
-      </div>
-      <div>
-        <h2 class="text-[18px] font-bold" :style="{ color: 'var(--cc-header)' }">Requirements</h2>
-        <ul class="mt-2 flex flex-col gap-1.5">
-          <li v-for="r in overview.requirements" :key="r" class="flex items-start gap-2.5 text-[15px] text-[#374151]"><Check class="w-4 h-4 mt-1 shrink-0" :style="{ color: 'var(--cc-primary)' }" stroke-width="2.4" />{{ r }}</li>
-        </ul>
-      </div>
-      <div>
-        <h2 class="text-[18px] font-bold" :style="{ color: 'var(--cc-header)' }">Benefits</h2>
-        <ul class="mt-2 flex flex-col gap-1.5">
-          <li v-for="b in overview.benefits" :key="b" class="flex items-start gap-2.5 text-[15px] text-[#374151]"><Check class="w-4 h-4 mt-1 shrink-0" :style="{ color: 'var(--cc-primary)' }" stroke-width="2.4" />{{ b }}</li>
-        </ul>
-      </div>
-      <!-- Bigger apply button -->
-      <button type="button" class="h-13 py-3.5 rounded-[14px] text-white text-[15.5px] font-bold transition duration-150 hover:brightness-110 active:scale-[0.99]" :style="{ background: 'var(--cc-primary)' }" @click="tab = 'application'">Apply for this job</button>
+
+      <!-- Full-width apply -->
+      <button type="button" class="mt-8 w-full py-4 rounded-[14px] text-white text-[15.5px] font-bold transition duration-150 hover:brightness-110 active:scale-[0.99]" :style="{ background: 'var(--cc-primary)' }" @click="tab = 'application'">Apply for this job</button>
     </div>
 
     <div v-else-if="tab === 'application'" class="mt-8">
