@@ -145,6 +145,9 @@ const inputCls = 'w-full h-12 px-4 rounded-[11px] border border-[#e3e6ea] bg-whi
         </div>
       </div>
     </div>
+
+    <!-- General application CTA under the job info -->
+    <CareerApplyCta />
   </div>
 
   <div v-else class="mx-auto max-w-[900px] px-6 py-24 text-center">
