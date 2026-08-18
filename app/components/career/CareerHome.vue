@@ -212,7 +212,7 @@ const marqueeStyle = computed(() => ({ animationDuration: `${Math.max(18, values
       </div>
       <div class="grid overflow-hidden rounded-[24px] border border-[#ececf0] shadow-[0_24px_64px_rgba(15,23,42,0.07)] lg:grid-cols-[minmax(0,1fr)_minmax(0,1.08fr)]" @mouseenter="stopT" @mouseleave="startT">
         <!-- Left: branded intro -->
-        <div class="relative flex flex-col justify-between gap-12 p-9 md:p-14 min-h-[440px] md:min-h-[500px]" :style="{ background: 'color-mix(in srgb, var(--cc-primary) 38%, white)' }">
+        <div class="relative flex flex-col justify-between gap-8 md:gap-12 p-8 md:p-14 min-h-0 md:min-h-[440px] lg:min-h-[500px]" :style="{ background: 'color-mix(in srgb, var(--cc-primary) 38%, white)' }">
           <QuoteIcon class="w-14 h-14 text-white/60" fill="currentColor" stroke-width="0" />
           <div>
             <h2 class="text-[clamp(1.7rem,3.4vw,2.4rem)] font-extrabold leading-[1.1] tracking-[-0.02em]" :style="{ color: 'var(--cc-header)' }">Real Stories from Real Employees</h2>
