@@ -4,7 +4,7 @@
   Job from useJobs(); themed + covered by useCareerSite().
 -->
 <script setup lang="ts">
-import { ArrowLeft, MapPin, Building2, Check, UploadCloud } from 'lucide-vue-next'
+import { ArrowLeft, MapPin, Building2, Check, UploadCloud, X } from 'lucide-vue-next'
 import { useJobs } from '~/composables/useJobs'
 import { useCompany } from '~/composables/useCompany'
 import { useCareerSite } from '~/composables/useCareerSite'
@@ -19,6 +19,9 @@ const { coverType, coverUrl } = useCareerSite()
 const companyName = computed(() => company.value?.name || 'Your Company')
 const job = computed(() => jobs.value.find(j => j.id === jobId))
 const overview = computed(() => job.value ? ccOverview(job.value) : null)
+// Only published/internal roles accept applications; closed/draft/archived show
+// a "currently closed" panel instead of the tabs.
+const isOpen = computed(() => job.value?.status === 'published' || job.value?.status === 'internal')
 const isImageCover = computed(() => coverType.value === 'image' && !!coverUrl.value)
 
 const tab = ref<'overview' | 'application'>('overview')
@@ -62,9 +65,18 @@ const inputCls = 'w-full h-12 px-4 rounded-[11px] border border-[#e3e6ea] bg-whi
               <span>{{ ccWorkLabel(job.workModel) }}</span>
             </div>
           </div>
-          <button type="button" class="h-12 px-7 rounded-[13px] text-white text-[15px] font-bold transition duration-150 hover:brightness-110 active:scale-[0.97]" :style="{ background: 'var(--cc-primary)' }" @click="tab = 'application'">Apply</button>
+          <button v-if="isOpen" type="button" class="h-12 px-7 rounded-[13px] text-white text-[15px] font-bold transition duration-150 hover:brightness-110 active:scale-[0.97]" :style="{ background: 'var(--cc-primary)' }" @click="tab = 'application'">Apply</button>
         </div>
 
+        <!-- Closed roles: show a message instead of the tabs/form -->
+        <div v-if="!isOpen" class="mt-8 rounded-[16px] border border-[#eceef1] bg-[#f7f8fa] px-6 py-16 text-center">
+          <div class="w-16 h-16 mx-auto rounded-full grid place-items-center text-white" :style="{ background: 'var(--cc-primary)' }"><X class="w-8 h-8" stroke-width="2.5" /></div>
+          <h2 class="mt-5 text-[22px] font-extrabold" :style="{ color: 'var(--cc-header)' }">Sorry, this job is currently closed</h2>
+          <p class="mt-2 text-[15px] text-[#6b7280]">This position is no longer accepting applications. Explore our other open roles.</p>
+          <button type="button" class="mt-6 h-12 px-7 rounded-[13px] text-white text-[15px] font-bold transition duration-150 hover:brightness-110 active:scale-[0.97]" :style="{ background: 'var(--cc-primary)' }" @click="emit('back')">Browse open roles</button>
+        </div>
+
+        <template v-else>
         <div class="mt-9 flex items-center gap-8 border-b-[1.5px] border-[#d1d5db]">
           <button v-for="t in (['overview','application'] as const)" :key="t" type="button"
             class="pb-3.5 -mb-[1.5px] border-b-[2.5px] text-[15px] font-semibold transition"
@@ -143,11 +155,12 @@ const inputCls = 'w-full h-12 px-4 rounded-[11px] border border-[#e3e6ea] bg-whi
             </div>
           </form>
         </div>
+        </template>
       </div>
     </div>
 
-    <!-- General application CTA — only on the Overview tab, not while applying -->
-    <CareerApplyCta v-if="tab === 'overview'" />
+    <!-- General application CTA — on Overview, or when the role is closed -->
+    <CareerApplyCta v-if="!isOpen || tab === 'overview'" />
   </div>
 
   <div v-else class="mx-auto max-w-[900px] px-6 py-24 text-center">
