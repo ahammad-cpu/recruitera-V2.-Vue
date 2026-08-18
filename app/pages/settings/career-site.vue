@@ -755,8 +755,8 @@ const testimonialsGridClass = computed(() => (previewMode.value === 'desktop' ? 
             <!-- Hero — image cover: framed sharp photo over a blurred fill -->
             <section v-if="previewImage" class="relative overflow-hidden">
               <img :src="ccCover" alt="" aria-hidden="true" class="absolute inset-0 h-full w-full object-cover scale-125 blur-2xl">
-              <div class="relative p-4">
-                <img :src="ccCover" alt="" class="block w-full h-auto rounded-[18px] shadow-[0_10px_30px_rgba(0,0,0,0.25)]">
+              <div class="relative px-4 pt-4">
+                <img :src="ccCover" alt="" class="block w-full h-auto rounded-t-[18px] shadow-[0_10px_30px_rgba(0,0,0,0.25)]">
               </div>
             </section>
             <!-- Hero — video / gradient: headline + intro + CTA -->
