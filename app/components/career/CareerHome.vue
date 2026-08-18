@@ -3,7 +3,7 @@
   Emits open-job / view-all instead of routing. Driven by useCareerSite().
 -->
 <script setup lang="ts">
-import { ArrowRight, MapPin, Clock, Briefcase, Quote as QuoteIcon } from 'lucide-vue-next'
+import { ArrowRight, MapPin, Clock, Briefcase, Quote as QuoteIcon, ChevronLeft, ChevronRight } from 'lucide-vue-next'
 import { useCareerSite, valueIcon } from '~/composables/useCareerSite'
 import { useCompany } from '~/composables/useCompany'
 import { useJobs } from '~/composables/useJobs'
@@ -38,6 +38,28 @@ const heroIsVideo = computed(() => coverType.value === 'video' && coverHasVideo.
 const heroImage = computed(() => coverType.value === 'image' && !!coverUrl.value)
 function initials(name: string) { return name.trim().split(/\s+/).map(p => p[0]).slice(0, 2).join('').toUpperCase() || '?' }
 function scrollToJobs() { document.getElementById('jobs')?.scrollIntoView({ behavior: 'smooth' }) }
+
+// ── Values carousel: show `perView` at a time, loop when there are more ──
+const GAP_REM = 1.25 // matches gap-5
+const perView = ref(3)
+const valueIndex = ref(0)
+const valuesLoop = computed(() => values.value.length > perView.value)
+const valueMax = computed(() => Math.max(0, values.value.length - perView.value))
+const cardStyle = computed(() => ({ width: `calc((100% - ${(perView.value - 1) * GAP_REM}rem) / ${perView.value})` }))
+const trackStyle = computed(() => ({ transform: `translateX(calc(${-valueIndex.value} * ((100% - ${(perView.value - 1) * GAP_REM}rem) / ${perView.value} + ${GAP_REM}rem)))` }))
+function goValues(dir: number) {
+  const n = valueIndex.value + dir
+  valueIndex.value = n < 0 ? valueMax.value : n > valueMax.value ? 0 : n
+}
+let valueTimer: ReturnType<typeof setInterval> | undefined
+function startValues() { if (valuesLoop.value && !valueTimer) valueTimer = setInterval(() => goValues(1), 3800) }
+function stopValues() { if (valueTimer) { clearInterval(valueTimer); valueTimer = undefined } }
+function updatePerView() {
+  perView.value = window.innerWidth < 640 ? 1 : window.innerWidth < 1024 ? 2 : 3
+  if (valueIndex.value > valueMax.value) valueIndex.value = valueMax.value
+}
+onMounted(() => { updatePerView(); window.addEventListener('resize', updatePerView); startValues() })
+onBeforeUnmount(() => { window.removeEventListener('resize', updatePerView); stopValues() })
 </script>
 
 <template>
@@ -125,8 +147,8 @@ function scrollToJobs() { document.getElementById('jobs')?.scrollIntoView({ beha
         <div class="text-[13px] font-extrabold uppercase tracking-[0.14em]" :style="{ color: 'var(--cc-primary)' }">What we stand for</div>
         <h2 class="mt-2 text-[clamp(1.8rem,3.8vw,2.6rem)] font-extrabold tracking-[-0.02em] text-balance" :style="{ color: 'var(--cc-header)' }">The principles behind how we work</h2>
       </div>
-      <!-- Centered flex-wrap: any count centers; more than 3 wrap to a new centered row -->
-      <div class="mt-12 flex flex-wrap justify-center gap-5">
+      <!-- ≤ perView: centered row -->
+      <div v-if="!valuesLoop" class="mt-12 flex flex-wrap justify-center gap-5">
         <div v-for="(v, i) in values" :key="i" class="group w-full sm:w-[calc(50%-0.625rem)] lg:w-[344px] rounded-2xl border border-[#ececf0] bg-white p-6 text-center transition duration-200 hover:-translate-y-1 hover:shadow-[0_20px_46px_rgba(15,23,42,0.08)] hover:border-[color:color-mix(in_srgb,var(--cc-primary)_35%,#ececf0)]">
           <div class="w-12 h-12 mx-auto grid place-items-center rounded-[14px] transition-transform duration-200 group-hover:scale-105"
             :style="{ background: 'color-mix(in srgb, var(--cc-primary) 12%, white)', boxShadow: 'inset 0 0 0 1px color-mix(in srgb, var(--cc-primary) 24%, white)' }">
@@ -134,6 +156,29 @@ function scrollToJobs() { document.getElementById('jobs')?.scrollIntoView({ beha
           </div>
           <h3 class="mt-5 text-[17px] font-bold" :style="{ color: 'var(--cc-header)' }">{{ v.name }}</h3>
           <p class="mt-1.5 text-[14px] leading-relaxed text-[#6b7280]">{{ v.desc }}</p>
+        </div>
+      </div>
+
+      <!-- > perView: carousel (shows perView, auto-loops) -->
+      <div v-else class="mt-12 relative" @mouseenter="stopValues" @mouseleave="startValues">
+        <div class="overflow-hidden">
+          <div class="flex gap-5 transition-transform duration-500 ease-out" :style="trackStyle">
+            <div v-for="(v, i) in values" :key="i" class="group shrink-0 rounded-2xl border border-[#ececf0] bg-white p-6 text-center transition duration-200 hover:-translate-y-1 hover:shadow-[0_20px_46px_rgba(15,23,42,0.08)] hover:border-[color:color-mix(in_srgb,var(--cc-primary)_35%,#ececf0)]" :style="cardStyle">
+              <div class="w-12 h-12 mx-auto grid place-items-center rounded-[14px] transition-transform duration-200 group-hover:scale-105"
+                :style="{ background: 'color-mix(in srgb, var(--cc-primary) 12%, white)', boxShadow: 'inset 0 0 0 1px color-mix(in srgb, var(--cc-primary) 24%, white)' }">
+                <component :is="valueIcon(v.icon)" class="w-[22px] h-[22px]" :style="{ color: 'var(--cc-primary)' }" stroke-width="1.9" />
+              </div>
+              <h3 class="mt-5 text-[17px] font-bold" :style="{ color: 'var(--cc-header)' }">{{ v.name }}</h3>
+              <p class="mt-1.5 text-[14px] leading-relaxed text-[#6b7280]">{{ v.desc }}</p>
+            </div>
+          </div>
+        </div>
+        <!-- arrows -->
+        <button type="button" aria-label="Previous" class="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 w-10 h-10 rounded-full bg-white border border-[#e6e8ec] shadow-[0_6px_20px_rgba(15,23,42,0.12)] grid place-items-center transition hover:scale-105" @click="goValues(-1)"><ChevronLeft class="w-5 h-5" :style="{ color: 'var(--cc-header)' }" /></button>
+        <button type="button" aria-label="Next" class="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 w-10 h-10 rounded-full bg-white border border-[#e6e8ec] shadow-[0_6px_20px_rgba(15,23,42,0.12)] grid place-items-center transition hover:scale-105" @click="goValues(1)"><ChevronRight class="w-5 h-5" :style="{ color: 'var(--cc-header)' }" /></button>
+        <!-- dots -->
+        <div class="mt-7 flex justify-center gap-2">
+          <button v-for="d in (valueMax + 1)" :key="d" type="button" :aria-label="`Go to slide ${d}`" class="h-2 rounded-full transition-all" :class="valueIndex === d - 1 ? 'w-6' : 'w-2 opacity-30 hover:opacity-60'" :style="{ background: 'var(--cc-primary)' }" @click="valueIndex = d - 1" />
         </div>
       </div>
     </section>
