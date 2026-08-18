@@ -65,9 +65,9 @@ const inputCls = 'w-full h-12 px-4 rounded-[11px] border border-[#e3e6ea] bg-whi
           <button type="button" class="h-12 px-7 rounded-[13px] text-white text-[15px] font-bold transition duration-150 hover:brightness-110 active:scale-[0.97]" :style="{ background: 'var(--cc-primary)' }" @click="tab = 'application'">Apply</button>
         </div>
 
-        <div class="mt-8 flex items-center gap-7 border-b border-[#eceef1]">
+        <div class="mt-9 flex items-center gap-8 border-b-[1.5px] border-[#d1d5db]">
           <button v-for="t in (['overview','application'] as const)" :key="t" type="button"
-            class="pb-3 -mb-px border-b-2 text-[15px] font-semibold transition"
+            class="pb-3.5 -mb-[1.5px] border-b-[2.5px] text-[15px] font-semibold transition"
             :style="tab === t ? { borderColor: 'var(--cc-primary)', color: 'var(--cc-primary)' } : {}"
             :class="tab === t ? '' : 'border-transparent text-[#8a919c] hover:text-[#4b5563]'"
             @click="tab = t">{{ t === 'overview' ? 'Overview' : 'Application' }}</button>
