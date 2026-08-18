@@ -3,7 +3,7 @@
   card + jobs list. Emits open-job(id). Driven by useJobs() + useCareerSite().
 -->
 <script setup lang="ts">
-import { Search, MapPin, ArrowRight } from 'lucide-vue-next'
+import { Search, MapPin, ArrowRight, ChevronLeft, ChevronRight } from 'lucide-vue-next'
 import { useJobs } from '~/composables/useJobs'
 import { useCareerSite } from '~/composables/useCareerSite'
 import { ccEmploymentType, ccWorkLabel, ccBlurb } from '~/utils/careerJob'
@@ -36,6 +36,23 @@ const results = computed(() => openRoles.value.filter((j) => {
 
 function clearFilters() { query.value = ''; fLocation.value = ''; fCollar.value = ''; fDept.value = ''; fWork.value = '' }
 const selCls = 'w-full h-11 px-3 rounded-[10px] border border-[#e3e6ea] bg-white text-[14px] text-[#374151] outline-none transition focus:border-[color:var(--cc-primary)]'
+
+// Pagination — keeps the list fast/readable for hundreds of roles.
+const PAGE_SIZE = 12
+const page = ref(1)
+const totalPages = computed(() => Math.max(1, Math.ceil(results.value.length / PAGE_SIZE)))
+const pagedResults = computed(() => results.value.slice((page.value - 1) * PAGE_SIZE, page.value * PAGE_SIZE))
+watch(results, () => { page.value = 1 })
+// Windowed page numbers: 1 … cur-1 cur cur+1 … last (gaps become "…")
+const pageNumbers = computed(() => {
+  const total = totalPages.value, cur = page.value
+  const set = new Set<number>([1, 2, total, total - 1, cur, cur - 1, cur + 1])
+  return [...set].filter(n => n >= 1 && n <= total).sort((a, b) => a - b)
+})
+function goPage(p: number) {
+  page.value = Math.min(totalPages.value, Math.max(1, p))
+  if (import.meta.client) document.getElementById('jobs-top')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+}
 </script>
 
 <template>
@@ -94,13 +111,13 @@ const selCls = 'w-full h-11 px-3 rounded-[10px] border border-[#e3e6ea] bg-white
           </div>
 
           <!-- Jobs -->
-          <div class="mt-8">
+          <div id="jobs-top" class="mt-8 scroll-mt-24">
             <h2 class="text-[22px] font-extrabold tracking-[-0.01em]" :style="{ color: 'var(--cc-header)' }">Jobs</h2>
             <div class="mt-1 text-[14px] text-[#6b7280]">Found {{ results.length }} {{ results.length === 1 ? 'Job' : 'Jobs' }}</div>
             <div class="mt-4 text-[13px] font-medium text-[#9aa1ac]">Search Results</div>
 
             <div class="mt-4 flex flex-col gap-4">
-              <button v-for="job in results" :key="job.id" type="button"
+              <button v-for="job in pagedResults" :key="job.id" type="button"
                 class="block text-left rounded-[16px] border border-[#eceef1] bg-white p-5 transition duration-200 hover:-translate-y-0.5 hover:shadow-[0_16px_40px_rgba(15,23,42,0.08)] hover:border-[color:var(--cc-primary)] active:scale-[0.995]" @click="emit('open-job', job.id)">
                 <div class="flex items-start justify-between gap-4">
                   <div class="min-w-0">
@@ -121,6 +138,16 @@ const selCls = 'w-full h-11 px-3 rounded-[10px] border border-[#e3e6ea] bg-white
                 <div class="text-[15px] font-bold" :style="{ color: 'var(--cc-header)' }">No jobs match your filters</div>
                 <p class="mt-1 text-[13.5px] text-[#8a919c]">Try clearing a filter — new roles open often.</p>
               </div>
+            </div>
+
+            <!-- Pagination -->
+            <div v-if="totalPages > 1" class="mt-8 flex items-center justify-center gap-1.5">
+              <button type="button" :disabled="page === 1" class="w-10 h-10 rounded-[10px] border border-[#e3e6ea] grid place-items-center transition disabled:opacity-40 hover:bg-[#f7f8fa] active:scale-95" @click="goPage(page - 1)"><ChevronLeft class="w-[18px] h-[18px]" :style="{ color: 'var(--cc-header)' }" /></button>
+              <template v-for="(n, i) in pageNumbers" :key="n">
+                <span v-if="i > 0 && n - (pageNumbers[i - 1] ?? 0) > 1" class="px-1 text-[#9aa1ac]">…</span>
+                <button type="button" class="min-w-10 h-10 px-3 rounded-[10px] text-[14px] font-semibold transition active:scale-95" :class="n === page ? 'text-white' : 'border border-[#e3e6ea] text-[#4b5563] hover:bg-[#f7f8fa]'" :style="n === page ? { background: 'var(--cc-primary)' } : {}" @click="goPage(n)">{{ n }}</button>
+              </template>
+              <button type="button" :disabled="page === totalPages" class="w-10 h-10 rounded-[10px] border border-[#e3e6ea] grid place-items-center transition disabled:opacity-40 hover:bg-[#f7f8fa] active:scale-95" @click="goPage(page + 1)"><ChevronRight class="w-[18px] h-[18px]" :style="{ color: 'var(--cc-header)' }" /></button>
             </div>
           </div>
         </div>
