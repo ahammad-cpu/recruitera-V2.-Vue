@@ -3,7 +3,7 @@
   Emits open-job / view-all instead of routing. Driven by useCareerSite().
 -->
 <script setup lang="ts">
-import { ArrowRight, MapPin, Clock, Briefcase, Quote as QuoteIcon, Play } from 'lucide-vue-next'
+import { ArrowRight, MapPin, Clock, Briefcase, Quote as QuoteIcon, Play, ChevronLeft, ChevronRight } from 'lucide-vue-next'
 import { useCareerSite, valueIcon } from '~/composables/useCareerSite'
 import { useCompany } from '~/composables/useCompany'
 import { useJobs } from '~/composables/useJobs'
@@ -29,6 +29,17 @@ const gridColsClass = computed(() => {
 
 const ytId = computed(() => videoUrl.value.match(/(?:youtu\.be\/|[?&]v=|embed\/)([\w-]{11})/)?.[1] ?? '')
 const videoPlaying = ref(false)
+
+// Testimonials carousel — one at a time on the right, auto-advancing.
+const tIndex = ref(0)
+const activeT = computed(() => testimonials.value[tIndex.value] ?? testimonials.value[0] ?? { name: '', role: '', quote: '' })
+function goT(dir: number) { const n = testimonials.value.length || 1; tIndex.value = (tIndex.value + dir + n) % n }
+let tTimer: ReturnType<typeof setInterval> | undefined
+function startT() { if (testimonials.value.length > 1 && !tTimer) tTimer = setInterval(() => goT(1), 6000) }
+function stopT() { if (tTimer) { clearInterval(tTimer); tTimer = undefined } }
+function onTVisibility() { if (document.hidden) stopT(); else startT() }
+onMounted(() => { document.addEventListener('visibilitychange', onTVisibility); startT() })
+onBeforeUnmount(() => { document.removeEventListener('visibilitychange', onTVisibility); stopT() })
 // Cover video: YouTube link → embedded loop; anything else → treated as a video file (mp4/webm).
 const coverYtId = computed(() => coverVideoUrl.value.match(/(?:youtu\.be\/|[?&]v=|embed\/)([\w-]{11})/)?.[1] ?? '')
 const coverIsFile = computed(() => ccIsVideoFile(coverVideoUrl.value))
@@ -188,28 +199,40 @@ const marqueeStyle = computed(() => ({ animationDuration: `${Math.max(18, values
       </div>
     </section>
 
-    <!-- Testimonials -->
+    <!-- Testimonials — branded left panel + carousel on the right -->
     <section v-if="testimonials.length" class="mx-auto max-w-[1160px] px-6 py-16 md:py-24">
-      <div class="grid gap-8 lg:grid-cols-[0.85fr_1.15fr] items-stretch">
-        <div class="rounded-[22px] p-10 flex flex-col justify-between" :style="{ background: 'color-mix(in srgb, var(--cc-primary) 12%, white)' }">
-          <QuoteIcon class="w-14 h-14" :style="{ color: 'var(--cc-primary)' }" fill="currentColor" stroke-width="0" />
+      <div class="grid overflow-hidden rounded-[24px] border border-[#ececf0] shadow-[0_24px_64px_rgba(15,23,42,0.07)] lg:grid-cols-[minmax(0,1fr)_minmax(0,1.08fr)]" @mouseenter="stopT" @mouseleave="startT">
+        <!-- Left: branded intro -->
+        <div class="relative flex flex-col justify-between gap-12 p-9 md:p-14 min-h-[440px] md:min-h-[500px]" :style="{ background: 'color-mix(in srgb, var(--cc-primary) 38%, white)' }">
+          <QuoteIcon class="w-14 h-14 text-white/60" fill="currentColor" stroke-width="0" />
           <div>
-            <h2 class="text-[clamp(1.7rem,3.5vw,2.4rem)] font-extrabold tracking-[-0.02em] text-balance" :style="{ color: 'var(--cc-header)' }">Real stories from the team</h2>
-            <p class="mt-3 text-[15px] leading-relaxed text-[#4b5563]">An inside look at the culture, the growth, and the people — in their own words.</p>
+            <h2 class="text-[clamp(1.7rem,3.4vw,2.4rem)] font-extrabold leading-[1.1] tracking-[-0.02em]" :style="{ color: 'var(--cc-header)' }">Real Stories from Real Employees</h2>
+            <p class="mt-4 text-[15px] leading-relaxed" :style="{ color: 'color-mix(in srgb, var(--cc-header) 78%, white)' }">Get an inside look at our workplace culture, career growth opportunities, and team experiences through the voices of our employees.</p>
           </div>
         </div>
-        <div class="grid gap-4 sm:grid-cols-2 content-start">
-          <figure v-for="(t, i) in testimonials" :key="i" class="rounded-[18px] border border-[#eceef1] bg-white p-6 flex flex-col">
-            <blockquote class="text-[15px] leading-relaxed text-[#374151] flex-1">"{{ t.quote }}"</blockquote>
-            <figcaption class="mt-5 flex items-center gap-3">
-              <img v-if="t.photo" :src="t.photo" alt="" class="w-11 h-11 rounded-full object-cover">
-              <span v-else class="w-11 h-11 rounded-full grid place-items-center text-white text-[13px] font-bold" :style="{ background: 'var(--cc-primary)' }">{{ initials(t.name) }}</span>
-              <span>
-                <span class="block text-[14.5px] font-bold" :style="{ color: 'var(--cc-header)' }">{{ t.name }}</span>
-                <span class="block text-[12.5px] text-[#8a919c]">{{ t.role }}</span>
-              </span>
-            </figcaption>
-          </figure>
+        <!-- Right: one testimonial at a time -->
+        <div class="relative flex flex-col bg-white p-9 md:p-14">
+          <Transition name="cc-fade" mode="out-in">
+            <div :key="tIndex" class="flex-1">
+              <div class="flex items-center gap-4">
+                <img v-if="activeT.photo" :src="activeT.photo" alt="" class="w-12 h-12 rounded-full object-cover">
+                <span v-else class="w-12 h-12 rounded-full grid place-items-center text-white text-[14px] font-bold shrink-0" :style="{ background: 'var(--cc-primary)' }">{{ initials(activeT.name) }}</span>
+                <div>
+                  <div class="text-[16px] font-bold" :style="{ color: 'var(--cc-header)' }">{{ activeT.name }}</div>
+                  <div v-if="activeT.role" class="text-[13px] text-[#8a919c]">{{ activeT.role }}</div>
+                </div>
+              </div>
+              <blockquote class="mt-6 text-[16px] md:text-[17px] leading-relaxed text-[#3f4652]">"{{ activeT.quote }}"</blockquote>
+            </div>
+          </Transition>
+          <!-- controls -->
+          <div v-if="testimonials.length > 1" class="mt-8 flex items-center gap-3">
+            <button type="button" aria-label="Previous" class="w-10 h-10 rounded-full border border-[#e6e8ec] grid place-items-center transition hover:bg-[#f7f8fa]" @click="goT(-1)"><ChevronLeft class="w-5 h-5" :style="{ color: 'var(--cc-header)' }" /></button>
+            <button type="button" aria-label="Next" class="w-10 h-10 rounded-full border border-[#e6e8ec] grid place-items-center transition hover:bg-[#f7f8fa]" @click="goT(1)"><ChevronRight class="w-5 h-5" :style="{ color: 'var(--cc-header)' }" /></button>
+            <div class="ml-2 flex gap-2">
+              <button v-for="(t, i) in testimonials" :key="i" type="button" :aria-label="`Testimonial ${i + 1}`" class="h-2 rounded-full transition-all" :class="tIndex === i ? 'w-6' : 'w-2 opacity-30 hover:opacity-60'" :style="{ background: 'var(--cc-primary)' }" @click="tIndex = i" />
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -249,4 +272,7 @@ const marqueeStyle = computed(() => ({ animationDuration: `${Math.max(18, values
 @media (prefers-reduced-motion: reduce) {
   .cc-marquee { animation: none; }
 }
+/* Testimonial crossfade */
+.cc-fade-enter-active, .cc-fade-leave-active { transition: opacity .35s ease; }
+.cc-fade-enter-from, .cc-fade-leave-to { opacity: 0; }
 </style>

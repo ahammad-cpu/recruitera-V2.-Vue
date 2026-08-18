@@ -2,6 +2,8 @@
 import {
   Check,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   Clock,
   Copy,
   ExternalLink,
@@ -846,21 +848,30 @@ const testimonialsGridClass = computed(() => (previewMode.value === 'desktop' ? 
               </div>
             </section>
 
-            <!-- Testimonials -->
-            <section class="px-6 py-8">
-              <div class="font-extrabold text-[var(--brand-preview-text-heading)] mb-5" style="font-size:22px">From the team</div>
-              <div class="grid gap-3.5" :class="testimonialsGridClass">
-                <figure v-for="(t, i) in testimonials" :key="i" class="rounded-2xl border border-[var(--brand-preview-border-card)] bg-white p-4">
-                  <Quote class="w-[16px] h-[16px] mb-2" :style="{ color: primaryColor }" />
-                  <blockquote class="text-[13.5px] text-[var(--brand-preview-text-body)] leading-[1.6] mb-3">"{{ t.quote || 'Quote' }}"</blockquote>
-                  <figcaption class="flex items-center gap-2.5">
-                    <div class="grid size-9 place-items-center rounded-full text-[12px] font-semibold text-white" :style="{ background: primaryColor }">{{ initials(t.name) }}</div>
+            <!-- Testimonials — branded left panel + one testimonial on the right -->
+            <section v-if="testimonials.length" class="px-6 py-8">
+              <div class="grid overflow-hidden rounded-2xl border border-[var(--brand-preview-border-card)] md:grid-cols-2">
+                <div class="relative flex flex-col justify-between gap-8 p-6 min-h-[220px]" :style="{ background: `color-mix(in srgb, ${primaryColor} 38%, white)` }">
+                  <Quote class="w-9 h-9 text-white/60" fill="currentColor" stroke-width="0" />
+                  <div>
+                    <div class="font-extrabold leading-[1.15]" :style="{ color: headerColor, fontSize: '22px' }">Real Stories from Real Employees</div>
+                    <div class="mt-2.5 text-[12.5px] leading-[1.6]" :style="{ color: `color-mix(in srgb, ${headerColor} 78%, white)` }">Get an inside look at our workplace culture, career growth, and team experiences.</div>
+                  </div>
+                </div>
+                <div class="flex flex-col bg-white p-6">
+                  <div class="flex items-center gap-2.5">
+                    <div class="grid size-10 shrink-0 place-items-center rounded-full text-[12px] font-semibold text-white" :style="{ background: primaryColor }">{{ initials(testimonials[0]?.name || '') }}</div>
                     <div>
-                      <div class="text-[13px] font-semibold text-[var(--brand-preview-text-heading)]">{{ t.name || 'Name' }}</div>
-                      <div class="text-[11.5px] text-[var(--brand-preview-text-muted)]">{{ t.role || 'Role' }}</div>
+                      <div class="text-[14px] font-bold text-[var(--brand-preview-text-heading)]">{{ testimonials[0]?.name || 'Name' }}</div>
+                      <div class="text-[11.5px] text-[var(--brand-preview-text-muted)]">{{ testimonials[0]?.role || 'Role' }}</div>
                     </div>
-                  </figcaption>
-                </figure>
+                  </div>
+                  <blockquote class="mt-4 text-[13.5px] leading-[1.6] text-[var(--brand-preview-text-body)]">"{{ testimonials[0]?.quote || 'Quote' }}"</blockquote>
+                  <div v-if="testimonials.length > 1" class="mt-auto pt-5 flex items-center gap-2">
+                    <span class="grid size-8 place-items-center rounded-full border border-[var(--brand-preview-border)]"><ChevronLeft class="w-4 h-4" /></span>
+                    <span class="grid size-8 place-items-center rounded-full border border-[var(--brand-preview-border)]"><ChevronRight class="w-4 h-4" /></span>
+                  </div>
+                </div>
               </div>
             </section>
 
