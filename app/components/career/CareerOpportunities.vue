@@ -153,5 +153,8 @@ function goPage(p: number) {
         </div>
       </div>
     </div>
+
+    <!-- General application CTA -->
+    <CareerApplyCta />
   </div>
 </template>
