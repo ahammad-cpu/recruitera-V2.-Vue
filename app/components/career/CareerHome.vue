@@ -11,7 +11,7 @@ import { ccEmploymentType, ccWorkLabel, ccDaysAgo, ccBlurb, ccIsVideoFile } from
 
 const emit = defineEmits<{ 'open-job': [id: string]; 'view-all': [] }>()
 
-const { headline, intro, values, testimonials, videoUrl, forEmployeesOn, employeeDomain, coverType, coverUrl, coverVideoUrl, syncRev } = useCareerSite()
+const { headline, intro, values, testimonials, videoUrl, forEmployeesOn, employeeDomain, coverType, coverUrl, coverVideoUrl, showHero, syncRev } = useCareerSite()
 const { data: company } = useCompany()
 const { jobs } = useJobs()
 const companyName = computed(() => company.value?.name || 'Your Company')
@@ -65,7 +65,7 @@ const marqueeStyle = computed(() => ({ animationDuration: `${Math.max(18, values
   <div>
     <!-- Hero — VIDEO: Vodafone-style. Tall (fills the screen), text bottom-left
          hugging the edge; the featured-jobs card still overlaps it. -->
-    <section v-if="heroIsVideo" class="relative overflow-hidden min-h-[94vh] flex items-end bg-black">
+    <section v-if="showHero && heroIsVideo" class="relative overflow-hidden min-h-[94vh] flex items-end bg-black">
       <div class="absolute inset-0 overflow-hidden">
         <iframe v-if="coverYtId" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[177.78vh] min-w-full h-[56.25vw] min-h-full pointer-events-none"
           :src="`https://www.youtube.com/embed/${coverYtId}?autoplay=1&mute=1&loop=1&playlist=${coverYtId}&controls=0&showinfo=0&modestbranding=1&rel=0&playsinline=1`"
@@ -81,7 +81,7 @@ const marqueeStyle = computed(() => ({ animationDuration: `${Math.max(18, values
     </section>
 
     <!-- Hero — IMAGE / GRADIENT: content top-left in the centered column (SC1) -->
-    <section v-else class="relative overflow-hidden">
+    <section v-else-if="showHero" class="relative overflow-hidden">
       <div class="absolute inset-0" :style="heroImage
         ? { backgroundImage: `url(${coverUrl})`, backgroundSize: 'cover', backgroundPosition: 'center' }
         : { background: 'linear-gradient(135deg, var(--cc-primary), color-mix(in srgb, var(--cc-primary) 45%, #0b1220))' }" />
@@ -95,9 +95,8 @@ const marqueeStyle = computed(() => ({ animationDuration: `${Math.max(18, values
       </div>
     </section>
 
-    <!-- Featured jobs — overlaps the hero (smaller overlap on the tall video so
-         it doesn't cover the bottom-anchored text) -->
-    <section id="jobs" class="relative z-10" :class="heroIsVideo ? '-mt-14 md:-mt-16' : '-mt-28 md:-mt-32'">
+    <!-- Featured jobs — overlaps the hero, or clears the header when hero is off -->
+    <section id="jobs" class="relative z-10" :class="!showHero ? 'pt-28 md:pt-32' : (heroIsVideo ? '-mt-14 md:-mt-16' : '-mt-28 md:-mt-32')">
       <div class="mx-auto max-w-[1160px] px-6">
         <div class="rounded-[22px] bg-white border border-[#eceef1] shadow-[0_28px_70px_rgba(15,23,42,0.12)] p-7 md:p-10">
           <div class="flex flex-wrap items-end justify-between gap-4">

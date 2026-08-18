@@ -69,6 +69,8 @@ const forEmployeesOn = ref(true)
 // Header layout
 const headerSticky = ref(true)
 const headerFullWidth = ref(false)
+// Hero
+const showHero = ref(true)
 // Single source of truth for publish state (was: publishedOn + liveOn + a badge).
 const published = ref(true)
 
@@ -264,6 +266,7 @@ forEmployeesOn.value = _cs.forEmployeesOn.value
 generalApplicationOn.value = _cs.generalApplicationOn.value
 headerSticky.value = _cs.headerSticky.value
 headerFullWidth.value = _cs.headerFullWidth.value
+showHero.value = _cs.showHero.value
 published.value = _cs.published.value
 // Keep the store in sync with builder edits (→ persists → public /careers page).
 watchEffect(() => {
@@ -283,6 +286,7 @@ watchEffect(() => {
   _cs.generalApplicationOn.value = generalApplicationOn.value
   _cs.headerSticky.value = headerSticky.value
   _cs.headerFullWidth.value = headerFullWidth.value
+  _cs.showHero.value = showHero.value
   _cs.published.value = published.value
 })
 // Logo / cover uploads write straight to the shared store (data URLs).
@@ -322,7 +326,7 @@ function onCoverUpload(e: Event) {
 function snapshot() {
   return JSON.stringify({
     g: generalApplicationOn.value, fe: forEmployeesOn.value, pub: published.value,
-    hsticky: headerSticky.value, hfull: headerFullWidth.value,
+    hsticky: headerSticky.value, hfull: headerFullWidth.value, shero: showHero.value,
     pc: primaryColor.value, hc: headerColor.value, bc: btnColor.value, cc: ctaColor.value,
     font: font.value, hl: headline.value, intro: intro.value, video: videoUrl.value,
     values: values.value, testimonials: testimonials.value, ed: employeeDomain.value, sub: subdomain.value,
@@ -342,7 +346,7 @@ function discardChanges() {
   if (!savedSnapshot.value) return
   const s = JSON.parse(savedSnapshot.value)
   generalApplicationOn.value = s.g; forEmployeesOn.value = s.fe; published.value = s.pub
-  headerSticky.value = s.hsticky; headerFullWidth.value = s.hfull
+  headerSticky.value = s.hsticky; headerFullWidth.value = s.hfull; showHero.value = s.shero
   primaryColor.value = s.pc; headerColor.value = s.hc; btnColor.value = s.bc; ctaColor.value = s.cc
   font.value = s.font; headline.value = s.hl; intro.value = s.intro; videoUrl.value = s.video
   values.value = JSON.parse(JSON.stringify(s.values)); testimonials.value = JSON.parse(JSON.stringify(s.testimonials))
@@ -538,6 +542,13 @@ const testimonialsGridClass = computed(() => (previewMode.value === 'desktop' ? 
                   <div class="text-[11.5px] text-[var(--brand-text-secondary)]">Header stays pinned to the top as you scroll</div>
                 </div>
                 <Switch v-model="headerSticky" class="shrink-0 data-[state=checked]:bg-[var(--brand-teal)]" />
+              </div>
+              <div class="flex items-center justify-between gap-3 border-t border-[var(--brand-border)] pt-3">
+                <div>
+                  <div class="text-[13px] text-[var(--brand-text)]">Show hero section</div>
+                  <div class="text-[11.5px] text-[var(--brand-text-secondary)]">Off = no cover/headline; the page opens with the jobs</div>
+                </div>
+                <Switch v-model="showHero" class="shrink-0 data-[state=checked]:bg-[var(--brand-teal)]" />
               </div>
             </div>
 
@@ -753,7 +764,7 @@ const testimonialsGridClass = computed(() => (previewMode.value === 'desktop' ? 
             </header>
 
             <!-- Hero — one layout; background is video (thumbnail) / image / gradient -->
-            <section class="relative flex flex-col items-start justify-center gap-4 overflow-hidden px-6" style="padding-top:56px;padding-bottom:56px;min-height:300px" :style="heroHasCover ? {} : { background: heroBackground }">
+            <section v-if="showHero" class="relative flex flex-col items-start justify-center gap-4 overflow-hidden px-6" style="padding-top:56px;padding-bottom:56px;min-height:300px" :style="heroHasCover ? {} : { background: heroBackground }">
               <template v-if="previewVideo">
                 <img v-if="coverYtId" :src="`https://img.youtube.com/vi/${coverYtId}/hqdefault.jpg`" alt="" class="absolute inset-0 h-full w-full object-cover">
                 <video v-else class="absolute inset-0 h-full w-full object-cover" :src="ccCoverVideo" muted loop playsinline />
