@@ -86,6 +86,7 @@ export default defineNuxtConfig({
     '/analytics':      { ssr: false },
     '/whatsapp':       { ssr: false },
     '/careers':        { ssr: false },
+    '/careers/**':     { ssr: false },
   },
 
   experimental: {
