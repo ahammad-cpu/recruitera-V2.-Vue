@@ -80,8 +80,9 @@ const marqueeStyle = computed(() => ({ animationDuration: `${Math.max(18, values
       </div>
     </section>
 
-    <!-- Hero — IMAGE cover: whole photo at its natural aspect (no crop), no copy -->
-    <section v-else-if="heroImage" class="relative">
+    <!-- Hero — IMAGE cover: whole photo at natural aspect, starting below the
+         header (pt clears the header overlap so the top isn't cut off) -->
+    <section v-else-if="heroImage" class="relative pt-20">
       <img :src="coverUrl" alt="" class="block w-full h-auto">
     </section>
 
