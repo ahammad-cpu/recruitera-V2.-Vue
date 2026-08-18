@@ -80,12 +80,13 @@ const marqueeStyle = computed(() => ({ animationDuration: `${Math.max(18, values
       </div>
     </section>
 
-    <!-- Hero — IMAGE cover: whole photo at natural aspect, starting below the
-         header (pt clears the header overlap so the top isn't cut off) -->
-    <section v-else-if="heroImage" class="relative pt-20">
-      <img :src="coverUrl" alt="" class="block w-full h-auto">
-      <!-- subtle black overlay across the gap + photo for depth -->
-      <div class="absolute inset-0 pointer-events-none" style="background:linear-gradient(180deg, rgba(8,14,22,.42), rgba(8,14,22,.24))" />
+    <!-- Hero — IMAGE cover: sharp photo framed inside the container (equal
+         margin, rounded 24px) over a heavily blurred copy that fills the rest -->
+    <section v-else-if="heroImage" class="relative overflow-hidden">
+      <img :src="coverUrl" alt="" aria-hidden="true" class="absolute inset-0 h-full w-full object-cover scale-125 blur-2xl">
+      <div class="relative mx-auto max-w-[1200px] px-4 pt-24 pb-4">
+        <img :src="coverUrl" alt="" class="block w-full h-auto rounded-[24px] shadow-[0_16px_50px_rgba(0,0,0,0.28)]">
+      </div>
     </section>
 
     <!-- Hero — GRADIENT (no cover): headline + intro + CTA -->
@@ -102,7 +103,7 @@ const marqueeStyle = computed(() => ({ animationDuration: `${Math.max(18, values
 
     <!-- Featured jobs — overlaps the hero (smaller overlap on the tall video so
          it doesn't cover the bottom-anchored text) -->
-    <section id="jobs" class="relative z-10" :class="(heroIsVideo || heroImage) ? '-mt-14 md:-mt-16' : '-mt-28 md:-mt-32'">
+    <section id="jobs" class="relative z-10" :class="heroImage ? '' : (heroIsVideo ? '-mt-14 md:-mt-16' : '-mt-28 md:-mt-32')">
       <div class="mx-auto max-w-[1160px] px-6">
         <div class="rounded-[22px] bg-white border border-[#eceef1] shadow-[0_28px_70px_rgba(15,23,42,0.12)] p-7 md:p-10">
           <div class="flex flex-wrap items-end justify-between gap-4">
