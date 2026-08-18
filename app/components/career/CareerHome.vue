@@ -86,10 +86,11 @@ const marqueeStyle = computed(() => ({ animationDuration: `${Math.max(18, values
         ? { backgroundImage: `url(${coverUrl})`, backgroundSize: 'cover', backgroundPosition: 'center' }
         : { background: 'linear-gradient(135deg, var(--cc-primary), color-mix(in srgb, var(--cc-primary) 45%, #0b1220))' }" />
       <div class="absolute inset-0" :style="{ background: heroImage ? 'linear-gradient(90deg, rgba(8,14,22,.82), rgba(8,14,22,.45))' : 'transparent' }" />
-      <div class="relative mx-auto max-w-[1160px] px-6 pt-28 pb-40 md:pt-36 md:pb-48 text-white">
-        <h1 class="text-[clamp(2rem,5vw,3.6rem)] font-extrabold leading-[1.05] tracking-[-0.03em] max-w-[18ch] text-balance">{{ headline }}</h1>
-        <p class="mt-5 text-[15px] md:text-[16.5px] leading-relaxed text-white/85 max-w-[56ch]">{{ intro }}</p>
-        <div class="mt-9 flex flex-wrap gap-3">
+      <!-- Image cover = clean banner (no headline/intro); gradient keeps the copy -->
+      <div class="relative mx-auto max-w-[1160px] px-6 text-white" :class="heroImage ? 'pt-40 pb-40 md:pt-52 md:pb-48' : 'pt-28 pb-40 md:pt-36 md:pb-48'">
+        <h1 v-if="!heroImage" class="text-[clamp(2rem,5vw,3.6rem)] font-extrabold leading-[1.05] tracking-[-0.03em] max-w-[18ch] text-balance">{{ headline }}</h1>
+        <p v-if="!heroImage" class="mt-5 text-[15px] md:text-[16.5px] leading-relaxed text-white/85 max-w-[56ch]">{{ intro }}</p>
+        <div :class="heroImage ? '' : 'mt-9'" class="flex flex-wrap gap-3">
           <button type="button" class="inline-flex items-center gap-2 h-12 px-6 rounded-[13px] bg-white text-[15px] font-bold transition hover:brightness-95" :style="{ color: 'var(--cc-primary)' }" @click="scrollToJobs">View openings <ArrowRight class="w-[18px] h-[18px]" stroke-width="2.2" /></button>
         </div>
       </div>
