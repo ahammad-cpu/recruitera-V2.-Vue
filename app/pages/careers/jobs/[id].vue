@@ -7,7 +7,7 @@ function back() { navigateTo('/careers/opportunities') }
 </script>
 
 <template>
-  <CareerShell>
+  <CareerShell hero-overlap>
     <CareerJob :job-id="jobId" @back="back" />
   </CareerShell>
 </template>
