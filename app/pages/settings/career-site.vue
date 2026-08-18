@@ -815,14 +815,20 @@ const testimonialsGridClass = computed(() => (previewMode.value === 'desktop' ? 
               </div>
             </section>
 
-            <!-- Culture video -->
-            <section class="px-6 pb-8">
-              <div class="font-extrabold text-[var(--brand-preview-text-heading)] mb-3" style="font-size:22px">Life at Acme Talent</div>
-              <div class="relative grid aspect-video w-full place-items-center overflow-hidden rounded-2xl" :style="{ background: videoBackground }">
-                <div class="grid size-14 place-items-center rounded-full bg-white/90 shadow-xl">
-                  <Play class="w-[22px] h-[22px] text-[var(--brand-preview-text-heading)] fill-current" />
+            <!-- Culture video — two-column dark block -->
+            <section class="px-6 py-8" :style="{ background: headerColor }">
+              <div class="grid gap-6 md:grid-cols-2 md:items-center">
+                <div>
+                  <div class="text-[11px] font-extrabold uppercase tracking-[0.16em]" :style="{ color: primaryColor }">Inside Acme Talent</div>
+                  <div class="mt-2 font-extrabold text-white leading-[1.1]" style="font-size:26px">A day in the life,<br>in 90 seconds</div>
+                  <div class="mt-3 text-[13px] leading-[1.6] text-white/65">Meet the people, the pace, and the problems we're solving together.</div>
                 </div>
-                <span v-if="!videoUrl" class="absolute bottom-3 left-3 text-[12px] text-white/80">Add a YouTube URL to embed your culture video</span>
+                <div class="relative grid aspect-video w-full place-items-center overflow-hidden rounded-2xl ring-1 ring-white/10" :style="{ background: videoBackground }">
+                  <div class="grid size-14 place-items-center rounded-full shadow-xl" :style="{ background: primaryColor }">
+                    <Play class="w-[22px] h-[22px] text-white fill-current translate-x-[2px]" />
+                  </div>
+                  <span v-if="!videoUrl" class="absolute bottom-3 left-3 text-[12px] text-white/80">Add a YouTube URL in Culture video</span>
+                </div>
               </div>
             </section>
 

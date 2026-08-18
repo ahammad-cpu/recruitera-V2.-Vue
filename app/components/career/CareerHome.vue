@@ -3,7 +3,7 @@
   Emits open-job / view-all instead of routing. Driven by useCareerSite().
 -->
 <script setup lang="ts">
-import { ArrowRight, MapPin, Clock, Briefcase, Quote as QuoteIcon } from 'lucide-vue-next'
+import { ArrowRight, MapPin, Clock, Briefcase, Quote as QuoteIcon, Play } from 'lucide-vue-next'
 import { useCareerSite, valueIcon } from '~/composables/useCareerSite'
 import { useCompany } from '~/composables/useCompany'
 import { useJobs } from '~/composables/useJobs'
@@ -28,6 +28,7 @@ const gridColsClass = computed(() => {
 })
 
 const ytId = computed(() => videoUrl.value.match(/(?:youtu\.be\/|[?&]v=|embed\/)([\w-]{11})/)?.[1] ?? '')
+const videoPlaying = ref(false)
 // Cover video: YouTube link → embedded loop; anything else → treated as a video file (mp4/webm).
 const coverYtId = computed(() => coverVideoUrl.value.match(/(?:youtu\.be\/|[?&]v=|embed\/)([\w-]{11})/)?.[1] ?? '')
 const coverIsFile = computed(() => ccIsVideoFile(coverVideoUrl.value))
@@ -161,16 +162,28 @@ const marqueeStyle = computed(() => ({ animationDuration: `${Math.max(18, values
       </div>
     </section>
 
-    <!-- Culture video -->
-    <section v-if="videoUrl" class="bg-[#f7f8fa]">
-      <div class="mx-auto max-w-[1160px] px-6 py-16 md:py-24">
-        <div class="text-center">
-          <div class="text-[13px] font-extrabold uppercase tracking-[0.14em]" :style="{ color: 'var(--cc-primary)' }">Inside {{ companyName }}</div>
-          <h2 class="mt-2 text-[clamp(1.8rem,3.8vw,2.6rem)] font-extrabold tracking-[-0.02em]" :style="{ color: 'var(--cc-header)' }">A day in the life</h2>
+    <!-- Culture video — two-column dark block (text left, video right) -->
+    <section v-if="videoUrl" :style="{ background: 'var(--cc-header)' }">
+      <div class="mx-auto max-w-[1160px] px-6 py-16 md:py-24 grid gap-10 lg:gap-14 lg:grid-cols-2 lg:items-center">
+        <!-- Left: copy -->
+        <div>
+          <div class="text-[13px] font-extrabold uppercase tracking-[0.16em]" :style="{ color: 'var(--cc-primary)' }">Inside {{ companyName }}</div>
+          <h2 class="mt-4 text-[clamp(2rem,4.4vw,3.1rem)] font-extrabold leading-[1.08] tracking-[-0.025em] text-white">A day in the life,<br>in 90 seconds</h2>
+          <p class="mt-5 text-[16px] leading-relaxed text-white/65 max-w-[46ch]">Meet the people, the pace, and the problems we're solving together. No corporate gloss — just how we actually work.</p>
         </div>
-        <div class="mt-10 aspect-video w-full max-w-[900px] mx-auto rounded-[20px] overflow-hidden shadow-[0_28px_70px_rgba(15,23,42,0.16)] bg-black">
-          <iframe v-if="ytId" class="w-full h-full" :src="`https://www.youtube.com/embed/${ytId}`" title="Culture video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen />
-          <div v-else class="w-full h-full grid place-items-center text-white/60 text-[14px]">Video preview</div>
+        <!-- Right: video card with click-to-play -->
+        <div class="relative aspect-video rounded-[20px] overflow-hidden shadow-[0_30px_80px_rgba(0,0,0,0.45)] ring-1 ring-white/10">
+          <iframe v-if="videoPlaying && ytId" class="absolute inset-0 w-full h-full" :src="`https://www.youtube.com/embed/${ytId}?autoplay=1&rel=0`" title="Culture video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen />
+          <video v-else-if="videoPlaying" class="absolute inset-0 w-full h-full object-cover" :src="videoUrl" autoplay controls playsinline />
+          <button v-else type="button" class="group absolute inset-0 w-full h-full" aria-label="Play culture video" @click="videoPlaying = true">
+            <img v-if="ytId" :src="`https://img.youtube.com/vi/${ytId}/hqdefault.jpg`" alt="" class="absolute inset-0 w-full h-full object-cover">
+            <span class="absolute inset-0" :style="{ background: ytId ? 'linear-gradient(135deg, rgba(8,14,22,.55), rgba(8,14,22,.35))' : 'linear-gradient(135deg, color-mix(in srgb, var(--cc-header) 55%, #000), color-mix(in srgb, var(--cc-primary) 45%, #000))' }" />
+            <span class="absolute inset-0 grid place-items-center">
+              <span class="w-16 h-16 rounded-full grid place-items-center shadow-lg transition-transform duration-200 group-hover:scale-110" :style="{ background: 'var(--cc-primary)' }">
+                <Play class="w-6 h-6 text-white fill-current translate-x-[2px]" />
+              </span>
+            </span>
+          </button>
         </div>
       </div>
     </section>
