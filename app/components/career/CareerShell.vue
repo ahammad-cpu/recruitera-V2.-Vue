@@ -47,8 +47,8 @@ const isHome = computed(() => active === 'home')
             <button type="button" class="transition" :style="!isHome ? { color: 'var(--cc-primary)' } : {}" :class="!isHome ? '' : 'text-white/65 hover:text-white'" @click="emit('navigate', 'opportunities')">Opportunities</button>
           </nav>
           <div class="ml-auto flex items-center gap-2.5">
-            <button v-if="forEmployeesOn" type="button" class="h-10 px-5 rounded-[999px] text-[13.5px] font-bold text-white transition hover:brightness-110" :style="{ background: 'var(--cc-primary)' }">For Employees</button>
-            <button type="button" class="h-10 px-3.5 rounded-[999px] border border-white/25 text-white text-[13px] font-semibold inline-flex items-center gap-1.5 hover:bg-white/10 transition" aria-label="Switch language"><Globe class="w-4 h-4" stroke-width="1.9" /> العربية</button>
+            <button v-if="forEmployeesOn" type="button" class="h-10 px-5 rounded-[999px] text-[13.5px] font-bold text-white transition duration-150 hover:brightness-110 active:scale-[0.96]" :style="{ background: 'var(--cc-primary)' }">For Employees</button>
+            <button type="button" class="h-10 px-3.5 rounded-[999px] border border-white/25 text-white text-[13px] font-semibold inline-flex items-center gap-1.5 hover:bg-white/10 transition duration-150 active:scale-[0.96]" aria-label="Switch language"><Globe class="w-4 h-4" stroke-width="1.9" /> العربية</button>
           </div>
         </div>
       </div>

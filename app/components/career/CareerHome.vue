@@ -76,7 +76,7 @@ const marqueeStyle = computed(() => ({ animationDuration: `${Math.max(18, values
       <div class="relative w-full px-6 sm:px-10 lg:px-16 pb-28 md:pb-32 text-white">
         <h1 class="text-[clamp(2rem,5vw,3.6rem)] font-extrabold leading-[1.05] tracking-[-0.03em] max-w-[18ch] text-balance">{{ headline }}</h1>
         <p v-if="intro" class="mt-5 text-[15px] md:text-[16.5px] leading-relaxed text-white/85 max-w-[56ch]">{{ intro }}</p>
-        <button type="button" class="mt-8 inline-flex items-center gap-2 h-12 px-6 rounded-[13px] bg-white text-[15px] font-bold transition hover:brightness-95" :style="{ color: 'var(--cc-primary)' }" @click="scrollToJobs">View openings <ArrowRight class="w-[18px] h-[18px]" stroke-width="2.2" /></button>
+        <button type="button" class="mt-8 inline-flex items-center gap-2 h-12 px-6 rounded-[13px] bg-white text-[15px] font-bold transition duration-150 hover:brightness-95 active:scale-[0.97]" :style="{ color: 'var(--cc-primary)' }" @click="scrollToJobs">View openings <ArrowRight class="w-[18px] h-[18px]" stroke-width="2.2" /></button>
       </div>
     </section>
 
@@ -92,7 +92,7 @@ const marqueeStyle = computed(() => ({ animationDuration: `${Math.max(18, values
         <h1 class="text-[clamp(2rem,5vw,3.6rem)] font-extrabold leading-[1.05] tracking-[-0.03em] max-w-[18ch] text-balance">{{ headline }}</h1>
         <p class="mt-5 text-[15px] md:text-[16.5px] leading-relaxed text-white/85 max-w-[56ch]">{{ intro }}</p>
         <div class="mt-9 flex flex-wrap gap-3">
-          <button type="button" class="inline-flex items-center gap-2 h-12 px-6 rounded-[13px] bg-white text-[15px] font-bold transition hover:brightness-95" :style="{ color: 'var(--cc-primary)' }" @click="scrollToJobs">View openings <ArrowRight class="w-[18px] h-[18px]" stroke-width="2.2" /></button>
+          <button type="button" class="inline-flex items-center gap-2 h-12 px-6 rounded-[13px] bg-white text-[15px] font-bold transition duration-150 hover:brightness-95 active:scale-[0.97]" :style="{ color: 'var(--cc-primary)' }" @click="scrollToJobs">View openings <ArrowRight class="w-[18px] h-[18px]" stroke-width="2.2" /></button>
         </div>
       </div>
     </section>
@@ -108,12 +108,12 @@ const marqueeStyle = computed(() => ({ animationDuration: `${Math.max(18, values
               <h2 class="mt-2 text-[clamp(1.35rem,3vw,1.9rem)] font-semibold" :style="{ color: 'var(--cc-header)' }">Discover our featured jobs</h2>
               <p class="mt-2 text-[14.5px] leading-relaxed text-[#6b7280] max-w-[500px]">The roles we're most excited about right now at {{ companyName }} — standout positions where you can grow fast and make real impact from day one.</p>
             </div>
-            <button type="button" class="inline-flex items-center gap-1.5 h-10 px-4 rounded-[11px] border-[1.5px] text-[13.5px] font-semibold transition hover:bg-[color-mix(in_srgb,var(--cc-primary)_8%,white)]" :style="{ borderColor: 'var(--cc-primary)', color: 'var(--cc-primary)' }" @click="emit('view-all')">View all <ArrowRight class="w-4 h-4" stroke-width="2" /></button>
+            <button type="button" class="inline-flex items-center gap-1.5 h-10 px-4 rounded-[11px] border-[1.5px] text-[13.5px] font-semibold transition duration-150 hover:bg-[color-mix(in_srgb,var(--cc-primary)_8%,white)] active:scale-[0.96]" :style="{ borderColor: 'var(--cc-primary)', color: 'var(--cc-primary)' }" @click="emit('view-all')">View all <ArrowRight class="w-4 h-4" stroke-width="2" /></button>
           </div>
 
           <div class="mt-6 flex flex-wrap gap-2.5">
             <button v-for="c in (['all','white','blue'] as const)" :key="c" type="button"
-              class="h-9 px-4 rounded-full text-[13px] font-semibold transition"
+              class="h-9 px-4 rounded-full text-[13px] font-semibold transition duration-150 active:scale-[0.95]"
               :style="collar === c ? { background: 'var(--cc-primary)', color: '#fff' } : {}"
               :class="collar === c ? '' : 'bg-white border border-[#e3e6ea] text-[#4b5563] hover:border-[#c3c8cf]'"
               @click="collar = c">{{ c === 'all' ? 'All' : c === 'white' ? 'White Collar' : 'Blue Collar' }}</button>
@@ -121,7 +121,7 @@ const marqueeStyle = computed(() => ({ animationDuration: `${Math.max(18, values
 
           <div class="mt-7 grid gap-5" :class="gridColsClass">
             <button v-for="job in featured" :key="job.id" type="button"
-              class="group relative flex flex-col text-left rounded-[18px] border border-[#ececf0] bg-white p-5 transition duration-200 hover:-translate-y-1 hover:border-[color:var(--cc-primary)] hover:shadow-[0_20px_46px_rgba(15,23,42,0.10)]"
+              class="group relative flex flex-col text-left rounded-[18px] border border-[#ececf0] bg-white p-5 transition duration-200 hover:-translate-y-1 hover:border-[color:var(--cc-primary)] hover:shadow-[0_20px_46px_rgba(15,23,42,0.10)] active:translate-y-0 active:scale-[0.99]"
               @click="emit('open-job', job.id)">
               <!-- Top row: department chip + work-mode badge -->
               <div class="flex items-center justify-between gap-3">
@@ -188,7 +188,7 @@ const marqueeStyle = computed(() => ({ animationDuration: `${Math.max(18, values
         <div class="relative aspect-video rounded-[20px] overflow-hidden shadow-[0_30px_80px_rgba(0,0,0,0.45)] ring-1 ring-white/10">
           <iframe v-if="videoPlaying && ytId" class="absolute inset-0 w-full h-full" :src="`https://www.youtube.com/embed/${ytId}?autoplay=1&rel=0`" title="Culture video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen />
           <video v-else-if="videoPlaying" class="absolute inset-0 w-full h-full object-cover" :src="videoUrl" autoplay controls playsinline />
-          <button v-else type="button" class="group absolute inset-0 w-full h-full" aria-label="Play culture video" @click="videoPlaying = true">
+          <button v-else type="button" class="group absolute inset-0 w-full h-full transition active:scale-[0.995]" aria-label="Play culture video" @click="videoPlaying = true">
             <img v-if="ytId" :src="`https://img.youtube.com/vi/${ytId}/hqdefault.jpg`" alt="" class="absolute inset-0 w-full h-full object-cover">
             <span class="absolute inset-0" :style="{ background: ytId ? 'linear-gradient(135deg, rgba(8,14,22,.55), rgba(8,14,22,.35))' : 'linear-gradient(135deg, color-mix(in srgb, var(--cc-header) 55%, #000), color-mix(in srgb, var(--cc-primary) 45%, #000))' }" />
             <span class="absolute inset-0 grid place-items-center">
@@ -229,8 +229,8 @@ const marqueeStyle = computed(() => ({ animationDuration: `${Math.max(18, values
           </Transition>
           <!-- controls -->
           <div v-if="testimonials.length > 1" class="mt-8 flex items-center gap-3">
-            <button type="button" aria-label="Previous" class="w-10 h-10 rounded-full border border-[#e6e8ec] grid place-items-center transition hover:bg-[#f7f8fa]" @click="goT(-1)"><ChevronLeft class="w-5 h-5" :style="{ color: 'var(--cc-header)' }" /></button>
-            <button type="button" aria-label="Next" class="w-10 h-10 rounded-full border border-[#e6e8ec] grid place-items-center transition hover:bg-[#f7f8fa]" @click="goT(1)"><ChevronRight class="w-5 h-5" :style="{ color: 'var(--cc-header)' }" /></button>
+            <button type="button" aria-label="Previous" class="w-10 h-10 rounded-full border border-[#e6e8ec] grid place-items-center transition duration-150 hover:bg-[#f7f8fa] active:scale-[0.9]" @click="goT(-1)"><ChevronLeft class="w-5 h-5" :style="{ color: 'var(--cc-header)' }" /></button>
+            <button type="button" aria-label="Next" class="w-10 h-10 rounded-full border border-[#e6e8ec] grid place-items-center transition duration-150 hover:bg-[#f7f8fa] active:scale-[0.9]" @click="goT(1)"><ChevronRight class="w-5 h-5" :style="{ color: 'var(--cc-header)' }" /></button>
             <div class="ml-2 flex gap-2">
               <button v-for="(t, i) in testimonials" :key="i" type="button" :aria-label="`Testimonial ${i + 1}`" class="h-2 rounded-full transition-all" :class="tIndex === i ? 'w-6' : 'w-2 opacity-30 hover:opacity-60'" :style="{ background: 'var(--cc-primary)' }" @click="tIndex = i" />
             </div>
