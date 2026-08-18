@@ -54,7 +54,11 @@ const trackStyle = computed(() => ({ transform: `translateX(calc(${-valueIndex.v
 function snapTo(i: number) {
   noTransition.value = true
   valueIndex.value = i
-  requestAnimationFrame(() => requestAnimationFrame(() => { noTransition.value = false }))
+  const clear = () => { noTransition.value = false }
+  // Double rAF re-enables the transition after the snap; setTimeout is a
+  // fallback for when rAF is throttled (hidden/blurred tab).
+  requestAnimationFrame(() => requestAnimationFrame(clear))
+  setTimeout(clear, 90)
 }
 function nextValues() {
   valueIndex.value++
@@ -77,8 +81,20 @@ function updatePerView() {
   const pv = window.innerWidth < 640 ? 1 : window.innerWidth < 1024 ? 2 : 3
   if (pv !== perView.value) { perView.value = pv; snapTo(0) }
 }
-onMounted(() => { updatePerView(); window.addEventListener('resize', updatePerView); startValues() })
-onBeforeUnmount(() => { window.removeEventListener('resize', updatePerView); stopValues() })
+// Pause when the tab is hidden (timers are throttled anyway) and resume — so
+// the carousel always keeps auto-playing whenever the page is actually visible.
+function onVisibility() { if (document.hidden) stopValues(); else startValues() }
+onMounted(() => {
+  updatePerView()
+  window.addEventListener('resize', updatePerView)
+  document.addEventListener('visibilitychange', onVisibility)
+  startValues()
+})
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', updatePerView)
+  document.removeEventListener('visibilitychange', onVisibility)
+  stopValues()
+})
 </script>
 
 <template>
