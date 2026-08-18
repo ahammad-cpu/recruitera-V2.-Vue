@@ -80,27 +80,26 @@ const marqueeStyle = computed(() => ({ animationDuration: `${Math.max(18, values
       </div>
     </section>
 
-    <!-- Hero — IMAGE / GRADIENT: content top-left in the centered column (SC1) -->
+    <!-- Hero — IMAGE cover: full-bleed like the video hero, no copy -->
+    <section v-else-if="heroImage" class="relative overflow-hidden min-h-[94vh]">
+      <img :src="coverUrl" alt="" class="absolute inset-0 w-full h-full object-cover">
+    </section>
+
+    <!-- Hero — GRADIENT (no cover): headline + intro + CTA -->
     <section v-else class="relative overflow-hidden">
-      <div class="absolute inset-0" :style="heroImage
-        ? { backgroundImage: `url(${coverUrl})`, backgroundSize: 'cover', backgroundPosition: 'center' }
-        : { background: 'linear-gradient(135deg, var(--cc-primary), color-mix(in srgb, var(--cc-primary) 45%, #0b1220))' }" />
-      <div class="absolute inset-0" :style="{ background: heroImage ? 'linear-gradient(90deg, rgba(8,14,22,.82), rgba(8,14,22,.45))' : 'transparent' }" />
-      <!-- Image cover = clean banner (no headline/intro); gradient keeps the copy -->
-      <div class="relative mx-auto max-w-[1160px] px-6 text-white" :class="heroImage ? 'pt-40 pb-40 md:pt-52 md:pb-48' : 'pt-28 pb-40 md:pt-36 md:pb-48'">
-        <template v-if="!heroImage">
-          <h1 class="text-[clamp(2rem,5vw,3.6rem)] font-extrabold leading-[1.05] tracking-[-0.03em] max-w-[18ch] text-balance">{{ headline }}</h1>
-          <p class="mt-5 text-[15px] md:text-[16.5px] leading-relaxed text-white/85 max-w-[56ch]">{{ intro }}</p>
-          <div class="mt-9 flex flex-wrap gap-3">
-            <button type="button" class="inline-flex items-center gap-2 h-12 px-6 rounded-[13px] bg-white text-[15px] font-bold transition hover:brightness-95" :style="{ color: 'var(--cc-primary)' }" @click="scrollToJobs">View openings <ArrowRight class="w-[18px] h-[18px]" stroke-width="2.2" /></button>
-          </div>
-        </template>
+      <div class="absolute inset-0" style="background:linear-gradient(135deg, var(--cc-primary), color-mix(in srgb, var(--cc-primary) 45%, #0b1220))" />
+      <div class="relative mx-auto max-w-[1160px] px-6 pt-28 pb-40 md:pt-36 md:pb-48 text-white">
+        <h1 class="text-[clamp(2rem,5vw,3.6rem)] font-extrabold leading-[1.05] tracking-[-0.03em] max-w-[18ch] text-balance">{{ headline }}</h1>
+        <p class="mt-5 text-[15px] md:text-[16.5px] leading-relaxed text-white/85 max-w-[56ch]">{{ intro }}</p>
+        <div class="mt-9 flex flex-wrap gap-3">
+          <button type="button" class="inline-flex items-center gap-2 h-12 px-6 rounded-[13px] bg-white text-[15px] font-bold transition hover:brightness-95" :style="{ color: 'var(--cc-primary)' }" @click="scrollToJobs">View openings <ArrowRight class="w-[18px] h-[18px]" stroke-width="2.2" /></button>
+        </div>
       </div>
     </section>
 
     <!-- Featured jobs — overlaps the hero (smaller overlap on the tall video so
          it doesn't cover the bottom-anchored text) -->
-    <section id="jobs" class="relative z-10" :class="heroIsVideo ? '-mt-14 md:-mt-16' : '-mt-28 md:-mt-32'">
+    <section id="jobs" class="relative z-10" :class="(heroIsVideo || heroImage) ? '-mt-14 md:-mt-16' : '-mt-28 md:-mt-32'">
       <div class="mx-auto max-w-[1160px] px-6">
         <div class="rounded-[22px] bg-white border border-[#eceef1] shadow-[0_28px_70px_rgba(15,23,42,0.12)] p-7 md:p-10">
           <div class="flex flex-wrap items-end justify-between gap-4">
