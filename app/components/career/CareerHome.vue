@@ -80,9 +80,9 @@ const marqueeStyle = computed(() => ({ animationDuration: `${Math.max(18, values
       </div>
     </section>
 
-    <!-- Hero — IMAGE cover: full-bleed like the video hero, no copy -->
-    <section v-else-if="heroImage" class="relative overflow-hidden min-h-[94vh]">
-      <img :src="coverUrl" alt="" class="absolute inset-0 w-full h-full object-cover">
+    <!-- Hero — IMAGE cover: whole photo at its natural aspect (no crop), no copy -->
+    <section v-else-if="heroImage" class="relative">
+      <img :src="coverUrl" alt="" class="block w-full h-auto">
     </section>
 
     <!-- Hero — GRADIENT (no cover): headline + intro + CTA -->

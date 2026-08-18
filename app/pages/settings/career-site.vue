@@ -752,9 +752,9 @@ const testimonialsGridClass = computed(() => (previewMode.value === 'desktop' ? 
               </span>
             </header>
 
-            <!-- Hero — image cover: full-bleed like the video, no copy -->
-            <section v-if="previewImage" class="relative overflow-hidden" style="min-height:460px">
-              <img :src="ccCover" alt="" class="absolute inset-0 h-full w-full object-cover">
+            <!-- Hero — image cover: whole photo at natural aspect (no crop) -->
+            <section v-if="previewImage" class="relative">
+              <img :src="ccCover" alt="" class="block w-full h-auto">
             </section>
             <!-- Hero — video / gradient: headline + intro + CTA -->
             <section v-else class="relative flex flex-col items-start justify-center gap-4 overflow-hidden px-6" style="padding-top:56px;padding-bottom:56px;min-height:300px" :style="heroHasCover ? {} : { background: heroBackground }">
