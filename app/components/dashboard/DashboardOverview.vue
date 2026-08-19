@@ -41,6 +41,30 @@ const sourceList = computed(() => sourcesData.value?.data ?? [])
 const { data: recentsData, isPending: recentsLoading } = useDashboardRecents()
 const recents = computed(() => recentsData.value?.data ?? [])
 
+// Recents row — horizontal scroll with ‹ / › arrows (shown only when scrollable).
+const recentsRow = ref<HTMLElement | null>(null)
+// Function ref — the element lives inside a v-for, where a string ref won't bind.
+function setRecentsRow(el: unknown) {
+  recentsRow.value = (el as HTMLElement) ?? null
+  scheduleArrows()
+}
+const canLeft = ref(false)
+const canRight = ref(false)
+function updateArrows() {
+  const el = recentsRow.value
+  if (!el) { canLeft.value = false; canRight.value = false; return }
+  canLeft.value = el.scrollLeft > 4
+  canRight.value = el.scrollLeft + el.clientWidth < el.scrollWidth - 4
+}
+function scheduleArrows() {
+  if (!import.meta.client) return
+  nextTick(() => requestAnimationFrame(updateArrows))
+}
+function scrollRow(dir: number) { recentsRow.value?.scrollBy({ left: dir * 320, behavior: 'smooth' }) }
+watch(recents, scheduleArrows, { immediate: true })
+onMounted(() => { scheduleArrows(); setTimeout(updateArrows, 400); window.addEventListener('resize', updateArrows) })
+onBeforeUnmount(() => window.removeEventListener('resize', updateArrows))
+
 const { data: newCandData, isPending: newCandLoading } = useDashboardNewCandidates()
 const newCandidates = computed(() => newCandData.value?.data ?? [])
 
@@ -165,26 +189,30 @@ function resetDrag() { armed.value = false; dragKey.value = null; overKey.value 
           @mousedown="armed = true"
         ><GripVertical class="w-4 h-4" stroke-width="2" /></button>
 
-      <!-- Recents -->
-      <div v-if="key === 'recents'" class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+      <!-- Recents — single horizontal, scrollable row with ‹ / › arrows -->
+      <div v-if="key === 'recents'" class="relative">
+        <button v-if="canLeft" type="button" aria-label="Scroll left" class="absolute left-0.5 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full bg-white border border-[var(--brand-border)] shadow-[0_2px_10px_rgba(0,20,18,0.14)] grid place-items-center text-[var(--brand-text-secondary)] hover:bg-[var(--brand-canvas)] transition" @click="scrollRow(-1)"><ChevronLeft class="w-4 h-4" stroke-width="2" /></button>
+        <button v-if="canRight" type="button" aria-label="Scroll right" class="absolute right-0.5 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full bg-white border border-[var(--brand-border)] shadow-[0_2px_10px_rgba(0,20,18,0.14)] grid place-items-center text-[var(--brand-text-secondary)] hover:bg-[var(--brand-canvas)] transition" @click="scrollRow(1)"><ChevronRight class="w-4 h-4" stroke-width="2" /></button>
+        <div :ref="setRecentsRow" class="flex gap-3 overflow-x-auto pb-1 -mx-0.5 px-0.5 scroll-smooth [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" @scroll="updateArrows">
         <!-- Skeletons reserve height while MSW loads (no layout shift). -->
         <template v-if="recentsLoading">
-          <div v-for="n in 2" :key="n" class="flex flex-col gap-2.5 p-4 rounded-[14px] border border-[var(--brand-border-light)] bg-[var(--brand-surface-white)]">
-            <div class="w-10 h-10 rounded-[10px] bg-[var(--brand-canvas)] animate-pulse" />
+          <div v-for="n in 4" :key="n" class="w-[190px] shrink-0 flex flex-col gap-2 p-3.5 rounded-[14px] border border-[var(--brand-border-light)] bg-[var(--brand-surface-white)]">
+            <div class="w-8 h-8 rounded-[9px] bg-[var(--brand-canvas)] animate-pulse" />
             <div class="w-2/3 h-3.5 rounded bg-[var(--brand-canvas)] animate-pulse" />
             <div class="w-1/2 h-3 rounded bg-[var(--brand-canvas)] animate-pulse" />
           </div>
         </template>
-        <NuxtLink v-for="r in recents" v-else :key="r.id" :to="r.kind === 'candidate' ? '/candidates' : '/jobs'" class="flex flex-col gap-2.5 p-4 rounded-[14px] border border-[var(--brand-border-light)] bg-[var(--brand-surface-white)] hover:bg-[var(--brand-canvas)] hover:border-[var(--brand-border)] transition-colors">
-          <BrandAvatarInitials v-if="r.kind === 'candidate'" :initials="r.initial!" :bg="r.bg!" :color="AVATAR_TEXT" size="xl" />
-          <span v-else class="w-10 h-10 rounded-[10px] inline-flex items-center justify-center" style="background:color-mix(in_srgb,var(--brand-teal-secondary) 14%,var(--brand-surface-white))">
-            <Briefcase class="w-5 h-5 text-[var(--brand-teal-secondary)]" stroke-width="1.8" />
+        <NuxtLink v-for="r in recents" v-else :key="r.id" :to="r.kind === 'candidate' ? '/candidates' : '/jobs'" class="w-[190px] shrink-0 flex flex-col gap-2 p-3.5 rounded-[14px] border border-[var(--brand-border-light)] bg-[var(--brand-surface-white)] hover:bg-[var(--brand-canvas)] hover:border-[var(--brand-border)] transition-colors">
+          <BrandAvatarInitials v-if="r.kind === 'candidate'" :initials="r.initial!" :bg="r.bg!" :color="AVATAR_TEXT" size="md" />
+          <span v-else class="w-8 h-8 rounded-[9px] inline-flex items-center justify-center" style="background:color-mix(in_srgb,var(--brand-teal-secondary) 14%,var(--brand-surface-white))">
+            <Briefcase class="w-[18px] h-[18px] text-[var(--brand-teal-secondary)]" stroke-width="1.8" />
           </span>
           <div class="min-w-0">
-            <div class="text-[14px] font-semibold text-[var(--brand-text)] truncate">{{ r.title }}</div>
-            <div class="text-[12.5px] text-[var(--brand-text-muted)] truncate">{{ r.sub }}</div>
+            <div class="text-[13.5px] font-semibold text-[var(--brand-text)] truncate">{{ r.title }}</div>
+            <div class="text-[12px] text-[var(--brand-text-muted)] truncate">{{ r.sub }}</div>
           </div>
         </NuxtLink>
+        </div>
       </div>
 
       <!-- Upcoming events -->
