@@ -38,6 +38,7 @@ export const candidatesHandlers = [
     const status  = url.searchParams.get('status')
     const search  = url.searchParams.get('search') ?? ''
     const job     = url.searchParams.get('job')?.toLowerCase()
+    const pool    = url.searchParams.get('pool')
     const page    = Math.max(1, Number(url.searchParams.get('page') ?? 1))
     const perPage = Math.max(1, Number(url.searchParams.get('perPage') ?? 30))
 
@@ -47,6 +48,7 @@ export const candidatesHandlers = [
     // (e.g. "recruiter" also matches "Talent Acquisition"). See candidateSearch.ts.
     if (search.trim()) result = result.filter(c => matchesSearchQuery(candidateHaystack(c), search))
     if (job) result = result.filter(c => c.jobs.some(j => j.title.toLowerCase().includes(job)))
+    if (pool) result = result.filter(c => c.talentPools.includes(pool))
 
     const total = result.length
     const start = (page - 1) * perPage

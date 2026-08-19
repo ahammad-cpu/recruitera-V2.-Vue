@@ -81,3 +81,27 @@ export interface DashboardActivityGroup {
   date: string
   events: DashboardActivityEvent[]
 }
+
+export interface DashboardEvent {
+  id: string
+  candidate: string
+  initials: string
+  bg: string
+  job: string
+  jobDot: string
+  title: string
+  date: string
+  time: string
+  scope: 'week' | 'today' | 'past'
+  role: string
+}
+
+export interface DashboardTag {
+  label: string
+  count: number
+}
+
+export interface DashboardSource {
+  label: string
+  count: number
+}

@@ -19,6 +19,7 @@ import { offerTemplatesHandlers } from './offer-templates.handlers'
 import { teamHandlers } from './team.handlers'
 import { dashboardHandlers } from './dashboard.handlers'
 import { requisitionsHandlers } from './requisitions.handlers'
+import { talentPoolsHandlers } from './talent-pools.handlers'
 import { stubHandlers } from './stub.handlers'
 
 export const handlers = [
@@ -43,5 +44,6 @@ export const handlers = [
   ...teamHandlers,
   ...dashboardHandlers,
   ...requisitionsHandlers,
+  ...talentPoolsHandlers,
   ...stubHandlers,
 ]

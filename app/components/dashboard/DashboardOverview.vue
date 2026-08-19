@@ -14,11 +14,29 @@ import { useLocalStorage } from '@vueuse/core'
 import { BrandAvatarInitials, BrandEmptyState } from '~/components/brand'
 import { useJobs } from '~/composables/useJobs'
 import { useTeamMembers } from '~/composables/useTeam'
-import { useDashboardRecents, useDashboardNewCandidates, useDashboardAppliedStats } from '~/composables/useDashboard'
+import { useDashboardRecents, useDashboardNewCandidates, useDashboardAppliedStats, useDashboardEvents, useDashboardTags, useDashboardSources } from '~/composables/useDashboard'
 import type { Job } from '~/types'
 
 const { data: teamData } = useTeamMembers()
 const firstName = computed(() => (teamData.value?.data?.[0]?.name ?? 'there').split(/\s+/)[0])
+
+const { data: eventsData } = useDashboardEvents()
+const allEvents = computed(() => eventsData.value?.data ?? [])
+const scopedEvents = computed(() => {
+  const s = eventScope.value
+  if (s === 'Today') return allEvents.value.filter(e => e.scope === 'today')
+  if (s === 'Past events') return allEvents.value.filter(e => e.scope === 'past')
+  return allEvents.value.filter(e => e.scope !== 'past') // This week
+})
+function eventCount(s: 'This week' | 'Today' | 'Past events') {
+  if (s === 'Today') return allEvents.value.filter(e => e.scope === 'today').length
+  if (s === 'Past events') return allEvents.value.filter(e => e.scope === 'past').length
+  return allEvents.value.filter(e => e.scope !== 'past').length
+}
+const { data: tagsData } = useDashboardTags()
+const tagList = computed(() => tagsData.value?.data ?? [])
+const { data: sourcesData } = useDashboardSources()
+const sourceList = computed(() => sourcesData.value?.data ?? [])
 
 const { data: recentsData, isPending: recentsLoading } = useDashboardRecents()
 const recents = computed(() => recentsData.value?.data ?? [])
@@ -189,13 +207,25 @@ function resetDrag() { armed.value = false; dragKey.value = null; overKey.value 
           <div class="p-5 md:border-r border-[var(--brand-border-fade)]">
             <div class="flex items-center justify-between gap-3 mb-3">
               <div class="flex items-center gap-4">
-                <button v-for="s in (['This week','Today','Past events'] as const)" :key="s" type="button" class="pb-1.5 text-[13.5px] border-b-2 transition" :class="eventScope === s ? 'border-[var(--brand-teal)] text-[var(--brand-text)] font-semibold' : 'border-transparent text-[var(--brand-text-quiet)] hover:text-[var(--brand-text)]'" @click="eventScope = s">{{ s }}</button>
+                <button v-for="s in (['This week','Today','Past events'] as const)" :key="s" type="button" class="pb-1.5 text-[13.5px] border-b-2 transition inline-flex items-center gap-1.5" :class="eventScope === s ? 'border-[var(--brand-teal)] text-[var(--brand-text)] font-semibold' : 'border-transparent text-[var(--brand-text-quiet)] hover:text-[var(--brand-text)]'" @click="eventScope = s">{{ s }} <span v-if="eventCount(s)" class="inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full bg-[var(--brand-badge-settings-bg)] text-[10px] font-bold text-[var(--brand-badge-settings-text)]">{{ eventCount(s) }}</span></button>
               </div>
               <button type="button" class="inline-flex items-center gap-1.5 text-[12.5px] font-semibold text-[var(--brand-text-secondary)] hover:text-[var(--brand-text)]">
                 <Filter class="w-3.5 h-3.5" stroke-width="1.8" /> Everyone's events <ChevronDown class="w-3.5 h-3.5" stroke-width="2" />
               </button>
             </div>
-            <BrandEmptyState :icon="CalendarX" title="No events yet" />
+            <div v-if="scopedEvents.length" class="space-y-3.5">
+              <div v-for="e in scopedEvents" :key="e.id" class="flex items-start gap-3">
+                <BrandAvatarInitials :initials="e.initials" :bg="e.bg" :color="AVATAR_TEXT" size="md" />
+                <div class="min-w-0 flex-1">
+                  <div class="text-[12.5px] text-[var(--brand-text-quiet)] tabular-nums">{{ e.date }} · {{ e.time }}</div>
+                  <div class="text-[14px] font-semibold text-[var(--brand-text)] flex items-center gap-2 flex-wrap">{{ e.candidate }} <span class="inline-flex items-center gap-1 text-[12.5px] font-normal text-[var(--brand-text-muted)]"><span class="w-2 h-2 rounded-full" :style="{ background: e.jobDot }" />{{ e.job }}</span></div>
+                  <div class="text-[13px] text-[var(--brand-text-secondary)]">{{ e.title }}</div>
+                </div>
+                <span class="text-[12px] text-[var(--brand-text-quiet)] shrink-0 hidden sm:block">{{ e.role }}</span>
+              </div>
+              <div class="text-[12.5px] text-[var(--brand-text-quiet)] pt-1">You have {{ scopedEvents.length }} event{{ scopedEvents.length === 1 ? '' : 's' }} {{ eventScope === 'Past events' ? 'in the past' : eventScope.toLowerCase() }}.</div>
+            </div>
+            <BrandEmptyState v-else :icon="CalendarX" title="No events yet" />
           </div>
           <div class="p-5">
             <div class="flex items-center justify-between mb-3">
@@ -340,14 +370,33 @@ function resetDrag() { armed.value = false; dragKey.value = null; overKey.value 
 
       <!-- Tags & sources -->
       <div v-else-if="key === 'tags'" class="rounded-[14px] border border-[var(--brand-border-light)] bg-[var(--brand-surface-white)] flex flex-col">
-        <div v-for="(sec, i) in [{ t: 'Tags', s: 'Candidate tags will appear here.' }, { t: 'Sources', s: 'Candidate sources will appear here.' }]" :key="i" :class="i === 1 ? 'border-t border-[var(--brand-border-fade)]' : ''">
+        <!-- Tags -->
+        <div>
           <div class="flex items-center justify-between gap-2 px-5 py-4">
-            <span class="text-[15px] font-bold text-[var(--brand-text)]">{{ sec.t }}</span>
-            <button type="button" class="w-8 h-8 rounded-[8px] border border-[var(--brand-border)] inline-flex items-center justify-center text-[var(--brand-text-subtle)] hover:border-[var(--brand-teal)] transition" aria-label="Settings">
-              <Settings class="w-4 h-4" stroke-width="1.8" />
-            </button>
+            <div class="flex items-center gap-2">
+              <span class="text-[15px] font-bold text-[var(--brand-text)]">Tags</span>
+              <span class="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full bg-[var(--brand-badge-settings-bg)] text-[11px] font-bold text-[var(--brand-badge-settings-text)]">{{ tagList.length }}</span>
+            </div>
+            <button type="button" class="w-8 h-8 rounded-[8px] border border-[var(--brand-border)] inline-flex items-center justify-center text-[var(--brand-text-subtle)] hover:border-[var(--brand-teal)] transition" aria-label="Settings"><Settings class="w-4 h-4" stroke-width="1.8" /></button>
           </div>
-          <BrandEmptyState :icon="Tag" :title="`No ${sec.t.toLowerCase()}`" :description="sec.s" />
+          <div v-if="tagList.length" class="px-5 pb-4 flex flex-wrap gap-2">
+            <span v-for="t in tagList" :key="t.label" class="inline-flex items-center gap-1.5 h-7 px-2.5 rounded-lg border border-[var(--brand-border)] text-[12.5px] font-semibold text-[var(--brand-text)]">{{ t.label }} <span v-if="t.count" class="text-[var(--brand-text-quiet)] tabular-nums">{{ t.count }}</span></span>
+          </div>
+          <BrandEmptyState v-else :icon="Tag" title="No tags" description="Candidate tags will appear here." />
+        </div>
+        <!-- Sources -->
+        <div class="border-t border-[var(--brand-border-fade)]">
+          <div class="flex items-center justify-between gap-2 px-5 py-4">
+            <div class="flex items-center gap-2">
+              <span class="text-[15px] font-bold text-[var(--brand-text)]">Sources</span>
+              <span class="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full bg-[var(--brand-badge-settings-bg)] text-[11px] font-bold text-[var(--brand-badge-settings-text)]">{{ sourceList.length }}</span>
+            </div>
+            <button type="button" class="w-8 h-8 rounded-[8px] border border-[var(--brand-border)] inline-flex items-center justify-center text-[var(--brand-text-subtle)] hover:border-[var(--brand-teal)] transition" aria-label="Settings"><Settings class="w-4 h-4" stroke-width="1.8" /></button>
+          </div>
+          <div v-if="sourceList.length" class="px-5 pb-4 flex flex-wrap gap-2">
+            <span v-for="s in sourceList" :key="s.label" class="inline-flex items-center gap-1.5 h-7 px-2.5 rounded-lg border border-[var(--brand-border)] text-[12.5px] font-semibold text-[var(--brand-text)]">{{ s.label }} <span v-if="s.count" class="text-[var(--brand-text-quiet)] tabular-nums">{{ s.count }}</span></span>
+          </div>
+          <BrandEmptyState v-else :icon="Tag" title="No sources" description="Candidate sources will appear here." />
         </div>
       </div>
       </div>

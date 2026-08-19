@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/vue-query'
 import { useApi } from '~/composables/useApi'
 import type {
   DashboardRecent, DashboardNewCandidate, DashboardAppliedStats, DashboardEvaluation,
-  DashboardTask, DashboardNoteGroup, DashboardActivityGroup,
+  DashboardTask, DashboardNoteGroup, DashboardActivityGroup, DashboardEvent, DashboardTag, DashboardSource,
 } from '~/types'
 
 /** Home / Overview dashboard data — all served by MSW (dashboard.handlers). */
@@ -11,6 +11,30 @@ export function useDashboardRecents() {
   return useQuery({
     queryKey: ['dashboard', 'recents'],
     queryFn: () => api.get<{ data: DashboardRecent[] }>('/api/dashboard/recents'),
+  })
+}
+
+export function useDashboardEvents() {
+  const api = useApi()
+  return useQuery({
+    queryKey: ['dashboard', 'events'],
+    queryFn: () => api.get<{ data: DashboardEvent[] }>('/api/dashboard/events'),
+  })
+}
+
+export function useDashboardTags() {
+  const api = useApi()
+  return useQuery({
+    queryKey: ['dashboard', 'tags'],
+    queryFn: () => api.get<{ data: DashboardTag[] }>('/api/dashboard/tags'),
+  })
+}
+
+export function useDashboardSources() {
+  const api = useApi()
+  return useQuery({
+    queryKey: ['dashboard', 'sources'],
+    queryFn: () => api.get<{ data: DashboardSource[] }>('/api/dashboard/sources'),
   })
 }
 
