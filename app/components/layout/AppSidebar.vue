@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useMediaQuery } from '@vueuse/core'
-import { Home, Users, Briefcase, BarChart3, Calendar, TrendingUp, Settings, ChevronsLeft, ChevronsRight } from 'lucide-vue-next'
+import { Home, Users, Briefcase, BarChart3, Calendar, TrendingUp, ClipboardList, Settings, ChevronsLeft, ChevronsRight } from 'lucide-vue-next'
 import { useSidebarStore } from '~/stores/sidebar.store'
 
 const route = useRoute()
@@ -21,6 +21,7 @@ const navItems = [
   { label: 'Jobs',         to: '/jobs',         icon: Briefcase },
   { label: 'Talent pools', to: '/talent-pools', icon: BarChart3 },
   { label: 'Calendar',     to: '/interviews',   icon: Calendar },
+  { label: 'Requisitions', to: '/requisitions', icon: ClipboardList },
   { label: 'Analytics',    to: '/analytics',    icon: TrendingUp },
 ]
 const bottomItems = [

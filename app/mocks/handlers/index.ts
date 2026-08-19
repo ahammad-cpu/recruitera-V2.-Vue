@@ -18,6 +18,7 @@ import { referralQuestionsHandlers } from './referral-questions.handlers'
 import { offerTemplatesHandlers } from './offer-templates.handlers'
 import { teamHandlers } from './team.handlers'
 import { dashboardHandlers } from './dashboard.handlers'
+import { requisitionsHandlers } from './requisitions.handlers'
 import { stubHandlers } from './stub.handlers'
 
 export const handlers = [
@@ -41,5 +42,6 @@ export const handlers = [
   ...offerTemplatesHandlers,
   ...teamHandlers,
   ...dashboardHandlers,
+  ...requisitionsHandlers,
   ...stubHandlers,
 ]
