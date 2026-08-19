@@ -22,6 +22,17 @@ export function useRequisitionMembers() {
   })
 }
 
+export function useRequisitionWorkload() {
+  return useQuery({
+    queryKey: ['requisition-workload'],
+    queryFn: async () => {
+      const res = await fetch('/api/requisitions/workload')
+      if (!res.ok) throw new Error('Failed to fetch workload')
+      return res.json() as Promise<import('~/types').RequisitionWorkloadResponse>
+    },
+  })
+}
+
 export function useRequisitionCurrentUser() {
   return useQuery({
     queryKey: ['requisition-me'],
@@ -88,6 +99,7 @@ export function useRequisitionMutations() {
   const qc = useQueryClient()
   const invalidate = (id?: string) => {
     qc.invalidateQueries({ queryKey: ['requisitions'] })
+    qc.invalidateQueries({ queryKey: ['requisition-workload'] })
     if (id) qc.invalidateQueries({ queryKey: ['requisition', id] })
   }
 

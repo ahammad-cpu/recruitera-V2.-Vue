@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { refDebounced } from '@vueuse/core'
-import { Plus, ClipboardList, ChevronDown, Rows3, Columns3, Sparkles, Archive, ArrowDownUp } from 'lucide-vue-next'
+import { Plus, ClipboardList, ChevronDown, Rows3, Columns3, Sparkles, ArrowDownUp, Users, CalendarRange } from 'lucide-vue-next'
 import { BrandSearchBar, BrandButton, BrandEmptyState } from '~/components/brand'
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
@@ -10,22 +10,33 @@ import {
 } from '~/components/ui/dropdown-menu'
 import RequisitionCard from '~/components/requisitions/RequisitionCard.vue'
 import RequisitionBoardCard from '~/components/requisitions/RequisitionBoardCard.vue'
+import RequisitionWorkloadTable from '~/components/requisitions/RequisitionWorkloadTable.vue'
+import RequisitionTimeline from '~/components/requisitions/RequisitionTimeline.vue'
 import NewRequisitionDialog from '~/components/requisitions/NewRequisitionDialog.vue'
-import { useRequisitions, useRequisitionMutations, useRequisitionProjects } from '~/composables/useRequisitions'
-import { REQUISITION_STATUS_META, type NewRequisitionInput, type Requisition, type RequisitionFilter, type RequisitionScope, type RequisitionView } from '~/types'
+import { useRequisitions, useRequisitionMutations, useRequisitionProjects, useRequisitionWorkload } from '~/composables/useRequisitions'
+import { REQUISITION_STATUS_META, type NewRequisitionInput, type Requisition, type RequisitionFilter, type RequisitionView } from '~/types'
 
 definePageMeta({ layout: 'default' })
 
-const scope = ref<RequisitionScope>('active')
+// Top tabs: Active list · Hiring Timeline · Team-Lead Workload.
+const topTab = ref<'active' | 'timeline' | 'workload'>('active')
 const filter = ref<RequisitionFilter>('all')
 const view = ref<RequisitionView>('list')
 const searchInput = ref('')
 const debouncedSearch = refDebounced(searchInput, 300)
 
-const query = computed(() => ({ scope: scope.value, filter: filter.value, search: debouncedSearch.value }))
+const query = computed(() => ({
+  scope: 'active',
+  filter: topTab.value === 'active' ? filter.value : 'all',
+  search: topTab.value === 'active' ? debouncedSearch.value : '',
+}))
 const { data, isFetching } = useRequisitions(query)
-const counts = computed(() => data.value?.counts ?? { all: 0, approval: 0, mine: 0 })
-const archivedCount = computed(() => data.value?.archivedCount ?? 0)
+const counts = computed(() => data.value?.counts ?? { all: 0, approval: 0, mine: 0, assigned: 0 })
+
+// Workload dashboard + timeline
+const { data: workloadData } = useRequisitionWorkload()
+const workload = computed(() => workloadData.value?.data ?? [])
+const timelineReqs = computed(() => (data.value?.groups ?? []).flatMap(g => g.items))
 const total = computed(() => data.value?.total ?? 0)
 const currentUserId = computed(() => data.value?.currentUserId ?? '')
 
@@ -54,10 +65,11 @@ function toggleGroup(status: string) { collapsed[status] = !collapsed[status] }
 const newOpen = ref(false)
 const confirmDeleteId = ref<string | null>(null)
 
-const FILTERS: { id: RequisitionFilter, label: string, key: 'all' | 'approval' | 'mine' }[] = [
+const FILTERS: { id: RequisitionFilter, label: string, key: 'all' | 'approval' | 'mine' | 'assigned' }[] = [
   { id: 'all', label: 'All', key: 'all' },
   { id: 'approval', label: 'Need my approval', key: 'approval' },
   { id: 'mine', label: 'Requested by me', key: 'mine' },
+  { id: 'assigned', label: 'Assigned to me', key: 'assigned' },
 ]
 
 function openDetail(r: Requisition) { navigateTo(`/requisitions/${r.id}`) }
@@ -79,20 +91,23 @@ const STATUS_DOT: Record<string, string> = {
 
 <template>
   <div class="flex flex-col h-full min-w-0 overflow-hidden bg-[var(--brand-surface-white)] border-t border-[var(--brand-border)]">
-    <!-- Active / Archived -->
+    <!-- Active / Archived / Workload -->
     <div class="px-6 pt-5 flex items-center gap-6 border-b border-[var(--brand-border-light)]">
-      <button type="button" class="flex items-center gap-1.5 pb-2.5 -mb-px text-[14.5px] font-semibold border-b-2 transition-colors" :class="scope === 'active' ? 'text-[var(--brand-text)] border-[var(--brand-teal)]' : 'text-[var(--brand-text-quiet)] border-transparent hover:text-[var(--brand-text)]'" @click="scope = 'active'">
+      <button type="button" class="flex items-center gap-1.5 pb-2.5 -mb-px text-[14.5px] font-semibold border-b-2 transition-colors" :class="topTab === 'active' ? 'text-[var(--brand-text)] border-[var(--brand-teal)]' : 'text-[var(--brand-text-quiet)] border-transparent hover:text-[var(--brand-text)]'" @click="topTab = 'active'">
         <Sparkles class="w-4 h-4" /> Active requisitions
       </button>
-      <button type="button" class="flex items-center gap-1.5 pb-2.5 -mb-px text-[14.5px] font-semibold border-b-2 transition-colors" :class="scope === 'archived' ? 'text-[var(--brand-text)] border-[var(--brand-teal)]' : 'text-[var(--brand-text-quiet)] border-transparent hover:text-[var(--brand-text)]'" @click="scope = 'archived'">
-        <Archive class="w-4 h-4" /> Archived <span class="text-[var(--brand-text-quiet)] tabular-nums">{{ archivedCount }}</span>
+      <button type="button" class="flex items-center gap-1.5 pb-2.5 -mb-px text-[14.5px] font-semibold border-b-2 transition-colors" :class="topTab === 'timeline' ? 'text-[var(--brand-text)] border-[var(--brand-teal)]' : 'text-[var(--brand-text-quiet)] border-transparent hover:text-[var(--brand-text)]'" @click="topTab = 'timeline'">
+        <CalendarRange class="w-4 h-4" /> Hiring Timeline
+      </button>
+      <button type="button" class="flex items-center gap-1.5 pb-2.5 -mb-px text-[14.5px] font-semibold border-b-2 transition-colors" :class="topTab === 'workload' ? 'text-[var(--brand-text)] border-[var(--brand-teal)]' : 'text-[var(--brand-text-quiet)] border-transparent hover:text-[var(--brand-text)]'" @click="topTab = 'workload'">
+        <Users class="w-4 h-4" /> Workload
       </button>
     </div>
 
-    <!-- Toolbar -->
-    <div class="px-6 py-3.5 flex items-center gap-3 flex-wrap">
+    <!-- Toolbar (active list only) -->
+    <div v-if="topTab === 'active'" class="px-6 py-3.5 flex items-center gap-3 flex-wrap">
       <!-- Filter pill group -->
-      <div v-if="scope === 'active'" class="inline-flex items-center rounded-[10px] border border-[var(--brand-border)] overflow-hidden">
+      <div v-if="topTab === 'active'" class="inline-flex items-center rounded-[10px] border border-[var(--brand-border)] overflow-hidden">
         <button v-for="f in FILTERS" :key="f.id" type="button" class="inline-flex items-center gap-1.5 h-9 px-3.5 text-[13px] font-semibold border-l first:border-l-0 border-[var(--brand-border)] transition-colors" :class="filter === f.id ? 'bg-[var(--brand-lime-tint-hover)] text-[var(--brand-text)]' : 'text-[var(--brand-text-quiet)] hover:bg-[var(--brand-canvas)]'" @click="filter = f.id">
           {{ f.label }}
           <span class="inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded text-[11px] font-bold tabular-nums" :class="filter === f.id ? 'bg-white text-[var(--brand-teal)]' : 'bg-[var(--brand-canvas)] text-[var(--brand-text-muted)]'">{{ counts[f.key] }}</span>
@@ -127,18 +142,30 @@ const STATUS_DOT: Record<string, string> = {
     </div>
 
     <!-- Content -->
-    <div class="flex-1 overflow-auto px-6 pb-6" :class="view === 'board' && total > 0 ? 'pt-4' : ''">
-      <div v-if="showSkeleton" class="space-y-3 pt-2">
+    <div class="flex-1 overflow-auto px-6 pb-6" :class="view === 'board' && total > 0 && topTab === 'active' ? 'pt-4' : ''">
+      <!-- WORKLOAD dashboard -->
+      <div v-if="topTab === 'workload'" class="pt-2">
+        <p class="text-[13px] text-[var(--brand-text-quiet)] mb-3">Requisitions assigned to each recruiter. Click a row to see their assigned requisitions.</p>
+        <RequisitionWorkloadTable :workload="workload" :current-user-id="currentUserId" @open="(id) => navigateTo(`/requisitions/${id}`)" />
+      </div>
+
+      <!-- HIRING TIMELINE -->
+      <div v-else-if="topTab === 'timeline'" class="pt-2">
+        <p class="text-[13px] text-[var(--brand-text-quiet)] mb-3">Each requisition is placed at its target joining month; the dark fill shows fulfillment (hires / openings).</p>
+        <RequisitionTimeline :requisitions="timelineReqs" @open="(id) => navigateTo(`/requisitions/${id}`)" />
+      </div>
+
+      <div v-else-if="showSkeleton" class="space-y-3 pt-2">
         <div v-for="i in 5" :key="i" class="h-[104px] rounded-[14px] border border-[var(--brand-border-light)] bg-[var(--brand-canvas)] animate-pulse" />
       </div>
 
       <BrandEmptyState
         v-else-if="total === 0"
         :icon="ClipboardList"
-        :title="scope === 'archived' ? 'Nothing archived' : 'No requisitions'"
+        title="No requisitions"
         :description="hasSearchOrFilter ? 'No requisitions match your search or filter.' : 'Raise a new requisition to start the approval workflow.'"
       >
-        <BrandButton v-if="!hasSearchOrFilter && scope === 'active'" variant="primary-teal" size="md" class="gap-2" @click="newOpen = true">
+        <BrandButton v-if="!hasSearchOrFilter && topTab === 'active'" variant="primary-teal" size="md" class="gap-2" @click="newOpen = true">
           <Plus class="w-4 h-4" /> New requisition
         </BrandButton>
       </BrandEmptyState>

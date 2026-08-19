@@ -55,9 +55,11 @@ interface SeedInput {
   currency?: string, from?: number | null, to?: number | null
   locations?: string[], openings?: RequisitionJobOpening[], hires?: number
   requesterId: string, steps?: RequisitionApprovalStep[], following?: boolean, date: string
+  assignedTo?: string
 }
 function mk(s: SeedInput): Requisition {
   const req = memberById(s.requesterId)
+  const asg = s.assignedTo ? memberById(s.assignedTo) : null
   const jobOpenings = s.openings ?? []
   return {
     id: nextId(), code: s.code, title: s.title, status: s.status,
@@ -65,9 +67,12 @@ function mk(s: SeedInput): Requisition {
     joiningMonth: s.joiningMonth ?? '', workplace: s.workplace ?? '', employmentType: s.employmentType ?? '', experience: s.experience ?? '',
     salaryCurrency: s.currency ?? '', salaryFrom: s.from ?? null, salaryTo: s.to ?? null,
     customQuestions: [], jobOpenings, openingsTotal: jobOpenings.length, hiresCount: s.hires ?? 0,
+    expectedJoinDate: '', fulfilledAt: '',
     locations: s.locations ?? [],
     approvalSteps: s.steps ?? [],
     requesterId: req.id, requesterName: req.name, requesterInitials: req.initials,
+    assignedRecruiterId: asg?.id ?? '', assignedRecruiterName: asg?.name ?? '', assignedRecruiterInitials: asg?.initials ?? '',
+    assignedAt: asg ? s.date : '',
     following: s.following ?? false, linkedJobIds: [],
     team: [{ id: req.id, name: req.name, initials: req.initials, role: 'Requester' }],
     notes: [], activity: [{ id: 'a1', at: s.date, actor: req.name, text: 'created this requisition' }],
@@ -78,19 +83,43 @@ function mk(s: SeedInput): Requisition {
 let requisitions: Requisition[] = [
   mk({ code: '2ftst', title: 'Support jobs requisition', status: 'draft', project: 'Project test', requesterId: 'u1', following: true, date: '2026-08-19T09:00:00.000Z' }),
   mk({ code: 'k91zq', title: 'Accounts Payable Specialist', status: 'draft', project: '2025 Headcount Plan', department: 'Finance', joiningMonth: 'September', workplace: 'on-site', employmentType: 'full-time', experience: 'experienced', currency: 'EGP', from: 15000, to: 25000, locations: ['Cairo'], openings: openings(1), requesterId: 'u1', steps: [step(1, [apr('u3')]), step(2, [apr('u5')])], date: '2025-07-14T09:00:00.000Z' }),
-  mk({ code: 'cpeku', title: 'Finance queue', status: 'pending', project: 'Q3 Backfills', department: 'Finance', joiningMonth: 'October', workplace: 'on-site', employmentType: 'full-time', experience: 'mid', currency: 'EGP', from: 12000, to: 18000, locations: ['Cairo'], openings: openings(15), requesterId: 'u2', steps: [step(1, [apr('u1')]), step(2, [apr('u5')])], following: true, date: '2023-10-12T10:30:00.000Z' }),
-  mk({ code: '2bfgp', title: 'Analytics jobs requisition', status: 'pending', project: 'New Market — GCC', department: 'Product', joiningMonth: 'September', workplace: 'remote', employmentType: 'full-time', experience: 'senior', currency: 'USD', from: 4000, to: 6000, locations: ['Aruba'], openings: openings(6), requesterId: 'u3', steps: [step(1, [apr('u1')])], following: true, date: '2024-09-16T14:00:00.000Z' }),
-  mk({ code: '9wq2a', title: 'Talent Acquisition Partner', status: 'pending', project: '2025 Headcount Plan', department: 'Human Resources', joiningMonth: 'August', workplace: 'on-site', employmentType: 'full-time', experience: 'experienced', currency: 'EGP', from: 18000, to: 28000, locations: ['Cairo'], openings: openings(1), requesterId: 'u1', steps: [step(1, [apr('u4', 'approved')]), step(2, [apr('u3')])], date: '2025-07-06T08:15:00.000Z' }),
-  mk({ code: 'm4d1c', title: 'Senior Backend Engineer', status: 'approved', project: 'Q3 Backfills', department: 'Engineering', joiningMonth: 'September', workplace: 'hybrid', employmentType: 'full-time', experience: 'senior', currency: 'USD', from: 5000, to: 8000, locations: ['Cairo', 'Remote'], openings: openings(2), hires: 1, requesterId: 'u2', steps: [step(1, [apr('u1', 'approved')]), step(2, [apr('u3', 'approved')])], following: true, date: '2025-06-30T12:00:00.000Z' }),
-  mk({ code: 'p7k3n', title: 'Product Designer', status: 'approved', project: 'New Market — GCC', department: 'Product', joiningMonth: 'October', workplace: 'remote', employmentType: 'full-time', experience: 'mid', currency: 'USD', from: 3500, to: 5000, locations: ['Remote'], openings: openings(1), requesterId: 'u3', steps: [step(1, [apr('u1', 'approved')])], date: '2025-06-22T09:00:00.000Z' }),
-  mk({ code: 'z0x8b', title: 'Warehouse Operatives', status: 'approved', project: '2025 Headcount Plan', department: 'Operations', joiningMonth: 'August', workplace: 'on-site', employmentType: 'contract', experience: 'entry', currency: 'EGP', from: 6000, to: 9000, locations: ['Cairo'], openings: openings(4), hires: 2, requesterId: 'u4', steps: [step(1, [apr('u1', 'approved')]), step(2, [apr('u3', 'approved')])], date: '2025-06-18T12:00:00.000Z' }),
-  mk({ code: 'q5r2t', title: 'Sales Development Reps', status: 'approved', project: 'New Market — GCC', department: 'Sales', joiningMonth: 'September', workplace: 'hybrid', employmentType: 'full-time', experience: 'junior', currency: 'AED', from: 8000, to: 12000, locations: ['Dubai'], openings: openings(3), hires: 1, requesterId: 'u1', steps: [step(1, [apr('u5', 'approved')])], date: '2025-06-10T09:00:00.000Z' }),
-  mk({ code: 'h1n9v', title: 'Sample req', status: 'filled', project: 'Q3 Backfills', department: 'Product', joiningMonth: 'March', workplace: 'remote', employmentType: 'full-time', experience: 'senior', currency: 'USD', from: 4000, to: 6000, locations: ['Aruba'], openings: openings(1), hires: 1, requesterId: 'u3', steps: [step(1, [apr('u1', 'approved')])], date: '2023-03-23T09:00:00.000Z' }),
-  mk({ code: 'b3m7k', title: 'Customer Success Lead', status: 'filled', project: '2025 Headcount Plan', department: 'Operations', joiningMonth: 'May', workplace: 'on-site', employmentType: 'full-time', experience: 'lead', currency: 'EGP', from: 30000, to: 45000, locations: ['Cairo'], openings: openings(1), hires: 1, requesterId: 'u1', steps: [step(1, [apr('u3', 'approved')])], date: '2025-05-02T09:00:00.000Z' }),
+  mk({ code: 'cpeku', title: 'Finance queue', status: 'pending', project: 'Q3 Backfills', department: 'Finance', joiningMonth: 'October', workplace: 'on-site', employmentType: 'full-time', experience: 'mid', currency: 'EGP', from: 12000, to: 18000, locations: ['Cairo'], openings: openings(15), requesterId: 'u2', steps: [step(1, [apr('u1')]), step(2, [apr('u5')])], following: true, assignedTo: 'u4', date: '2023-10-12T10:30:00.000Z' }),
+  mk({ code: '2bfgp', title: 'Analytics jobs requisition', status: 'pending', project: 'New Market — GCC', department: 'Product', joiningMonth: 'September', workplace: 'remote', employmentType: 'full-time', experience: 'senior', currency: 'USD', from: 4000, to: 6000, locations: ['Aruba'], openings: openings(6), requesterId: 'u3', steps: [step(1, [apr('u1')])], following: true, assignedTo: 'u2', date: '2024-09-16T14:00:00.000Z' }),
+  mk({ code: '9wq2a', title: 'Talent Acquisition Partner', status: 'pending', project: '2025 Headcount Plan', department: 'Human Resources', joiningMonth: 'August', workplace: 'on-site', employmentType: 'full-time', experience: 'experienced', currency: 'EGP', from: 18000, to: 28000, locations: ['Cairo'], openings: openings(1), requesterId: 'u1', steps: [step(1, [apr('u4', 'approved')]), step(2, [apr('u3')])], assignedTo: 'u1', date: '2025-07-06T08:15:00.000Z' }),
+  mk({ code: 'm4d1c', title: 'Senior Backend Engineer', status: 'approved', project: 'Q3 Backfills', department: 'Engineering', joiningMonth: 'September', workplace: 'hybrid', employmentType: 'full-time', experience: 'senior', currency: 'USD', from: 5000, to: 8000, locations: ['Cairo', 'Remote'], openings: openings(2), hires: 1, requesterId: 'u2', steps: [step(1, [apr('u1', 'approved')]), step(2, [apr('u3', 'approved')])], following: true, assignedTo: 'u1', date: '2025-06-30T12:00:00.000Z' }),
+  mk({ code: 'p7k3n', title: 'Product Designer', status: 'approved', project: 'New Market — GCC', department: 'Product', joiningMonth: 'October', workplace: 'remote', employmentType: 'full-time', experience: 'mid', currency: 'USD', from: 3500, to: 5000, locations: ['Remote'], openings: openings(1), requesterId: 'u3', steps: [step(1, [apr('u1', 'approved')])], assignedTo: 'u2', date: '2025-06-22T09:00:00.000Z' }),
+  mk({ code: 'z0x8b', title: 'Warehouse Operatives', status: 'approved', project: '2025 Headcount Plan', department: 'Operations', joiningMonth: 'August', workplace: 'on-site', employmentType: 'contract', experience: 'entry', currency: 'EGP', from: 6000, to: 9000, locations: ['Cairo'], openings: openings(4), hires: 2, requesterId: 'u4', steps: [step(1, [apr('u1', 'approved')]), step(2, [apr('u3', 'approved')])], assignedTo: 'u4', date: '2025-06-18T12:00:00.000Z' }),
+  mk({ code: 'q5r2t', title: 'Sales Development Reps', status: 'approved', project: 'New Market — GCC', department: 'Sales', joiningMonth: 'September', workplace: 'hybrid', employmentType: 'full-time', experience: 'junior', currency: 'AED', from: 8000, to: 12000, locations: ['Dubai'], openings: openings(3), hires: 1, requesterId: 'u1', steps: [step(1, [apr('u5', 'approved')])], assignedTo: 'u1', date: '2025-06-10T09:00:00.000Z' }),
+  mk({ code: 'h1n9v', title: 'Sample req', status: 'filled', project: 'Q3 Backfills', department: 'Product', joiningMonth: 'March', workplace: 'remote', employmentType: 'full-time', experience: 'senior', currency: 'USD', from: 4000, to: 6000, locations: ['Aruba'], openings: openings(1), hires: 1, requesterId: 'u3', steps: [step(1, [apr('u1', 'approved')])], assignedTo: 'u2', date: '2023-03-23T09:00:00.000Z' }),
+  mk({ code: 'b3m7k', title: 'Customer Success Lead', status: 'filled', project: '2025 Headcount Plan', department: 'Operations', joiningMonth: 'May', workplace: 'on-site', employmentType: 'full-time', experience: 'lead', currency: 'EGP', from: 30000, to: 45000, locations: ['Cairo'], openings: openings(1), hires: 1, requesterId: 'u1', steps: [step(1, [apr('u3', 'approved')])], assignedTo: 'u4', date: '2025-05-02T09:00:00.000Z' }),
   mk({ code: 'r8t4w', title: 'Marketing Manager', status: 'rejected', project: 'New Market — GCC', department: 'Marketing', joiningMonth: 'June', workplace: 'hybrid', employmentType: 'full-time', experience: 'senior', currency: 'AED', from: 20000, to: 30000, locations: ['Dubai'], openings: openings(1), requesterId: 'u2', steps: [step(1, [apr('u1', 'rejected', 'Budget deferred to next quarter.')])], date: '2025-06-24T16:45:00.000Z' }),
   mk({ code: 'a1c2e', title: 'Seasonal Retail Staff 2024', status: 'archived', project: '2025 Headcount Plan', department: 'Operations', locations: ['Cairo'], openings: openings(20), hires: 20, requesterId: 'u4', date: '2024-11-01T09:00:00.000Z' }),
   mk({ code: 'a3f5h', title: 'Old QA requisition', status: 'archived', project: 'Q3 Backfills', department: 'Engineering', locations: ['Remote'], openings: openings(2), requesterId: 'u2', date: '2024-08-01T09:00:00.000Z' }),
 ]
+
+// Derive coherent timeline dates from joiningMonth (a 2026 window):
+//   createdAt (request)  = 3 months before the expected join  → bar start
+//   expectedJoinDate     = 1st of the joining month, 2026     → "expected to join"
+//   fulfilledAt          = ~5 days before expected (filled only) → "joined"
+const MONTH_IDX: Record<string, number> = { January: 0, February: 1, March: 2, April: 3, May: 4, June: 5, July: 6, August: 7, September: 8, October: 9, November: 10, December: 11 }
+for (const r of requisitions) {
+  if (r.status === 'archived' || !(r.joiningMonth in MONTH_IDX)) continue
+  const m = MONTH_IDX[r.joiningMonth]!
+  const expected = new Date(Date.UTC(2026, m, 1))
+  r.expectedJoinDate = expected.toISOString()
+  const req = new Date(expected)
+  req.setUTCMonth(req.getUTCMonth() - 3)
+  r.createdAt = req.toISOString()
+  r.updatedAt = req.toISOString()
+  if (r.activity[0]) r.activity[0].at = r.createdAt
+  if (r.assignedRecruiterId) r.assignedAt = r.createdAt
+  if (r.status === 'filled') {
+    const done = new Date(expected)
+    done.setUTCDate(done.getUTCDate() - 5)
+    r.fulfilledAt = done.toISOString()
+    r.updatedAt = done.toISOString()
+  }
+}
 
 const GROUP_ORDER: RequisitionStatus[] = ['draft', 'pending', 'approved', 'filled', 'rejected']
 
@@ -114,11 +143,13 @@ export const requisitionsHandlers = [
       all: active.length,
       approval: active.filter(isPendingForMe).length,
       mine: active.filter(r => r.requesterId === CURRENT_USER.id).length,
+      assigned: active.filter(r => r.assignedRecruiterId === CURRENT_USER.id).length,
     }
 
     let rows = searched
     if (filter === 'mine') rows = searched.filter(r => r.requesterId === CURRENT_USER.id)
     else if (filter === 'approval') rows = searched.filter(isPendingForMe)
+    else if (filter === 'assigned') rows = searched.filter(r => r.assignedRecruiterId === CURRENT_USER.id)
 
     const order = scope === 'archived' ? (['archived'] as RequisitionStatus[]) : GROUP_ORDER
     const groups = order
@@ -132,6 +163,33 @@ export const requisitionsHandlers = [
   http.get('/api/requisitions/me', () => HttpResponse.json(CURRENT_USER)),
   http.get('/api/requisitions/members', () => HttpResponse.json({ data: MEMBERS })),
   http.get('/api/requisitions/projects', () => HttpResponse.json({ data: MANPOWER_PROJECTS })),
+
+  // Team-Lead workload: per-recruiter aggregate over assigned, non-archived reqs.
+  http.get('/api/requisitions/workload', () => {
+    const assigned = requisitions.filter(r => r.status !== 'archived' && r.assignedRecruiterId)
+    const byRec = new Map<string, Requisition[]>()
+    for (const r of assigned) {
+      if (!byRec.has(r.assignedRecruiterId)) byRec.set(r.assignedRecruiterId, [])
+      byRec.get(r.assignedRecruiterId)!.push(r)
+    }
+    const data = [...byRec.entries()].map(([recruiterId, reqs]) => {
+      const m = memberById(recruiterId)
+      const filled = reqs.filter(r => r.status === 'filled')
+      const avgDaysToFill = filled.length
+        ? Math.round(filled.reduce((n, r) => n + (new Date(r.updatedAt).getTime() - new Date(r.createdAt).getTime()) / 86400000, 0) / filled.length)
+        : null
+      return {
+        recruiterId, name: m.name, initials: m.initials, role: m.role,
+        active: reqs.filter(r => r.status === 'approved').length,
+        pending: reqs.filter(r => r.status === 'pending').length,
+        fulfilled: filled.length,
+        total: reqs.length,
+        avgDaysToFill,
+        requisitions: reqs.sort((a, b) => (a.updatedAt < b.updatedAt ? 1 : -1)),
+      }
+    }).sort((a, b) => b.total - a.total)
+    return HttpResponse.json({ data, currentUserId: CURRENT_USER.id })
+  }),
 
   http.get('/api/requisitions/:id', ({ params }) => {
     const r = requisitions.find(x => x.id === params.id)

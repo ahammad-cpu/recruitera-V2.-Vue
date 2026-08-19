@@ -6,7 +6,7 @@
 export type RequisitionStatus = 'draft' | 'pending' | 'approved' | 'rejected' | 'filled' | 'archived'
 export type ApproverDecision = 'pending' | 'approved' | 'rejected'
 
-export type RequisitionFilter = 'all' | 'approval' | 'mine'
+export type RequisitionFilter = 'all' | 'approval' | 'mine' | 'assigned'
 export type RequisitionScope = 'active' | 'archived'
 export type RequisitionView = 'list' | 'board'
 
@@ -90,6 +90,10 @@ export interface Requisition {
   jobOpenings: RequisitionJobOpening[]
   openingsTotal: number // = jobOpenings.length
   hiresCount: number
+  // Timeline dates: requestedAt = createdAt (bar start); expectedJoinDate =
+  // planned join milestone; fulfilledAt = actual join-done milestone (or '').
+  expectedJoinDate: string
+  fulfilledAt: string
   locations: string[]
   // Approval
   approvalSteps: RequisitionApprovalStep[]
@@ -97,6 +101,11 @@ export interface Requisition {
   requesterId: string
   requesterName: string
   requesterInitials: string
+  // Assigned recruiter (E5 — set after approval; empty while unassigned)
+  assignedRecruiterId: string
+  assignedRecruiterName: string
+  assignedRecruiterInitials: string
+  assignedAt: string
   following: boolean
   linkedJobIds: string[]
   team: RequisitionTeamMember[]
@@ -110,6 +119,26 @@ export interface RequisitionCounts {
   all: number
   approval: number
   mine: number
+  assigned: number
+}
+
+// One row of the Team-Lead workload dashboard.
+export interface RecruiterWorkload {
+  recruiterId: string
+  name: string
+  initials: string
+  role: string
+  active: number // approved & open
+  pending: number
+  fulfilled: number
+  total: number
+  avgDaysToFill: number | null
+  requisitions: Requisition[]
+}
+
+export interface RequisitionWorkloadResponse {
+  data: RecruiterWorkload[]
+  currentUserId: string
 }
 
 export interface RequisitionGroup {
