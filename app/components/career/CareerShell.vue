@@ -50,7 +50,7 @@ watch(() => route.path, () => { menuOpen.value = false })
           </nav>
           <div class="ml-auto flex items-center gap-2.5">
             <!-- desktop actions -->
-            <button v-if="forEmployeesOn" type="button" class="hidden sm:inline-flex h-10 px-5 rounded-[999px] text-[13.5px] font-bold text-white transition duration-150 hover:brightness-110 active:scale-[0.96]" :style="{ background: 'var(--cc-primary)' }">For Employees</button>
+            <button v-if="forEmployeesOn" type="button" class="hidden sm:inline-flex items-center justify-center leading-none h-10 px-5 rounded-[999px] text-[13.5px] font-bold text-white transition duration-150 hover:brightness-110 active:scale-[0.96]" :style="{ background: 'var(--cc-primary)' }">For Employees</button>
             <button type="button" class="hidden sm:inline-flex h-10 px-3.5 rounded-[999px] border border-white/25 text-white text-[13px] font-semibold items-center gap-1.5 hover:bg-white/10 transition duration-150 active:scale-[0.96]" aria-label="Switch language"><Globe class="w-4 h-4" stroke-width="1.9" /> العربية</button>
             <!-- mobile menu button -->
             <button type="button" class="sm:hidden w-11 h-11 -mr-1.5 rounded-[12px] grid place-items-center text-white transition active:scale-90" :aria-expanded="menuOpen" aria-label="Menu" @click="menuOpen = !menuOpen">
@@ -66,7 +66,7 @@ watch(() => route.path, () => { menuOpen.value = false })
             <NuxtLink to="/careers" class="flex items-center h-12 px-3 rounded-[12px] text-[16px] font-semibold transition active:scale-[0.98]" :style="isHome ? { color: 'var(--cc-primary)' } : {}" :class="isHome ? '' : 'text-white/80 hover:bg-white/5'">Home</NuxtLink>
             <NuxtLink to="/careers/opportunities" class="flex items-center h-12 px-3 rounded-[12px] text-[16px] font-semibold transition active:scale-[0.98]" :style="!isHome ? { color: 'var(--cc-primary)' } : {}" :class="!isHome ? '' : 'text-white/80 hover:bg-white/5'">Opportunities</NuxtLink>
             <div class="mt-3 flex flex-col gap-2.5">
-              <button v-if="forEmployeesOn" type="button" class="h-12 rounded-[12px] text-[15px] font-bold text-white transition active:scale-[0.98]" :style="{ background: 'var(--cc-primary)' }">For Employees</button>
+              <button v-if="forEmployeesOn" type="button" class="flex items-center justify-center leading-none h-12 rounded-[12px] text-[15px] font-bold text-white transition active:scale-[0.98]" :style="{ background: 'var(--cc-primary)' }">For Employees</button>
               <button type="button" class="h-12 rounded-[12px] border border-white/25 text-white text-[15px] font-semibold inline-flex items-center justify-center gap-1.5 transition active:scale-[0.98]"><Globe class="w-4 h-4" stroke-width="1.9" /> العربية</button>
             </div>
           </nav>
