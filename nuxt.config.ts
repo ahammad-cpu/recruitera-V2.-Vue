@@ -52,6 +52,9 @@ export default defineNuxtConfig({
     public: {
       apiBase: process.env.NUXT_PUBLIC_API_BASE ?? 'http://localhost:3000',
       appEnv:  process.env.NUXT_PUBLIC_APP_ENV  ?? 'development',
+      // Intercom Messenger — set your Recruitera workspace App ID to enable.
+      // Dormant (no script loaded) while empty.
+      intercomAppId: process.env.NUXT_PUBLIC_INTERCOM_APP_ID ?? '',
     },
   },
 

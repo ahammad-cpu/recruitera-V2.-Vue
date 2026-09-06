@@ -1,6 +1,9 @@
 <script setup lang="ts">
-import { ChevronRight } from 'lucide-vue-next'
+import { ChevronRight, GraduationCap } from 'lucide-vue-next'
 import { BrandSearchBar, BrandTopbarActions } from '~/components/brand'
+import { useOnboarding } from '~/composables/useOnboarding'
+
+const { open, dismissed, percent } = useOnboarding()
 </script>
 
 <template>
@@ -21,6 +24,13 @@ import { BrandSearchBar, BrandTopbarActions } from '~/components/brand'
         <BrandSearchBar placeholder="Search, jump to, and more" hint="⌘ K" />
       </div>
     </div>
+
+    <!-- Getting started launcher -->
+    <button v-if="!dismissed" type="button" class="inline-flex items-center gap-2 h-9 px-3 rounded-lg bg-[var(--brand-topbar-pill-bg)] border border-[var(--brand-topbar-pill-border)] text-[13px] font-semibold text-[var(--brand-text)] hover:brightness-95 transition whitespace-nowrap shrink-0" @click="open = true">
+      <GraduationCap class="w-4 h-4 text-[var(--brand-teal)]" />
+      Getting started
+      <span class="text-[11px] font-bold text-[var(--brand-teal)] tabular-nums">{{ percent }}%</span>
+    </button>
 
     <!-- Right: icon buttons + avatar -->
     <BrandTopbarActions />
