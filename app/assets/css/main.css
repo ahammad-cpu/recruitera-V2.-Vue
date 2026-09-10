@@ -9,45 +9,43 @@
 :root {
   --radius: 0.625rem;
 
-  /* shadcn semantic tokens — V3 (navy ink · lime accent · cyan ring) */
+  /* shadcn semantic tokens */
   --background: 0 0% 100%;
-  --foreground: 216 46% 14%;              /* #18233A navy ink */
+  --foreground: 165 24% 13%;              /* #1a2b28 */
   --card: 0 0% 100%;
-  --card-foreground: 216 46% 14%;
+  --card-foreground: 165 24% 13%;
   --popover: 0 0% 100%;
-  --popover-foreground: 216 46% 14%;
-  --primary: 216 46% 14%;                 /* #132033 navy CTA/ink */
+  --popover-foreground: 165 24% 13%;
+  --primary: 184 100% 8%;                 /* #002427 deep teal CTA */
   --primary-foreground: 0 0% 100%;
-  --secondary: 210 16% 95%;               /* neutral chip/secondary */
-  --secondary-foreground: 216 46% 14%;    /* navy */
+  --secondary: 84 55% 92%;                /* #f4f7ec lime tint */
+  --secondary-foreground: 76 100% 17%;    /* #3f5600 */
   --muted: 210 14% 97%;                   /* #f7f8f9 */
-  --muted-foreground: 215 14% 45%;        /* neutral slate */
-  --accent: 70 94% 52%;                   /* #D1F811 brand lime (sparing) */
-  --accent-foreground: 216 46% 14%;       /* navy on lime */
-  --destructive: 2 64% 54%;               /* #D5453F */
+  --muted-foreground: 145 8% 40%;         /* #5b6b5f */
+  --accent: 71 96% 54%;                   /* #C9FD13 brand lime */
+  --accent-foreground: 76 100% 17%;       /* #3f5600 dark olive on lime */
+  --destructive: 0 72% 51%;
   --destructive-foreground: 0 0% 100%;
-  --border: 214 15% 88%;                  /* neutral grey */
-  --input: 214 15% 88%;
-  --ring: 196 76% 51%;                    /* #22AFE1 cyan focus */
+  --border: 84 12% 87%;                   /* #dfe3db */
+  --input: 84 12% 87%;
+  --ring: 184 100% 8%;                    /* #002427 focus */
 
   /* ─────────── Recruitera brand tokens ───────────
      Every color in the app is defined here. NEVER inline a hex code
      in a .vue file — use `bg-[var(--brand-xxx)]` or `text-[var(--brand-xxx)]`.
      Change any value below and it propagates through the whole product. */
 
-  /* Brand accent — V3 lime (sparing: check, one CTA, AI, selection tint) */
-  --brand-lime: #D1F811;
-  --brand-check: #D1F811;                         /* checkbox check, sparing accent */
-  --brand-lime-tint: #f4fbdd;                     /* accent-soft: subtle hover / active bg */
-  --brand-lime-tint-hover: #eef8cf;               /* slightly deeper hover */
-  --brand-accent-soft: rgba(209, 248, 17, 0.15);  /* V3 accent-soft */
-  --brand-lime-active-bg: rgba(209, 248, 17, 0.22);
-  --brand-lime-active-bg-strong: rgba(209, 248, 17, 0.32);
-  --brand-olive: #132033;                         /* navy text/ink on lime (V3 accent-foreground) */
+  /* Brand accent */
+  --brand-lime: #C9FD13;
+  --brand-lime-tint: #f4f7ec;                     /* subtle hover / active bg */
+  --brand-lime-tint-hover: #f4f7ef;               /* slightly warmer hover */
+  --brand-lime-active-bg: rgba(201, 253, 19, 0.28);
+  --brand-lime-active-bg-strong: rgba(201, 253, 19, 0.38);
+  --brand-olive: #3f5600;                         /* text on lime */
 
-  /* CTA / primary — V3 navy */
-  --brand-teal: #132033;                          /* primary CTA / ink (navy) */
-  --brand-teal-secondary: #10739D;                /* ocean / info accent */
+  /* CTA / deep teal */
+  --brand-teal: #002427;                          /* primary CTA */
+  --brand-teal-secondary: #127295;
   --brand-linkedin: #0a66c2;                      /* LinkedIn icon chip */
 
   /* Brand palette (official) — main + accents */
@@ -67,42 +65,33 @@
   --brand-surface-table-alt: #f7f8f4;             /* table zebra row */
   --brand-surface-listview: #f9fcfc;               /* jobs table + card list canvas */
 
-  /* Focus ring — V3 cyan (always --ring; never browser default) */
-  --brand-ring: #22AFE1;
-
-  /* Text scale — V3 navy ink → neutral slate greys (never lime/cyan as text) */
-  --brand-text: #18233A;                          /* primary (navy ink) */
-  --brand-text-secondary: #3a4560;                /* form labels */
-  --brand-text-muted: #5a6478;                    /* metadata, count values */
-  --brand-text-subtle: #6c778b;                   /* icon buttons, subtitles */
-  --brand-text-quiet: #8a94a6;                    /* placeholder, quiet */
-  --brand-text-disabled: #b3bac7;                 /* disabled text */
-  --brand-text-faint: #c3c9d3;                    /* chevrons, zero counts */
-  --brand-nav-text: #4a5468;                      /* sidebar nav labels */
+  /* Text scale */
+  --brand-text: #1a2b28;                          /* primary */
+  --brand-text-secondary: #3a4742;                /* form labels */
+  --brand-text-muted: #5b6b5f;                    /* metadata, count values */
+  --brand-text-subtle: #6b7a74;                   /* icon buttons, subtitles */
+  --brand-text-quiet: #8a978f;                    /* placeholder, quiet */
+  --brand-text-disabled: #b5bdb2;                 /* disabled text */
+  --brand-text-faint: #c3cabf;                    /* chevrons, zero counts */
+  --brand-nav-text: #4a5750;                      /* sidebar nav labels */
 
   /* Icons */
   --brand-icon-default: #6b7a74;                  /* header/bottom icon color (alias of text-subtle) */
   --brand-icon-muted: #aab3a8;                    /* × close icons */
   --brand-ai-accent: #8fbf1f;                     /* candidate profile: AI Summary / AI Criteria sparkle icon (olive-green, distinct hue from --brand-lime) */
 
-  /* Borders — V3 neutral grey */
-  --brand-border: #dbe0e7;                        /* default */
-  --brand-border-light: #e4e8ee;                  /* card / panel */
-  --brand-border-mid: #c6ccd6;                    /* checkbox / strong border */
-  --brand-border-divider: #dde1e7;                /* sidebar / column divider */
-  --brand-border-fade: #e6e9ef;                   /* light section divider */
-  --brand-border-key: #ccd2dc;                    /* ⌘K badge */
-  --brand-border-hairline: #eef1f5;               /* settings table column divider */
-  --brand-border-row: #f1f3f7;                    /* settings table row divider */
+  /* Borders */
+  --brand-border: #dfe3db;                        /* default */
+  --brand-border-light: #e6e9e1;                  /* card / panel */
+  --brand-border-mid: #c8cfc6;                    /* checkbox border */
+  --brand-border-divider: #dde1d7;                /* sidebar / column divider */
+  --brand-border-fade: #e2e6dc;                   /* light section divider */
+  --brand-border-key: #cfd6cd;                    /* ⌘K badge */
+  --brand-border-hairline: #eef1ea;               /* settings table column divider */
+  --brand-border-row: #f1f3ec;                    /* settings table row divider */
 
-  /* Semantics — V3 (success/warning/danger/info + link) */
-  --brand-danger: #D5453F;                        /* destructive */
-  --brand-danger-soft: #fbebea;                   /* danger soft bg tint */
-  --brand-danger-strong: #a82f2b;                 /* danger text-strong */
-  --brand-info: #10739D;                          /* info */
-  --brand-info-soft: #e6f1f7;
-  --brand-info-strong: #0b5573;
-  --brand-link: #10739D;                          /* links (ocean) */
+  /* Semantics */
+  --brand-danger: #e01919;                        /* destructive hover */
   --brand-badge-new-bg: var(--brand-teal-secondary);   /* "NEW" pill */
   --brand-badge-new-text: #ffffff;
   --brand-badge-settings-bg: #eef1ea;             /* settings table count badge (jobs, etc) */
@@ -136,12 +125,8 @@
   --brand-status-pending-text: #b45309;
   --brand-status-closed-bg: #fdecec;               /* Jobs table status: Closed */
   --brand-status-closed-text: #b02a2a;
-  --brand-success: #1E9E6A;                       /* candidate profile: evaluation score good / sent checkmark */
-  --brand-success-soft: #e6f4ee;
-  --brand-success-strong: #157a51;
-  --brand-warning: #C77D0A;                        /* candidate profile: evaluation score mid */
-  --brand-warning-soft: #fbf1e0;
-  --brand-warning-strong: #99600a;
+  --brand-success: #3aab52;                       /* candidate profile: evaluation score good / sent checkmark */
+  --brand-warning: #e8a33d;                        /* candidate profile: evaluation score mid */
   --brand-track: #eceee7;                          /* candidate profile: gauge/progress-bar track */
   --brand-whatsapp: #25D366;                       /* WhatsApp brand green — chat header icon, send button */
   --brand-whatsapp-bubble: #dcf6df;                /* WhatsApp tab: outbound message bubble bg */
@@ -196,14 +181,6 @@
   --brand-theme-dark-bg: #1a2b28;
   --brand-theme-dark-dot: #aaaaaa;
   --brand-theme-system-dot: #8a978f;
-
-  /* Sidebar — V3 navy rail (lime = the sparing active pop) */
-  --sidebar: #132033;                             /* dark navy rail */
-  --sidebar-foreground: #A9B6C8;                  /* inactive item */
-  --sidebar-primary: #D1F811;                     /* active icon + text = lime */
-  --sidebar-active-bg: color-mix(in srgb, #D1F811 15%, transparent);
-  --sidebar-border: rgba(255, 255, 255, 0.08);
-  --sidebar-ring: #22AFE1;
 
   /* Shell dimensions (matched to Recruitera Candidates.dc.html) */
   --sidebar-width: 212px;
@@ -312,7 +289,7 @@
   select:focus-visible,
   [tabindex]:focus-visible,
   [draggable="true"]:focus-visible {
-    outline: 2px solid var(--brand-ring);
+    outline: 2px solid var(--brand-teal);
     outline-offset: 2px;
     border-radius: 6px;
   }
