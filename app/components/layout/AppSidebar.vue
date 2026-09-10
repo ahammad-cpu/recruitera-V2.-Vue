@@ -34,7 +34,7 @@ const isActive = (to: string) => route.path === to || route.path.startsWith(to +
 
 <template>
   <nav
-    class="shrink-0 flex flex-col bg-[var(--brand-canvas)] transition-[width] duration-200 ease-out px-2.5 py-2.5 gap-0.5"
+    class="shrink-0 flex flex-col bg-[var(--sidebar)] transition-[width] duration-200 ease-out px-2.5 py-2.5 gap-0.5"
     :class="effectiveOpen ? 'w-[212px]' : 'w-[64px]'"
   >
     <!-- Primary nav -->
@@ -43,12 +43,12 @@ const isActive = (to: string) => route.path === to || route.path.startsWith(to +
       :key="item.to"
       :to="item.to"
       :title="!effectiveOpen ? item.label : undefined"
-      class="flex items-center gap-3 h-9 px-2.5 rounded-lg text-[13.5px] transition-colors whitespace-nowrap overflow-hidden"
+      class="group flex items-center gap-3 h-9 px-2.5 rounded-lg text-[13.5px] transition-colors whitespace-nowrap overflow-hidden"
       :class="isActive(item.to)
-        ? 'bg-[var(--brand-lime-active-bg-strong)] text-[var(--brand-olive)] font-bold'
-        : 'text-[var(--brand-nav-text)] font-semibold hover:bg-black/[.05]'"
+        ? 'bg-[var(--sidebar-active-bg)] text-[var(--sidebar-primary)] font-bold'
+        : 'text-[var(--sidebar-foreground)] font-semibold hover:bg-white/[.06]'"
     >
-      <component :is="item.icon" class="w-[21px] h-[21px] shrink-0" :stroke-width="isActive(item.to) ? 1.7 : 1.6" />
+      <component :is="item.icon" class="w-[21px] h-[21px] shrink-0 transition-opacity" :class="isActive(item.to) ? 'opacity-100' : 'opacity-55 group-hover:opacity-80'" :stroke-width="isActive(item.to) ? 1.9 : 1.6" />
       <span v-if="effectiveOpen">{{ item.label }}</span>
     </NuxtLink>
 
@@ -61,18 +61,18 @@ const isActive = (to: string) => route.path === to || route.path.startsWith(to +
       :key="item.to"
       :to="item.to"
       :title="!effectiveOpen ? item.label : undefined"
-      class="flex items-center gap-3 h-9 px-2.5 rounded-lg text-[13.5px] transition-colors whitespace-nowrap overflow-hidden"
+      class="group flex items-center gap-3 h-9 px-2.5 rounded-lg text-[13.5px] transition-colors whitespace-nowrap overflow-hidden"
       :class="isActive(item.to)
-        ? 'bg-[var(--brand-lime-active-bg-strong)] text-[var(--brand-olive)] font-bold'
-        : 'text-[var(--brand-nav-text)] font-semibold hover:bg-black/[.05]'"
+        ? 'bg-[var(--sidebar-active-bg)] text-[var(--sidebar-primary)] font-bold'
+        : 'text-[var(--sidebar-foreground)] font-semibold hover:bg-white/[.06]'"
     >
-      <component :is="item.icon" class="w-5 h-5 shrink-0" stroke-width="1.6" />
+      <component :is="item.icon" class="w-5 h-5 shrink-0 transition-opacity" :class="isActive(item.to) ? 'opacity-100' : 'opacity-55 group-hover:opacity-80'" stroke-width="1.6" />
       <span v-if="effectiveOpen">{{ item.label }}</span>
     </NuxtLink>
 
     <!-- Hide toggle -->
     <button
-      class="flex items-center gap-3 h-9 px-2.5 rounded-lg text-[13.5px] font-semibold text-[var(--brand-text-subtle)] hover:bg-black/[.05] transition-colors border-t border-[var(--brand-border-divider)] mt-1 pt-3 whitespace-nowrap overflow-hidden"
+      class="flex items-center gap-3 h-9 px-2.5 rounded-lg text-[13.5px] font-semibold text-[var(--sidebar-foreground)] hover:bg-white/[.06] transition-colors border-t border-[var(--sidebar-border)] mt-1 pt-3 whitespace-nowrap overflow-hidden"
       :title="!effectiveOpen ? 'Show sidebar' : 'Hide sidebar'"
       @click="sidebar.toggle"
     >

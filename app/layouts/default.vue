@@ -8,10 +8,8 @@ import OnboardingChecklist from '~/components/onboarding/OnboardingChecklist.vue
 <template>
   <div class="flex flex-col h-screen overflow-hidden bg-[var(--brand-canvas)]">
     <TrialBanner />
-    <!-- Top bar spans full width, canvas bg matches sidebar for seamless look.
-         No border-b here: it would cross the sidebar column under the logo.
-         The divider lives on <main> instead, so it only runs under the content column. -->
-    <header class="flex items-center h-[52px] bg-[var(--brand-canvas)] px-4 gap-4 flex-none">
+    <!-- V3 navbar: light surface, full-width bottom hairline. -->
+    <header class="flex items-center h-[52px] bg-[var(--brand-surface-white)] border-b border-[var(--brand-border)] px-4 gap-4 flex-none">
       <AppHeader />
     </header>
     <!-- Body: sidebar + main content -->

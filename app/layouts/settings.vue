@@ -11,7 +11,7 @@ import TrialBanner from '~/components/layout/TrialBanner.vue'
     <!-- Same top bar as the main app shell (logo + Recruitera wordmark +
          Your trial pill + search + topbar icons) so Settings feels like a
          drill-down into the app, not a separate surface. -->
-    <header class="flex items-center h-[52px] bg-[var(--brand-canvas)] px-4 gap-4 flex-none">
+    <header class="flex items-center h-[52px] bg-[var(--brand-surface-white)] border-b border-[var(--brand-border)] px-4 gap-4 flex-none">
       <AppHeader />
     </header>
     <!-- Body: app rail + settings sidebar + content -->
