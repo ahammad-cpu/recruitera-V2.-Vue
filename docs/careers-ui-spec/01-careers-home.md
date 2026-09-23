@@ -1,12 +1,27 @@
-# Careers Page — UI Design Spec
+# Career Site: Home Page, UI Design Spec
 
-The visual design of the public career home page
-(https://recruitera-v2-vue.vercel.app/careers). Use it to rebuild the same page
-in another project.
+**Page:** career site Home (live example: https://recruitera-v2-vue.vercel.app/careers)
+**Goes to:** Opportunities page ("View all") and Job detail page (click a job card).
+
+This file is **complete on its own**. It contains the shared rules, theme,
+header and footer as well as everything specific to this page. The other
+career pages (Opportunities, Job detail) have their own files that repeat
+the shared parts, so each file can be handed over separately.
+
+## Page order (top to bottom)
+
+1. Header: floating bar, sticky, overlaps the hero by 80px
+2. Hero: brand gradient with text (default), **or** cover photo, **or** cover video
+3. Featured jobs panel: white card pulled up over the bottom of the hero
+4. Values: "What we stand for"
+5. Culture video: dark band, only when a video is set
+6. Testimonials: "From the team"
+7. "Can't find your desired job?" box
+8. Footer
 
 ---
 
-## 0. Read this first: how to use this spec
+## Read this first: how to use this spec
 
 This is a **design spec, not code to copy**. It says what the page looks like
 and how it behaves. It does not say how to build it.
@@ -23,7 +38,7 @@ and how it behaves. It does not say how to build it.
    new token only when nothing close exists, and add it to your design system
    the normal way, not as a one-off value in the page.
 4. **Brand color and header color are the only theme inputs.** Everything
-   tinted (chips, icon tiles, panels) is a lighter mix of these two (see §1).
+   tinted (chips, icon tiles, panels) is a lighter mix of these two (see "Design tokens").
    Wire them to however your project already handles theming.
 5. **Icons:** use the equivalent glyph from the icon set you already have.
    The names in this spec are descriptive (e.g. "map pin", "briefcase").
@@ -41,7 +56,7 @@ and how it behaves. It does not say how to build it.
 
 ---
 
-## 1. Design tokens (target values)
+## Design tokens (target values, same on every career page)
 
 ### Theme inputs
 
@@ -149,60 +164,73 @@ screens) and B (large screens).
 
 ---
 
-## 2. Page order (top to bottom)
+## Header (same on every career page)
 
-1. Header: sticky, floating rounded bar that overlaps the hero by 80px
-2. Hero: brand gradient with text (default), **or** a cover photo, **or** a cover video
-3. Featured jobs panel: white card pulled up over the bottom of the hero
-4. Values: "What we stand for"
-5. Culture video: dark band, only shown when a video is set
-6. Testimonials: "From the team"
-7. "Can't find your desired job?" box
-8. Footer
+**Default:** a floating rounded bar that stays at the top while scrolling.
 
----
+### Desktop / tablet (≥ 640px)
 
-## 3. Header
-
-**Default:** floating bar that stays at the top while scrolling.
-
-- Outer area: 16px padding on top, left and right. It overlaps the hero by
-  80px, so the hero shows around and behind it.
+- Outer area: 16px padding on top, left and right. It **overlaps the content
+  below by 80px**, so the hero or banner shows around and behind it.
 - Bar: max 1200px wide, centered, 22px radius, header-color background,
-  floating-header shadow.
+  shadow `0 14px 38px rgba(10,15,25,0.28)`.
 - Inside the bar: one row, **64px tall**, items vertically centered.
-  - Side padding: 16px (mobile), 20px (tablet), 28px (≥ 768px).
-  - Gap between groups: 16px (mobile), 32px (tablet and up).
+  - Side padding: 20px (640–767px), 28px (≥ 768px).
+  - Gap between groups: 32px.
 
-Alternative (a setting): full-width bar, square corners, full-width header
-shadow, overlaps the hero by 64px.
+Alternative (a setting): full-width bar, square corners, shadow
+`0 2px 16px rgba(0,0,0,0.14)`, overlaps the content by 64px. Row content is
+the same, still max 1200px wide.
 
 **Logo (left)**
-- Uploaded logo: 32px tall on mobile, 36px from tablet up. Max width 130px
-  (mobile) or 150px. Scaled to fit, never cropped.
+- Uploaded logo: 36px tall, max 150px wide, scaled to fit, never cropped.
 - No logo: 36×36 tile, 10px radius, brand background, company initial in
-  white 15px/800, followed by the company name in white 16px (17px from
-  tablet) / 700, cut off with "…" if too long. 10px gap.
+  white 15px/800, followed by the company name in white 17px/700, cut off
+  with "…" if too long. 10px gap between tile and name.
+- Clicking the logo goes to the career Home page.
 
-**Nav (tablet and up):** "Home", "Opportunities". 28px gap, 15px/600. Current
-page in brand color; others white 65%, white on hover.
+**Nav:** "Home", "Opportunities". 28px gap, 15px/600.
+- Current page in the brand color; others white 65%, full white on hover.
+- "Opportunities" is current on the Opportunities page. "Home" is current on
+  every other career page (including Job detail, see the note in the Job
+  detail file).
 
-**Right side (tablet and up):** pushed to the far right, 10px gap.
-- "For Employees": 40px tall, 20px side padding, fully round, brand
-  background, white 13.5px/700.
-- Language ("globe icon + العربية"): 40px tall, 14px side padding, fully
-  round, 1px white 25% border, white 13px/600, 16px globe icon, 6px gap.
-  Hover: white 10% background.
+**Right side:** pushed to the far right, 10px gap.
+- "For Employees" (only shown when that setting is on): 40px tall, 20px side
+  padding, fully round, brand background, white 13.5px/700. Hover slightly
+  brighter; shrinks to 96% while pressed.
+- Language button ("globe icon + العربية"): 40px tall, 14px side padding,
+  fully round, 1px white 25% border, white 13px/600, 16px globe icon, 6px
+  gap. Hover: white 10% background.
 
-Mobile behavior is in §9.
+### Mobile (< 640px)
+
+- Still a floating rounded bar 16px from the screen edges, sticky, 64px tall.
+- Row side padding 16px, gap 16px.
+- Logo: 32px tall (max 130px wide), or 16px company name.
+- Nav links, "For Employees" and the language button are **hidden**.
+- A **menu button** appears on the right: 44×44 touch area (pulled 6px
+  toward the edge), 12px radius, 24px white hamburger icon. It turns into an
+  ✕ while the menu is open.
+- Tapping it opens a **dropdown inside the same rounded bar**, directly under
+  the 64px row (the bar grows taller; the page does not get a separate overlay):
+  - 1px white 10% line on top; padding 8px top, 16px sides and bottom.
+  - "Home" and "Opportunities" as full-width rows: 48px tall, 12px side
+    padding, 12px radius, 16px/600. Current page in brand color; others white
+    80% with a faint white 5% background on hover.
+  - 12px below: two full-width stacked buttons, 10px apart, 48px tall, 12px
+    radius, 15px: "For Employees" (brand background, white, 700) and the
+    language button (1px white 25% border, globe icon, 600).
+  - Opening/closing: fades while sliding 8px vertically, about 0.2–0.25s
+    with a soft ease-out. With reduced motion it only fades.
+  - The menu closes by itself when the user goes to another page.
 
 ---
-
-## 4. Hero
+## Hero
 
 There are three versions. Which one shows depends on the cover setting.
 
-### 4a. Gradient hero (default, no cover)
+### Gradient hero (default, no cover)
 
 - Background: diagonal gradient (135°) from the brand color to "hero gradient end".
 - Content: max 1160px wide, 24px side padding, white text.
@@ -216,30 +244,16 @@ There are three versions. Which one shows depends on the cover setting.
   padding, 13px radius, white background, brand-colored 15px/700 text, 18px
   arrow icon, 8px gap. Smoothly scrolls down to the featured-jobs panel.
 
-### 4b. Cover photo hero
+### Cover photo hero (when a cover image is uploaded)
 
-Shown when the cover is set to **Image** and a photo is uploaded (recommended
-shape **4:1**). The photo **replaces** the gradient hero entirely: **no title,
-no intro, no "View openings" button**.
+Exactly as described in "Cover photo banner" below. The photo replaces the
+gradient hero completely: **no title, no intro, no "View openings" button**.
+Visitors reach the jobs by scrolling; the featured-jobs panel already peeks
+up over the bottom of the photo. The panel overlaps the photo by only
+**16px on mobile, 48px on tablet (640–767px), 64px from 768px**, so most of
+the photo stays visible. Removing the photo brings back the gradient hero.
 
-Built from two layers:
-
-1. **Blurred background:** the same photo stretched to fill the whole hero
-   band, heavily blurred (~40px), and enlarged 125% so the blurry edges are
-   cut off. It shows behind the floating header, in the thin side margins,
-   and on both sides when the screen is wider than 1520px.
-2. **Sharp photo:** max 1520px wide, 8px margin left and right, starting
-   **86px** from the top (16px header gap + 64px header + 6px). It keeps its
-   own shape and is never cropped, so the hero's height comes from the photo
-   (a 4:1 photo is ~376px tall on a wide desktop and ~94px on a 390px phone).
-   **Top corners round (24px), bottom corners square**, cover-photo shadow.
-   The hero ends at the photo's bottom edge.
-
-The featured-jobs panel overlaps the bottom of the photo by only
-**16px on mobile, 48px on tablet, 64px from 768px**, so most of the photo
-stays visible. Removing the photo brings back the gradient hero.
-
-### 4c. Cover video hero
+### Cover video hero
 
 - At least 94% of the screen height, black background. The video (muted,
   looping, autoplaying) fills the area and is cropped to cover it.
@@ -252,7 +266,7 @@ stays visible. Removing the photo brings back the gradient hero.
 
 ---
 
-## 5. Featured jobs panel
+## Featured jobs panel
 
 - Pulled up over the hero: 112px / 128px (gradient), 56px / 64px (video),
   16px / 48px / 64px (photo). It sits on top of the hero.
@@ -308,7 +322,7 @@ wrap onto more lines if needed.
 
 ---
 
-## 6. Values section: "What we stand for"
+## Values section: "What we stand for"
 
 ### Layout shared by all sizes
 
@@ -375,7 +389,7 @@ the window is resized.
 
 ---
 
-## 7. Culture video band (only when a video is set)
+## Culture video band (only when a video is set)
 
 - Full-width band, header-color background.
 - Content: max 1160px wide, space above/below 64px (96px from 768px), 24px
@@ -396,7 +410,7 @@ the window is resized.
 
 ---
 
-## 8. Testimonials: "From the team"
+## Testimonials: "From the team"
 
 - Max 1160px wide, 24px side padding, space above/below 64px (96px from 768px).
 - Centered heading block (max ~46 characters): eyebrow "From the team",
@@ -437,37 +451,68 @@ Default testimonials:
 
 ---
 
-## 9. Mobile behavior (< 640px), whole page
+## Cover photo banner (shared by all career pages)
 
-The page is fully usable on phones with no sideways scrolling. Changes from
-desktop, section by section:
+Used when the company sets the cover to **Image** and uploads a photo
+(recommended shape **4:1**). On this page it **replaces** the default
+gradient hero/banner.
 
-**Header**
-- Still a floating rounded bar (16px from the screen edges), sticky, 64px tall.
-- Nav links, "For Employees" and the language button are **hidden**.
-- A **menu button** appears on the right: 44×44 touch area, 12px radius,
-  24px white hamburger icon. It turns into an ✕ when open.
-- Tapping it opens a **dropdown inside the same rounded bar**, directly
-  below the 64px row (the bar grows taller):
-  - 1px white 10% line on top, padding 8px top, 16px sides and bottom.
-  - "Home" and "Opportunities" as full-width rows: 48px tall, 12px side
-    padding, 12px radius, 16px/600. Current page in brand color; others white
-    80% with a faint white 5% background on press/hover.
-  - 12px below: two full-width stacked buttons, 10px apart, 48px tall,
-    12px radius, 15px: "For Employees" (brand background, white) and the
-    language button (1px white 25% border, globe icon).
-  - Opening: fades in while sliding down 8px (~0.2–0.25s, soft ease-out).
-    With reduced motion it only fades.
-  - The menu closes automatically when you navigate to another page.
-- Logo: 32px tall (max 130px wide), or 16px company name.
+Built from two layers:
+
+1. **Blurred background:** the same photo stretched to fill the whole band,
+   heavily blurred (~40px) and enlarged 125% so the blurry edges are cut off
+   (the band clips its content). It shows behind the floating header, in the
+   thin side margins, and on both sides when the screen is wider than 1520px.
+2. **Sharp photo:** max 1520px wide, centered, 8px margin left and right,
+   starting **86px** from the top (16px header gap + 64px header + 6px). It
+   keeps its own shape and is **never cropped**, so the band's height comes
+   from the photo (a 4:1 photo is ~376px tall on a wide desktop, ~94px on a
+   390px phone). **Top corners round (24px), bottom corners square.** Shadow
+   `0 16px 50px rgba(0,0,0,0.28)`. The band ends at the photo's bottom edge.
+
+No text is placed on the photo.
+
+---
+## "Can't find your desired job?" box (shared)
+
+Only shown when the "For Employees" setting is on.
+
+- Max 1160px wide, 24px side padding, **64px** space below (96px from 768px).
+- Box: 20px radius, header-color background, padding **32px** (40px from
+  768px). Text on the left, button on the right, vertically centered, 20px
+  gap.
+- Text (white):
+  - Title 20px/700: "Can't find your desired job?"
+  - 4px below, 14px, white 70%: "Apply through General Application and join
+    our Talent Pool for future hiring."
+- Button "Join Talent Pool": 48px tall, 24px side padding, 13px radius, brand
+  background, white 15px/700. Hover slightly brighter, shrinks to 97% while
+  pressed.
+- **Mobile / narrow:** when the text and button don't fit on one line, the
+  button drops **below** the text, aligned left.
+
+## Footer (shared)
+
+- 1px `#eceef1` line on top, white background.
+- Max 1160px wide, 40px padding top and bottom, 24px sides, centered text.
+- Company name 15px/700 in the header color.
+- 4px below, 12.5px `#8a919c`: "© {Company} · Careers powered by Recruitera".
+- Same on all screen sizes.
+
+---
+## Mobile behavior of this page (< 640px)
+
+No sideways scrolling anywhere. Changes from desktop, section by section:
+
+**Header:** hamburger menu, see "Header → Mobile".
 
 **Hero**
 - Gradient: title at its smallest (32px), intro 15px, 112px space above and
-  160px below. Button keeps its full size (48px tall).
+  160px below the text. The "View openings" button keeps full size (48px tall).
 - Cover photo: full width minus 8px each side; short because of the 4:1 shape
-  (~94px tall on a 390px phone). Featured panel overlaps it by just 16px.
-- Cover video: at least 94% of screen height, text bottom-left with 24px side
-  padding.
+  (~94px tall on a 390px phone). Featured panel overlaps it by only 16px.
+- Cover video: at least 94% of the screen height, text at bottom-left with
+  24px side padding.
 
 **Featured jobs panel**
 - 28px inner padding.
@@ -476,62 +521,35 @@ desktop, section by section:
 - Job cards in **one column**, full width.
 
 **Values**
-- Scrolling strip whenever there's more than one value (cards 300px wide), see §6.
+- Scrolling strip whenever there is more than one value (cards 300px wide),
+  see "Values → Two display modes".
 - 64px space above and below. Title at its smallest (28.8px).
 
-**Culture video**
-- Stacked: text first, video below at full width, 40px apart.
-- 64px space above and below.
+**Culture video:** stacked, text first and the video below at full width,
+40px apart. 64px space above and below.
 
 **Testimonials**
 - Box stacked: branded panel on top, slider below.
 - Branded panel: 32px padding, 32px between quote mark and text, no minimum
   height (only as tall as its content).
-- Slider panel: 36px padding. Quote 16px.
+- Slider panel: 36px padding. Quote text 16px.
 
-**"Can't find your desired job?" box**
-- 32px padding. The "Join Talent Pool" button drops **below** the text,
-  aligned left.
+**"Can't find your desired job?" box:** 32px padding, button below the text.
 
-**Footer**: unchanged.
+**Touch:** hover effects don't apply. Buttons shrink slightly (~95–97%) while
+pressed and job cards shrink to 99%, as press feedback.
 
-**Touch:** hover effects don't apply; buttons shrink slightly (to ~95–97%)
-while pressed and cards shrink to 99%, as feedback.
+### Tablet (640–1023px)
 
-### Tablet (640–1023px) in short
-
-- Header shows the full desktop version (nav + buttons).
-- Job cards and value cards in 2 columns (values: static row if 3 or fewer).
-- From 768px: bigger paddings (featured panel 40px, sections 96px,
-  testimonials panels 56px) and bigger hero spacing.
+- Header shows the full desktop version (nav and buttons).
+- Job cards: 2 columns. Values: static row of 2 per line if 3 or fewer values.
+- From 768px: bigger paddings (featured panel 40px, sections 96px above and
+  below, testimonial panels 56px) and bigger hero spacing (144px / 192px).
 - Culture video and testimonials stay **stacked** until 1024px.
 
 ---
 
-## 10. "Can't find your desired job?" box
-
-- Max 1160px wide, 24px side padding, 64px space below (96px from 768px).
-- Box: 20px radius, header-color background, padding 32px (40px from 768px).
-  Text on the left, button on the right, vertically centered, 20px gap; wraps
-  when there isn't room.
-- Text (white): title 20px/700 "Can't find your desired job?"; 4px below,
-  14px white 70% "Apply through General Application and join our Talent Pool
-  for future hiring."
-- Button "Join Talent Pool": 48px tall, 24px side padding, 13px radius, brand
-  background, white 15px/700.
-
----
-
-## 11. Footer
-
-- 1px `#eceef1` line on top, white background.
-- Max 1160px wide, 40px padding top/bottom, 24px sides, centered text.
-- Company name 15px/700 in header color; 4px below, 12.5px `#8a919c`:
-  "© {Company} · Careers powered by Recruitera".
-
----
-
-## 12. Interaction and motion summary
+## Interaction and motion summary
 
 | Interaction | Behavior |
 |---|---|
@@ -540,13 +558,26 @@ while pressed and cards shrink to 99%, as feedback.
 | White button hover | Slightly darker |
 | Job / value card hover | Moves up 4px + soft shadow (~200ms) |
 | "View openings" | Smooth scroll to the featured jobs panel |
-| Mobile menu | Fade + 8px slide down |
+| Mobile menu | Fade + 8px slide |
 | Values strip | Constant right-to-left scroll, pauses on hover |
-| Testimonials | Auto-advance every 6s, 0.35s crossfade, pauses on hover / hidden tab |
+| Testimonials | Auto-advance every 6s, 0.35s crossfade, pauses on hover and when the tab is hidden |
 | Reduced motion | Values strip stops; menu only fades |
 
-## 13. Icons needed (use your own icon set)
+## Icons needed (use your own icon set)
 
 Globe, hamburger menu, close (✕), arrow right, map pin, briefcase, quote
 mark, play, chevron left, chevron right, plus one icon per value (defaults:
 target, gem, speech bubble).
+
+## Done checklist
+
+- [ ] Built only with the project's existing components and tokens
+- [ ] Header: floating, sticky, 80px overlap; mobile menu works
+- [ ] Hero: gradient version plus cover photo and cover video versions
+- [ ] Featured panel overlap matches the hero type (112/128, 16/48/64, 56/64px)
+- [ ] Job grid columns: 1 / 2 / 3 by screen size; 1 job max 560px
+- [ ] Values: static row vs scrolling strip rules for mobile and desktop
+- [ ] Culture video only when set; plays in place
+- [ ] Testimonials slider: 6s auto, arrows, dots, pause on hover
+- [ ] CTA box only when "For Employees" is on
+- [ ] Checked at 390px, 768px, 1024px and 1440px wide
