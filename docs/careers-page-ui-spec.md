@@ -194,8 +194,67 @@ Three variants; the **default (no cover set) is the gradient hero**.
 - Button row margin-top 36px, gap 12px. **"View openings →"**: height 48px, padding 0 24px, radius 13px, bg white, text primary 15px/700, ArrowRight icon 18px (stroke 2.2), gap 8px. Hover `brightness(.95)`, active `scale(.97)`. Smooth-scrolls to `#jobs`.
 
 ### 4b. Image hero (cover image uploaded)
-- Section bg: the same image, `object-fit: cover; transform: scale(1.25); filter: blur(40px)` (blur-2xl).
-- Frame: max-width 1520px, padding-x 8px, padding-top 86px. Sharp image full width, auto height, top corners radius 24px, shadow `0 16px 50px rgba(0,0,0,.28)`. No text.
+
+Used when Settings → Career Site → Cover is set to **Image** and a PNG/JPG is
+uploaded (the upload box recommends **4:1**). The photo **replaces** the
+gradient hero completely: **no headline, no intro, no "View openings"
+button**. The photo is the whole hero.
+
+```
+┌──────────── blurred copy of the photo fills the whole band ────────────┐
+│  ┌──────── floating header pill (sticky, over the blur) ────────┐      │  16px top gap
+│  └──────────────────────────────────────────────────────────────┘      │  64px pill
+│                                                                        │  6px gap (86px total)
+│ ┌╭──────────────────────────────────────────────────────────────╮┐     │
+│ ││                  sharp photo, full frame width               ││ 8px │
+│ ││             height = its own aspect ratio (not cropped)      ││ side│
+│ ││         ┌──────── featured jobs panel (overlaps) ───────┐    ││     │
+└─┴┴─────────┤                                                ├────┴┴─────┘
+             │  white card, pulled up 16 / 48 / 64px          │
+```
+
+Structure:
+
+```html
+<section style="position:relative; overflow:hidden">
+  <!-- 1. blurred background fill -->
+  <img src="COVER" aria-hidden="true"
+       style="position:absolute; inset:0; width:100%; height:100%;
+              object-fit:cover; transform:scale(1.25); filter:blur(40px)">
+  <!-- 2. sharp framed photo -->
+  <div style="position:relative; max-width:1520px; margin:0 auto;
+              padding:86px 8px 0">
+    <img src="COVER"
+         style="display:block; width:100%; height:auto;
+                border-radius:24px 24px 0 0;
+                box-shadow:0 16px 50px rgba(0,0,0,.28)">
+  </div>
+</section>
+```
+
+Details:
+- **Blur layer:** the same image stretched to fill the section,
+  `blur(40px)` (Tailwind `blur-2xl`) and `scale(1.25)` so the soft blurred
+  edges fall outside the section (`overflow:hidden` clips them). It shows in
+  the 86px strip behind the header, the 8px side margins, and on either side
+  when the screen is wider than 1520px.
+- **Top offset 86px** = header's 16px top padding + 64px pill + 6px breathing
+  room, so the photo starts just under the floating header. The header's
+  `-80px` bottom margin still applies, so it sits over the blur.
+- **Photo frame:** max-width 1520px, 8px side padding, so the photo is at most
+  1504px wide. It keeps its own aspect ratio and is never cropped, so the hero
+  height depends on the image (4:1 at 1504px wide gives about 376px tall;
+  on a 390px phone about 94px tall).
+- **Corners:** only the **top** corners are rounded (24px). The bottom edge is
+  square and flush with the end of the section, where the white page begins.
+- **Shadow:** `0 16px 50px rgba(0,0,0,.28)`.
+- **Featured jobs panel overlap** is much smaller than with the gradient hero,
+  so it covers less of the photo: `-16px` on phones, `-48px` at ≥ 640px, `-64px`
+  at ≥ 768px (gradient hero uses −112 / −128px).
+- Since there's no "View openings" button, visitors reach the jobs by scrolling;
+  the panel is already partly visible under the photo.
+- Removing the image (or switching the cover type to Video with no video)
+  falls back to the gradient hero with text.
 
 ### 4c. Video hero (cover video)
 - `min-height: 94vh`, flex, items at bottom, bg black; video/YouTube covers the area (muted, looped, autoplay).
