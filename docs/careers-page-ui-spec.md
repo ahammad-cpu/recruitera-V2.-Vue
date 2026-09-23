@@ -1,60 +1,75 @@
-# Careers Page — UI Spec (handoff)
+# Careers Page — UI Design Spec
 
-Complete visual spec of the public career home page (`/careers`,
-https://recruitera-v2-vue.vercel.app/careers), taken from the source code so
-another project can reproduce the same UI.
-
-Source files:
-
-| Part | File |
-|---|---|
-| Page entry | `app/pages/careers/index.vue` |
-| Header + footer (shell) | `app/components/career/CareerShell.vue` |
-| Hero, featured jobs, values, video, testimonials | `app/components/career/CareerHome.vue` |
-| "Join Talent Pool" CTA | `app/components/career/CareerApplyCta.vue` |
-| Theme defaults + content | `app/composables/useCareerSite.ts` |
-| Job card text helpers | `app/utils/careerJob.ts` |
-
-Stack: Vue 3 / Nuxt 3, Tailwind CSS v4, icons from `lucide-vue-next`. If the
-target project also uses Tailwind, the class strings in the source files can be
-copied as-is. All pixel values below are resolved from the Tailwind classes
-(1 Tailwind unit = 4px).
-
-Breakpoints (Tailwind defaults): `sm` ≥ 640px, `md` ≥ 768px, `lg` ≥ 1024px.
+The visual design of the public career home page
+(https://recruitera-v2-vue.vercel.app/careers). Use it to rebuild the same page
+in another project.
 
 ---
 
-## 1. Design tokens
+## 0. Read this first: how to use this spec
 
-### Theme variables (set on the page root)
+This is a **design spec, not code to copy**. It says what the page looks like
+and how it behaves. It does not say how to build it.
 
-| Variable | Default | Used for |
+**Rules for the implementing project:**
+
+1. **Keep your stack as it is.** Don't add new frameworks, CSS libraries,
+   UI kits, icon packs or build tools for this page.
+2. **Build it with your existing design system.** Use your own Button, Card,
+   Badge/Chip, Container, Grid, Icon, Carousel, etc. Don't create a parallel
+   set of components or a separate stylesheet just for this page.
+3. **Map the values below onto your existing tokens.** For each color, radius,
+   shadow, spacing or font size, use the closest token you already have. Add a
+   new token only when nothing close exists, and add it to your design system
+   the normal way, not as a one-off value in the page.
+4. **Brand color and header color are the only theme inputs.** Everything
+   tinted (chips, icon tiles, panels) is a lighter mix of these two (see §1).
+   Wire them to however your project already handles theming.
+5. **Icons:** use the equivalent glyph from the icon set you already have.
+   The names in this spec are descriptive (e.g. "map pin", "briefcase").
+6. **Numbers are the target look.** Pixel values are the size things should
+   render at. Match them visually with your own spacing scale; being 1–2px off
+   to land on an existing token is fine.
+
+**Screen sizes used in this spec:**
+
+| Name | Width |
+|---|---|
+| Mobile | < 640px |
+| Tablet | 640–1023px (some things change again at 768px) |
+| Desktop | ≥ 1024px |
+
+---
+
+## 1. Design tokens (target values)
+
+### Theme inputs
+
+| Token | Default | Used for |
 |---|---|---|
-| `--cc-primary` | `#4d7c0f` (olive green) | Brand color: buttons, active nav link, chips, icons, eyebrow labels |
-| `--cc-header` | `#0f172a` (slate-900) | Header bar, headings, dark video section, CTA box |
-| `--cc-font` | `Geist` | Font family (falls back to `-apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif`) |
+| Brand / primary | `#4d7c0f` (olive green) | Buttons, active nav link, chips, icons, eyebrow labels, dots |
+| Header / ink | `#0f172a` (dark navy) | Header bar, headings, dark video band, CTA box, footer name |
+| Font | Geist, falling back to the system sans-serif stack | Whole page |
 
-Note: the app never loads Geist, so unless it is installed on the device, the
-live site renders in the system font stack. To match it exactly, use the
-system stack; to match the intent, load Geist from Google Fonts.
+Page background is white. Default body text color is the header color at 92%
+opacity.
 
-Default body text color: `color-mix(in srgb, var(--cc-header) 92%, transparent)`.
-Page background: `#ffffff`.
+### Tints derived from the theme
 
-### Derived colors (built with `color-mix`)
+"X% brand" means the brand color mixed with white at that strength.
 
-| Name | Formula | Where |
+| Name | Value | Where |
 |---|---|---|
-| primary-tint-8 | `color-mix(in srgb, var(--cc-primary) 8%, white)` | "View all" button hover bg |
-| primary-tint-11 | `… 11%, white` | Department chip bg |
-| primary-tint-12 | `… 12%, white` | Value icon tile bg |
-| primary-tint-24 | `… 24%, white` | Value icon tile 1px inset ring |
-| primary-tint-38 | `… 38%, white` | Testimonials left panel bg |
-| primary-border-35 | `color-mix(in srgb, var(--cc-primary) 35%, #ececf0)` | Value card hover border |
-| hero-gradient-end | `color-mix(in srgb, var(--cc-primary) 45%, #0b1220)` | Hero gradient end stop |
-| header-78 | `color-mix(in srgb, var(--cc-header) 78%, white)` | Testimonials panel paragraph |
+| Brand 8% | 8% brand + white | "View all" button hover background |
+| Brand 11% | 11% brand + white | Department chip background |
+| Brand 12% | 12% brand + white | Value icon tile background |
+| Brand 24% | 24% brand + white | Value icon tile 1px inner outline |
+| Brand 38% | 38% brand + white | Testimonials left panel background |
+| Brand border | 35% brand + `#ececf0` | Value card border on hover |
+| Hero gradient end | 45% brand + `#0b1220` | End color of the hero gradient |
+| Header 78% | 78% header color + white | Testimonials panel paragraph |
 
-### Neutral palette
+### Neutrals
 
 | Hex | Use |
 |---|---|
@@ -62,339 +77,476 @@ Page background: `#ffffff`.
 | `#ececf0` | Job card, value card, testimonials box border |
 | `#e3e6ea` | Inactive filter pill border (hover `#c3c8cf`) |
 | `#e6e8ec` | Work-mode badge border, carousel arrow border |
-| `#f0f1f4` | Job card footer divider |
-| `#f7f8fa` | Carousel arrow hover bg |
+| `#f0f1f4` | Divider inside job card |
+| `#f7f8fa` | Carousel arrow hover background |
 | `#4b5563` | Inactive filter pill text |
 | `#5b6472` | Work-mode badge text |
-| `#6b7280` | Secondary paragraph text |
-| `#727a86` | Job card blurb + meta text |
+| `#6b7280` | Secondary paragraphs |
+| `#727a86` | Job card description and meta |
 | `#8a919c` | Muted text (footer line, testimonial role) |
-| `#3f4652` | Testimonial quote text |
+| `#3f4652` | Testimonial quote |
 
-### Radii
+### Corner radius
 
 | Value | Element |
 |---|---|
-| 999px / full | Nav buttons, filter pills, chips, badges, avatars, play button, dots |
+| Fully round | Header buttons (desktop), filter pills, chips, badges, avatars, play button, dots |
 | 10px | Logo letter tile |
 | 11px | "View all" button |
-| 12px | Mobile menu items/buttons |
-| 13px | Large buttons (View openings, Join Talent Pool) |
+| 12px | Mobile menu items and buttons |
+| 13px | Large buttons ("View openings", "Join Talent Pool") |
 | 14px | Value icon tile |
-| 16px (`rounded-2xl`) | Value cards |
+| 16px | Value cards |
 | 18px | Job cards |
 | 20px | Culture video frame, CTA box |
-| 22px | Floating header pill, featured-jobs panel |
-| 24px | Testimonials box, image-hero top corners |
+| 22px | Floating header, featured-jobs panel |
+| 24px | Testimonials box, top corners of cover photo |
 
 ### Shadows
 
 | Element | Shadow |
 |---|---|
-| Floating header pill | `0 14px 38px rgba(10,15,25,0.28)` |
-| Full-width header bar | `0 2px 16px rgba(0,0,0,0.14)` |
+| Floating header | `0 14px 38px rgba(10,15,25,0.28)` |
+| Full-width header | `0 2px 16px rgba(0,0,0,0.14)` |
 | Featured-jobs panel | `0 28px 70px rgba(15,23,42,0.12)` |
 | Job card (hover) | `0 20px 46px rgba(15,23,42,0.10)` |
 | Value card (hover) | `0 20px 46px rgba(15,23,42,0.08)` |
 | Testimonials box | `0 24px 64px rgba(15,23,42,0.07)` |
-| Culture video frame | `0 30px 80px rgba(0,0,0,0.45)` + 1px ring `rgba(255,255,255,0.10)` |
-| Image hero photo | `0 16px 50px rgba(0,0,0,0.28)` |
+| Culture video frame | `0 30px 80px rgba(0,0,0,0.45)` plus a 1px white 10% outline |
+| Cover photo | `0 16px 50px rgba(0,0,0,0.28)` |
 
-### Containers
+### Page widths
 
 | Max width | Used by |
 |---|---|
-| 1200px | Header (pill and inner row) |
-| 1160px | Hero text, featured jobs, values, video, testimonials, CTA, footer |
-| 1520px | Image hero photo frame |
+| 1200px | Header |
+| 1160px | All content sections and footer |
+| 1520px | Cover photo frame |
 
-Content sections use `24px` side padding (`px-6`) at all sizes.
+Content sections have **24px side padding on every screen size**.
 
-### Type scale
+### Text styles
 
-| Role | Size | Weight | Line-height / tracking |
+Sizes written as "A → B" grow smoothly with the screen width between A (small
+screens) and B (large screens).
+
+| Role | Size | Weight | Other |
 |---|---|---|---|
-| Hero H1 | `clamp(2rem, 5vw, 3.6rem)` (32→57.6px) | 800 | lh 1.05, tracking −0.03em, max-width 18ch, `text-wrap: balance` |
-| Hero intro | 15px (md: 16.5px) | 400 | relaxed (1.625), white 85%, max-width 56ch |
-| Section eyebrow | 13px uppercase | 800 | tracking 0.14em (video: 0.16em), color primary |
-| Section H2 (values/testimonials) | `clamp(1.8rem, 3.8vw, 2.6rem)` | 800 | tracking −0.02em, balance |
-| Video H2 | `clamp(2rem, 4.4vw, 3.1rem)` | 800 | lh 1.08, tracking −0.025em |
-| Testimonial panel H2 | `clamp(1.7rem, 3.4vw, 2.4rem)` | 800 | lh 1.1, tracking −0.02em |
-| Featured panel company name | `clamp(1.3rem, 2.8vw, 1.7rem)` | 700 | tracking −0.01em, primary |
-| Featured panel H2 | `clamp(1.35rem, 3vw, 1.9rem)` | 600 | color header |
-| Card title (job/value) | 17px | 700 | job: snug (1.375), −0.01em |
-| Body | 14–15px | 400 | relaxed |
+| Hero title | 32px → 57.6px | 800 | line height 1.05, letter spacing −3%, max ~18 characters per line, balanced line breaks |
+| Hero intro | 15px (≥ 768: 16.5px) | 400 | line height 1.6, white 85%, max ~56 characters per line |
+| Section eyebrow | 13px, uppercase | 800 | letter spacing +14% (video band: +16%), brand color |
+| Section title (values, testimonials) | 28.8px → 41.6px | 800 | letter spacing −2%, balanced |
+| Video band title | 32px → 49.6px | 800 | line height 1.08, letter spacing −2.5% |
+| Testimonial panel title | 27.2px → 38.4px | 800 | line height 1.1, letter spacing −2% |
+| Featured panel company name | 20.8px → 27.2px | 700 | brand color |
+| Featured panel title | 21.6px → 30.4px | 600 | header color |
+| Card title (job, value) | 17px | 700 | |
+| Body | 14–15px | 400 | line height 1.6 |
 | Nav links | 15px | 600 | |
 | Small buttons | 13–13.5px | 600–700 | |
 | Chips / badges | 11.5px | 600 | |
-| Meta | 12.5px | 500 | |
+| Meta text | 12.5px | 500 | |
 
 ---
 
-## 2. Page structure (top to bottom)
+## 2. Page order (top to bottom)
 
-```
-┌ Header (sticky, floating rounded pill, overlaps hero by 80px)
-├ Hero (gradient by default · image or video if configured)
-├ Featured jobs panel (white card pulled UP over the hero)
-├ Values ("What we stand for")
-├ Culture video (dark, only if a video URL is set)
-├ Testimonials ("From the team")
-├ CTA box ("Can't find your desired job?")
-└ Footer
-```
+1. Header: sticky, floating rounded bar that overlaps the hero by 80px
+2. Hero: brand gradient with text (default), **or** a cover photo, **or** a cover video
+3. Featured jobs panel: white card pulled up over the bottom of the hero
+4. Values: "What we stand for"
+5. Culture video: dark band, only shown when a video is set
+6. Testimonials: "From the team"
+7. "Can't find your desired job?" box
+8. Footer
 
 ---
 
 ## 3. Header
 
-**Default mode = floating pill + sticky** (`headerSticky: true`, `headerFullWidth: false`).
+**Default:** floating bar that stays at the top while scrolling.
 
-- `<header>`: `position: sticky; top: 0; z-index: 40`, padding `16px 16px 0`
-  (`px-4 pt-4`), `margin-bottom: -80px` so it floats over the hero.
-- Pill: `max-width: 1200px; margin: 0 auto; border-radius: 22px; overflow: hidden`,
-  background `var(--cc-header)`, shadow `0 14px 38px rgba(10,15,25,.28)`.
-- Inner row: `max-width: 1200px`, **height 64px**, flex, align center.
-  - Horizontal padding: 16px → sm 20px → md 28px.
-  - Gap: 16px → sm 32px.
+- Outer area: 16px padding on top, left and right. It overlaps the hero by
+  80px, so the hero shows around and behind it.
+- Bar: max 1200px wide, centered, 22px radius, header-color background,
+  floating-header shadow.
+- Inside the bar: one row, **64px tall**, items vertically centered.
+  - Side padding: 16px (mobile), 20px (tablet), 28px (≥ 768px).
+  - Gap between groups: 16px (mobile), 32px (tablet and up).
 
-Full-width variant: no outer padding, no radius, shadow `0 2px 16px rgba(0,0,0,.14)`, `margin-bottom: -64px`.
+Alternative (a setting): full-width bar, square corners, full-width header
+shadow, overlaps the hero by 64px.
 
 **Logo (left)**
-- Uploaded logo: height 32px (sm 36px), max-width 130px (sm 150px), `object-fit: contain`.
-- Fallback: 36×36 tile, radius 10px, bg primary, white first letter 15px/800
-  + company name 16px (sm 17px) / 700, white, tracking −0.01em, truncate. Gap 10px.
+- Uploaded logo: 32px tall on mobile, 36px from tablet up. Max width 130px
+  (mobile) or 150px. Scaled to fit, never cropped.
+- No logo: 36×36 tile, 10px radius, brand background, company initial in
+  white 15px/800, followed by the company name in white 16px (17px from
+  tablet) / 700, cut off with "…" if too long. 10px gap.
 
-**Nav (sm and up)**: gap 28px, 15px/600. Active link = primary color; inactive = `rgba(255,255,255,.65)`, hover white. Items: "Home", "Opportunities".
+**Nav (tablet and up):** "Home", "Opportunities". 28px gap, 15px/600. Current
+page in brand color; others white 65%, white on hover.
 
-**Right actions (sm and up)**, `margin-left: auto`, gap 10px:
-- "For Employees": height 40px, padding 0 20px, pill, bg primary, white 13.5px/700. Hover `brightness(1.1)`, active `scale(.96)`.
-- Language ("🌐 العربية"): height 40px, padding 0 14px, pill, 1px border `rgba(255,255,255,.25)`, white 13px/600, Globe icon 16px, gap 6px. Hover bg `rgba(255,255,255,.10)`.
+**Right side (tablet and up):** pushed to the far right, 10px gap.
+- "For Employees": 40px tall, 20px side padding, fully round, brand
+  background, white 13.5px/700.
+- Language ("globe icon + العربية"): 40px tall, 14px side padding, fully
+  round, 1px white 25% border, white 13px/600, 16px globe icon, 6px gap.
+  Hover: white 10% background.
 
-**Mobile (< 640px)**
-- Menu button: 44×44, radius 12px, white Menu/X icon 24px (stroke 2), `margin-right: -6px`.
-- Dropdown (inside the pill): top border `rgba(255,255,255,.10)`, padding `8px 16px 16px`.
-  - Links: height 48px, padding 0 12px, radius 12px, 16px/600; inactive white 80%, hover bg white 5%.
-  - Buttons stack (margin-top 12px, gap 10px): height 48px, radius 12px, 15px; "For Employees" filled primary, language outlined.
-  - Animation: fade + `translateY(-8px)`, opacity .2s ease, transform .24s `cubic-bezier(.22,1,.36,1)`.
+Mobile behavior is in §9.
 
 ---
 
 ## 4. Hero
 
-Three variants; the **default (no cover set) is the gradient hero**.
+There are three versions. Which one shows depends on the cover setting.
 
-### 4a. Gradient hero (default)
-- Background: `linear-gradient(135deg, var(--cc-primary), color-mix(in srgb, var(--cc-primary) 45%, #0b1220))`.
-- Content: container 1160px, padding-x 24px.
-  - Padding top/bottom: **112px / 160px**, md: **144px / 192px** (the big bottom padding is what the featured panel overlaps).
-  - Text white.
-- H1 (see type scale) — default text: "Build the future of hiring with us".
-- Intro: margin-top 20px — "We help teams hire better and faster. Join a team that values craft, ownership, and candor — and do the best work of your career."
-- Button row margin-top 36px, gap 12px. **"View openings →"**: height 48px, padding 0 24px, radius 13px, bg white, text primary 15px/700, ArrowRight icon 18px (stroke 2.2), gap 8px. Hover `brightness(.95)`, active `scale(.97)`. Smooth-scrolls to `#jobs`.
+### 4a. Gradient hero (default, no cover)
 
-### 4b. Image hero (cover image uploaded)
+- Background: diagonal gradient (135°) from the brand color to "hero gradient end".
+- Content: max 1160px wide, 24px side padding, white text.
+  - Space above/below the text: **112px / 160px** below 768px wide, **144px / 192px** from 768px.
+    The large bottom space is what the featured-jobs panel overlaps.
+- Title (default): "Build the future of hiring with us".
+- Intro, 20px below the title: "We help teams hire better and faster. Join a
+  team that values craft, ownership, and candor — and do the best work of
+  your career."
+- Button, 36px below the intro: **"View openings →"**: 48px tall, 24px side
+  padding, 13px radius, white background, brand-colored 15px/700 text, 18px
+  arrow icon, 8px gap. Smoothly scrolls down to the featured-jobs panel.
 
-Used when Settings → Career Site → Cover is set to **Image** and a PNG/JPG is
-uploaded (the upload box recommends **4:1**). The photo **replaces** the
-gradient hero completely: **no headline, no intro, no "View openings"
-button**. The photo is the whole hero.
+### 4b. Cover photo hero
 
-```
-┌──────────── blurred copy of the photo fills the whole band ────────────┐
-│  ┌──────── floating header pill (sticky, over the blur) ────────┐      │  16px top gap
-│  └──────────────────────────────────────────────────────────────┘      │  64px pill
-│                                                                        │  6px gap (86px total)
-│ ┌╭──────────────────────────────────────────────────────────────╮┐     │
-│ ││                  sharp photo, full frame width               ││ 8px │
-│ ││             height = its own aspect ratio (not cropped)      ││ side│
-│ ││         ┌──────── featured jobs panel (overlaps) ───────┐    ││     │
-└─┴┴─────────┤                                                ├────┴┴─────┘
-             │  white card, pulled up 16 / 48 / 64px          │
-```
+Shown when the cover is set to **Image** and a photo is uploaded (recommended
+shape **4:1**). The photo **replaces** the gradient hero entirely: **no title,
+no intro, no "View openings" button**.
 
-Structure:
+Built from two layers:
 
-```html
-<section style="position:relative; overflow:hidden">
-  <!-- 1. blurred background fill -->
-  <img src="COVER" aria-hidden="true"
-       style="position:absolute; inset:0; width:100%; height:100%;
-              object-fit:cover; transform:scale(1.25); filter:blur(40px)">
-  <!-- 2. sharp framed photo -->
-  <div style="position:relative; max-width:1520px; margin:0 auto;
-              padding:86px 8px 0">
-    <img src="COVER"
-         style="display:block; width:100%; height:auto;
-                border-radius:24px 24px 0 0;
-                box-shadow:0 16px 50px rgba(0,0,0,.28)">
-  </div>
-</section>
-```
+1. **Blurred background:** the same photo stretched to fill the whole hero
+   band, heavily blurred (~40px), and enlarged 125% so the blurry edges are
+   cut off. It shows behind the floating header, in the thin side margins,
+   and on both sides when the screen is wider than 1520px.
+2. **Sharp photo:** max 1520px wide, 8px margin left and right, starting
+   **86px** from the top (16px header gap + 64px header + 6px). It keeps its
+   own shape and is never cropped, so the hero's height comes from the photo
+   (a 4:1 photo is ~376px tall on a wide desktop and ~94px on a 390px phone).
+   **Top corners round (24px), bottom corners square**, cover-photo shadow.
+   The hero ends at the photo's bottom edge.
 
-Details:
-- **Blur layer:** the same image stretched to fill the section,
-  `blur(40px)` (Tailwind `blur-2xl`) and `scale(1.25)` so the soft blurred
-  edges fall outside the section (`overflow:hidden` clips them). It shows in
-  the 86px strip behind the header, the 8px side margins, and on either side
-  when the screen is wider than 1520px.
-- **Top offset 86px** = header's 16px top padding + 64px pill + 6px breathing
-  room, so the photo starts just under the floating header. The header's
-  `-80px` bottom margin still applies, so it sits over the blur.
-- **Photo frame:** max-width 1520px, 8px side padding, so the photo is at most
-  1504px wide. It keeps its own aspect ratio and is never cropped, so the hero
-  height depends on the image (4:1 at 1504px wide gives about 376px tall;
-  on a 390px phone about 94px tall).
-- **Corners:** only the **top** corners are rounded (24px). The bottom edge is
-  square and flush with the end of the section, where the white page begins.
-- **Shadow:** `0 16px 50px rgba(0,0,0,.28)`.
-- **Featured jobs panel overlap** is much smaller than with the gradient hero,
-  so it covers less of the photo: `-16px` on phones, `-48px` at ≥ 640px, `-64px`
-  at ≥ 768px (gradient hero uses −112 / −128px).
-- Since there's no "View openings" button, visitors reach the jobs by scrolling;
-  the panel is already partly visible under the photo.
-- Removing the image (or switching the cover type to Video with no video)
-  falls back to the gradient hero with text.
+The featured-jobs panel overlaps the bottom of the photo by only
+**16px on mobile, 48px on tablet, 64px from 768px**, so most of the photo
+stays visible. Removing the photo brings back the gradient hero.
 
-### 4c. Video hero (cover video)
-- `min-height: 94vh`, flex, items at bottom, bg black; video/YouTube covers the area (muted, looped, autoplay).
-- Overlay: `linear-gradient(to top, rgba(8,14,22,.86) 0%, rgba(8,14,22,.42) 42%, rgba(8,14,22,.10) 100%)`.
-- Text block: padding-x 24 / sm 40 / lg 64px, padding-bottom 112px (md 128px). Same H1, intro, and button (button margin-top 32px).
+### 4c. Cover video hero
+
+- At least 94% of the screen height, black background. The video (muted,
+  looping, autoplaying) fills the area and is cropped to cover it.
+- Dark overlay from the bottom: 86% → 42% (at 42% height) → 10% at the top,
+  color `rgb(8,14,22)`.
+- Text sits at the **bottom-left**: side padding 24px (mobile), 40px
+  (tablet), 64px (desktop); bottom padding 112px (128px from 768px). Same
+  title, intro and button as 4a (button 32px below the intro).
+- The featured panel overlaps by 56px (64px from 768px).
 
 ---
 
-## 5. Featured jobs panel (`#jobs`)
+## 5. Featured jobs panel
 
-- Section: `position: relative; z-index: 10`, pulled up over the hero:
-  - gradient hero: `margin-top: -112px` (md `-128px`)
-  - video hero: `-56px` (md `-64px`)
-  - image hero: `-16px` (sm `-48px`, md `-64px`)
-- Container 1160px, padding-x 24px.
-- **Panel**: white, radius 22px, 1px border `#eceef1`, shadow `0 28px 70px rgba(15,23,42,.12)`, padding **28px** (md **40px**).
+- Pulled up over the hero: 112px / 128px (gradient), 56px / 64px (video),
+  16px / 48px / 64px (photo). It sits on top of the hero.
+- Max 1160px wide, 24px side padding.
+- **Panel:** white, 22px radius, 1px `#eceef1` border, featured-panel
+  shadow. Inner padding **28px** (40px from 768px).
 
-**Panel header**: flex, wrap, `align-items: flex-end`, `justify-content: space-between`, gap 16px.
-- Company name (primary, see type scale).
-- H2 "Discover our featured jobs", margin-top 8px, color header.
-- Paragraph, margin-top 8px, 14.5px, `#6b7280`, max-width 500px:
-  "The roles we're most excited about right now at {Company} — standout positions where you can grow fast and make real impact from day one."
-- **"View all →"** button: height 40px, padding 0 16px, radius 11px, 1.5px border primary, text primary 13.5px/600, icon 16px, gap 6px. Hover bg primary-tint-8, active `scale(.96)`.
+**Top part:** text block on the left, "View all" on the right, bottom-aligned,
+16px gap. Wraps onto separate lines when there isn't room.
+- Company name (brand color).
+- Title "Discover our featured jobs", 8px below.
+- Paragraph 8px below, 14.5px, `#6b7280`, max 500px wide: "The roles we're
+  most excited about right now at {Company} — standout positions where you
+  can grow fast and make real impact from day one."
+- **"View all →"**: 40px tall, 16px side padding, 11px radius, 1.5px brand
+  border, brand 13.5px/600 text, 16px arrow. Hover background: brand 8%.
 
-**Filter pills**: margin-top 24px, flex wrap, gap 10px. Labels: All · White Collar · Blue Collar.
-- Pill: height 36px, padding 0 16px, fully rounded, 13px/600.
-- Active: bg primary, white text. Inactive: white bg, 1px `#e3e6ea` border, text `#4b5563`, hover border `#c3c8cf`. Active press `scale(.95)`.
+**Filter pills**, 24px below: "All", "White Collar", "Blue Collar". 10px gap,
+wrap onto more lines if needed.
+- 36px tall, 16px side padding, fully round, 13px/600.
+- Selected: brand background, white text. Not selected: white, 1px
+  `#e3e6ea` border, `#4b5563` text; border `#c3c8cf` on hover.
 
-**Job grid**: margin-top 28px, gap 20px. Shows at most 6 published jobs.
-- 1 job: 1 column, max-width 560px.
-- 2 jobs: 1 col → sm 2 cols.
-- 3+ jobs: 1 col → sm 2 cols → lg 3 cols.
+**Job cards**, 28px below the pills, 20px gap. Up to 6 open jobs.
 
-**Job card** (whole card is a button):
-- Flex column, left-aligned, white, radius 18px, 1px border `#ececf0`, padding 20px.
-- Hover: `translateY(-4px)`, border primary, shadow `0 20px 46px rgba(15,23,42,.10)`, title turns primary. Active: `translateY(0) scale(.99)`. Transition 200ms.
-- Top row (flex, space-between, gap 12px):
-  - Department chip: height 24px, padding 0 10px, pill, 11.5px/600, bg primary-tint-11, text primary.
-  - Work-mode badge (margin-left auto): height 24px, padding 0 10px, pill, 1px border `#e6e8ec`, 11.5px/600 `#5b6472`, leading 6×6 primary dot, gap 6px. Text: On-site / Remote / Hybrid.
-- Title: margin-top 14px, 17px/700, color header.
-- Blurb: margin-top 8px, 13.5px, `#727a86`, clamp to 2 lines, `flex: 1` (keeps footers aligned). Text:
-  "We're looking for a {title} to join {department} and help build what's next — owning real work from day one alongside a team that values craft and candor."
-- Footer meta: margin-top 20px, padding-top 16px, top border `#f0f1f4`, flex wrap, gap 6px 16px, 12.5px/500 `#727a86`. Items with 14px icons (stroke 1.9), gap 6px: MapPin + location, Briefcase + "Full-time" (or "Shift Based" for blue-collar).
+| Jobs shown | Mobile | Tablet | Desktop |
+|---|---|---|---|
+| 1 | 1 column, max 560px wide | same | same |
+| 2 | 1 column | 2 columns | 2 columns |
+| 3–6 | 1 column | 2 columns | 3 columns |
 
----
-
-## 6. Values — "What we stand for"
-
-- Section: container 1160px, padding `64px 24px` (md `96px 24px`).
-- Heading block: centered, max-width 46ch.
-  - Eyebrow "What we stand for" (13px/800 uppercase, tracking .14em, primary).
-  - H2 "The principles behind how we work", margin-top 8px, color header.
-- Cards area margin-top 48px.
-
-**≤ 3 values → centered row**: flex wrap, center, gap 20px. Card width: 100% → sm `calc(50% - 10px)` → lg 344px.
-**> 3 values (or > 1 on mobile < 640px) → infinite marquee**: cards 300px (sm 330px) wide with 20px right margin, list duplicated, track animates `translateX(0 → -50%)` linear infinite, duration `max(18s, count × 6s)`, pauses on hover, edge fade mask `linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent)`. Disabled for reduced motion.
-
-**Value card**: white, radius 16px, 1px `#ececf0` border, padding 24px, text centered.
-- Hover: `translateY(-4px)`, shadow `0 20px 46px rgba(15,23,42,.08)`, border primary-border-35; icon tile `scale(1.05)`.
-- Icon tile: 48×48, centered, radius 14px, bg primary-tint-12, `box-shadow: inset 0 0 0 1px` primary-tint-24; lucide icon 22px, primary, stroke 1.9.
-- Name: margin-top 20px, 17px/700, header color.
-- Description: margin-top 6px, 14px, relaxed, `#6b7280`.
-
-Default values: Ownership (Target icon) — "We take end-to-end ownership of outcomes, not tasks." · Craft (Gem) — "We sweat the details and ship work we are proud of." · Candor (MessageSquare) — "We speak honestly and assume good intent from each other."
+**Job card** (the whole card is clickable and opens the job):
+- White, 18px radius, 1px `#ececf0` border, 20px padding, content stacked
+  vertically.
+- Hover: moves up 4px, border turns brand color, job-card shadow appears,
+  title turns brand color.
+- Top row: department chip on the left, work-mode badge on the far right.
+  - Department chip: 24px tall, 10px side padding, fully round, 11.5px/600,
+    brand 11% background, brand text.
+  - Work-mode badge: 24px tall, 10px side padding, fully round, 1px `#e6e8ec`
+    border, 11.5px/600 `#5b6472`, with a 6px brand dot before the text
+    ("On-site", "Remote", "Hybrid").
+- Title 14px below, 17px/700, header color.
+- Description 8px below, 13.5px, `#727a86`, **max 2 lines** (cut off with
+  "…"). It stretches so that card footers line up across a row. Text:
+  "We're looking for a {title} to join {department} and help build what's
+  next — owning real work from day one alongside a team that values craft
+  and candor."
+- Footer: 20px below, 16px top padding, 1px `#f0f1f4` line above. 12.5px/500
+  `#727a86`, items 16px apart (wrap with 6px row gap), each with a 14px
+  icon: map pin + location, briefcase + "Full-time" (or "Shift Based" for
+  blue-collar jobs).
 
 ---
 
-## 7. Culture video (only when a video URL is set)
+## 6. Values section: "What we stand for"
 
-- Full-width band, bg `var(--cc-header)`.
-- Inner: container 1160px, padding `64px 24px` (md 96px vertical), grid, gap 40px (lg 56px); lg: 2 equal columns, vertically centered.
-- Left:
-  - Eyebrow "Inside {Company}" (tracking .16em, primary).
-  - H2 "A look inside<br>our culture", margin-top 16px, white.
-  - Paragraph margin-top 20px, 16px, `rgba(255,255,255,.65)`, max-width 46ch:
-    "Meet the people, the pace, and the work behind what we do — no gloss, just a real look at life on our team."
-- Right: 16:9 frame, radius 20px, overflow hidden, big shadow + white 10% ring.
-  - Poster (YouTube thumbnail) + overlay `linear-gradient(135deg, rgba(8,14,22,.55), rgba(8,14,22,.35))`.
-  - Centered play button: 64×64 circle, bg primary, white filled Play icon 24px nudged 2px right; hover `scale(1.1)`. Click swaps in the player.
+### Layout shared by all sizes
+
+- Max 1160px wide, 24px side padding. Space above and below: **64px** below
+  768px, **96px** from 768px.
+- Centered heading block, max ~46 characters wide:
+  - Eyebrow "What we stand for".
+  - Title "The principles behind how we work", 8px below, header color.
+- Cards start **48px** below the heading.
+
+### Value card (same on all sizes)
+
+- White, 16px radius, 1px `#ececf0` border, 24px padding, everything centered.
+- Icon tile: 48×48, centered, 14px radius, brand 12% background with a 1px
+  brand 24% inner outline. Icon inside: 22px, brand color, thin-medium stroke.
+- Name 20px below the tile, 17px/700, header color.
+- Description 6px below, 14px, line height 1.6, `#6b7280`.
+- Hover (pointer devices): card moves up 4px, value-card shadow appears,
+  border becomes "brand border", icon tile grows to 105%.
+
+Default values:
+- **Ownership** (target icon): "We take end-to-end ownership of outcomes, not tasks."
+- **Craft** (gem icon): "We sweat the details and ship work we are proud of."
+- **Candor** (speech-bubble icon): "We speak honestly and assume good intent from each other."
+
+### Two display modes
+
+| Number of values | Mobile (< 640px) | Tablet / Desktop (≥ 640px) |
+|---|---|---|
+| 1 | Static card, full width | Static card, centered |
+| 2–3 | **Auto-scrolling strip** | **Static centered row** |
+| 4 or more | **Auto-scrolling strip** | **Auto-scrolling strip** |
+
+On phones a stacked list of cards gets long, so any list with more than one
+value scrolls instead.
+
+**Mode A: static centered row**
+- Cards wrap and are centered horizontally, 20px gap in both directions.
+- Card width:
+  - Mobile (only with 1 value): full width.
+  - Tablet: two per row (half the row minus 10px each). With 3 values the
+    third card sits alone, centered, on a second line.
+  - Desktop: fixed **344px** each, so 3 cards fit on one centered row
+    (3 × 344 + 2 × 20 = 1072px).
+- No movement.
+
+**Mode B: auto-scrolling strip (marquee)**
+- One horizontal row that scrolls **right-to-left forever at a steady speed**.
+  The list is shown twice in a row so the loop has no visible jump or gap.
+- Card width **300px** on mobile, **330px** from 640px; 20px gap between cards.
+  Cards keep their width, so on a phone about one card and a bit of the next
+  are visible.
+- Speed: one full pass of the list takes **6 seconds per value, at least 18
+  seconds** (3 values = 18s, 5 values = 30s). Linear, no easing.
+- **Both edges fade out**: the first and last 5% of the strip width fade to
+  transparent, so cards appear and disappear softly.
+- Pauses while the pointer is over the strip (desktop).
+- If the user's device asks for reduced motion: no scrolling; the strip just
+  shows the cards as they are.
+- The strip is clipped to the section width, so the page never scrolls sideways.
+
+Decide the mode from the screen width (switch at 640px) and update it when
+the window is resized.
 
 ---
 
-## 8. Testimonials — "From the team"
+## 7. Culture video band (only when a video is set)
 
-- Section: container 1160px, padding `64px 24px` (md 96px vertical).
-- Heading block (centered, max 46ch, margin-bottom 48px): eyebrow "From the team", H2 "What it's like to work with us".
-- **Box**: grid, overflow hidden, radius 24px, 1px `#ececf0` border, shadow `0 24px 64px rgba(15,23,42,.07)`. lg: 2 columns `minmax(0,1fr) minmax(0,1.08fr)`; stacked below lg.
+- Full-width band, header-color background.
+- Content: max 1160px wide, space above/below 64px (96px from 768px), 24px
+  side padding.
+- **Desktop:** two equal columns (text left, video right), vertically
+  centered, 56px apart.
+- Text:
+  - Eyebrow "Inside {Company}" (brand).
+  - Title "A look inside / our culture" (line break after "inside"), 16px below, white.
+  - Paragraph 20px below, 16px, white 65%, max ~46 characters wide: "Meet the
+    people, the pace, and the work behind what we do — no gloss, just a real
+    look at life on our team."
+- Video frame: 16:9, 20px radius, video-frame shadow and outline.
+  - Before playing: video thumbnail with a dark diagonal overlay (55% → 35%
+    `rgb(8,14,22)`) and a centered 64px round brand-colored play button with a
+    white filled play icon (grows to 110% on hover).
+  - Clicking plays the video in place.
 
-**Left panel** (branded): bg primary-tint-38, flex column, space-between, gap 32px (md 48px), padding 32px (md 56px), min-height md 440px / lg 500px.
-- Quote icon 56×56, filled, `rgba(255,255,255,.6)`.
-- H2 "Real Stories from Real Employees" (header color).
-- Paragraph margin-top 16px, 15px, color header-78:
-  "Get an inside look at our workplace culture, career growth opportunities, and team experiences through the voices of our employees."
+---
 
-**Right panel** (carousel): white, flex column, padding 36px (md 56px).
-- One testimonial at a time, cross-fade 0.35s. Auto-advance every 6s; pauses on hover and when the tab is hidden.
-- Person row (gap 16px): 48×48 round avatar (photo, or primary circle with white initials 14px/700); name 16px/700 header color; role 13px `#8a919c`.
-- Quote: margin-top 24px, 16px (md 17px), relaxed, `#3f4652`, wrapped in quotes.
-- Controls (only if > 1), margin-top 32px, gap 12px:
-  - Prev/next: 40×40 circles, 1px `#e6e8ec` border, Chevron icon 20px in header color, hover bg `#f7f8fa`, active `scale(.9)`.
-  - Dots (margin-left 8px, gap 8px): height 8px, primary; active width 24px, inactive width 8px at 30% opacity (hover 60%).
+## 8. Testimonials: "From the team"
+
+- Max 1160px wide, 24px side padding, space above/below 64px (96px from 768px).
+- Centered heading block (max ~46 characters): eyebrow "From the team",
+  title "What it's like to work with us". 48px space below it.
+- **Box:** 24px radius, 1px `#ececf0` border, testimonials shadow, content
+  clipped to the rounded corners.
+- **Desktop:** two columns side by side; the right one is slightly wider
+  (1 : 1.08).
+
+**Left panel (branded)**
+- Brand 38% background. Big quote mark at the top, text at the bottom.
+- Padding 32px (56px from 768px). Min height 440px from 768px, 500px on desktop.
+- Quote mark: 56px, filled, white 60%.
+- Title "Real Stories from Real Employees", header color.
+- Paragraph 16px below, 15px, "header 78%" color: "Get an inside look at our
+  workplace culture, career growth opportunities, and team experiences
+  through the voices of our employees."
+
+**Right panel (slider)**
+- White, padding 36px (56px from 768px).
+- Shows **one testimonial at a time**, fading between them (~0.35s). Moves
+  to the next every **6 seconds**, pauses while the pointer is over the box
+  and while the browser tab is hidden. Loops back to the first.
+- Person row (16px gap): 48px round photo, or a brand-colored circle with
+  white initials (14px/700); name 16px/700 header color; role 13px `#8a919c`.
+- Quote 24px below, 16px (17px from 768px), line height 1.6, `#3f4652`, in
+  quotation marks.
+- Controls, only if there's more than one testimonial, 32px below, 12px gap:
+  - Previous / next: 40px round, 1px `#e6e8ec` border, 20px chevron in header
+    color, `#f7f8fa` on hover.
+  - Dots (8px after the arrows, 8px apart): 8px tall, brand color. The active
+    dot is a 24px-wide pill; the others are 8px circles at 30% opacity (60% on
+    hover). Clicking a dot jumps to that testimonial.
 
 Default testimonials:
-- Mariam Adel, Senior Engineer — "The best team I have worked with — real autonomy and real impact from day one."
-- Omar Khaled, Product Designer — "Culture of craft is not a slogan here. It shows up in every review and ship."
+- **Mariam Adel**, Senior Engineer: "The best team I have worked with — real autonomy and real impact from day one."
+- **Omar Khaled**, Product Designer: "Culture of craft is not a slogan here. It shows up in every review and ship."
 
 ---
 
-## 9. CTA — "Can't find your desired job?"
+## 9. Mobile behavior (< 640px), whole page
 
-- Section: container 1160px, padding `0 24px 64px` (md bottom 96px).
-- Box: radius 20px, padding 32px (md 40px), bg `var(--cc-header)`, flex wrap, center-aligned, space-between, gap 20px.
-- Text (white): title 20px/700 "Can't find your desired job?"; subtitle margin-top 4px, 14px, white 70%:
-  "Apply through General Application and join our Talent Pool for future hiring."
-- Button "Join Talent Pool": height 48px, padding 0 24px, radius 13px, bg primary, white 15px/700; hover `brightness(1.1)`, active `scale(.97)`.
+The page is fully usable on phones with no sideways scrolling. Changes from
+desktop, section by section:
+
+**Header**
+- Still a floating rounded bar (16px from the screen edges), sticky, 64px tall.
+- Nav links, "For Employees" and the language button are **hidden**.
+- A **menu button** appears on the right: 44×44 touch area, 12px radius,
+  24px white hamburger icon. It turns into an ✕ when open.
+- Tapping it opens a **dropdown inside the same rounded bar**, directly
+  below the 64px row (the bar grows taller):
+  - 1px white 10% line on top, padding 8px top, 16px sides and bottom.
+  - "Home" and "Opportunities" as full-width rows: 48px tall, 12px side
+    padding, 12px radius, 16px/600. Current page in brand color; others white
+    80% with a faint white 5% background on press/hover.
+  - 12px below: two full-width stacked buttons, 10px apart, 48px tall,
+    12px radius, 15px: "For Employees" (brand background, white) and the
+    language button (1px white 25% border, globe icon).
+  - Opening: fades in while sliding down 8px (~0.2–0.25s, soft ease-out).
+    With reduced motion it only fades.
+  - The menu closes automatically when you navigate to another page.
+- Logo: 32px tall (max 130px wide), or 16px company name.
+
+**Hero**
+- Gradient: title at its smallest (32px), intro 15px, 112px space above and
+  160px below. Button keeps its full size (48px tall).
+- Cover photo: full width minus 8px each side; short because of the 4:1 shape
+  (~94px tall on a 390px phone). Featured panel overlaps it by just 16px.
+- Cover video: at least 94% of screen height, text bottom-left with 24px side
+  padding.
+
+**Featured jobs panel**
+- 28px inner padding.
+- "View all" drops **below** the text block, aligned left.
+- Filter pills wrap onto a second line if needed.
+- Job cards in **one column**, full width.
+
+**Values**
+- Scrolling strip whenever there's more than one value (cards 300px wide), see §6.
+- 64px space above and below. Title at its smallest (28.8px).
+
+**Culture video**
+- Stacked: text first, video below at full width, 40px apart.
+- 64px space above and below.
+
+**Testimonials**
+- Box stacked: branded panel on top, slider below.
+- Branded panel: 32px padding, 32px between quote mark and text, no minimum
+  height (only as tall as its content).
+- Slider panel: 36px padding. Quote 16px.
+
+**"Can't find your desired job?" box**
+- 32px padding. The "Join Talent Pool" button drops **below** the text,
+  aligned left.
+
+**Footer**: unchanged.
+
+**Touch:** hover effects don't apply; buttons shrink slightly (to ~95–97%)
+while pressed and cards shrink to 99%, as feedback.
+
+### Tablet (640–1023px) in short
+
+- Header shows the full desktop version (nav + buttons).
+- Job cards and value cards in 2 columns (values: static row if 3 or fewer).
+- From 768px: bigger paddings (featured panel 40px, sections 96px,
+  testimonials panels 56px) and bigger hero spacing.
+- Culture video and testimonials stay **stacked** until 1024px.
 
 ---
 
-## 10. Footer
+## 10. "Can't find your desired job?" box
 
-- Top border 1px `#eceef1`, white bg.
-- Inner: container 1160px, padding `40px 24px`, centered text.
-- Company name 15px/700 in header color; below (margin-top 4px) 12.5px `#8a919c`: "© {Company} · Careers powered by Recruitera".
+- Max 1160px wide, 24px side padding, 64px space below (96px from 768px).
+- Box: 20px radius, header-color background, padding 32px (40px from 768px).
+  Text on the left, button on the right, vertically centered, 20px gap; wraps
+  when there isn't room.
+- Text (white): title 20px/700 "Can't find your desired job?"; 4px below,
+  14px white 70% "Apply through General Application and join our Talent Pool
+  for future hiring."
+- Button "Join Talent Pool": 48px tall, 24px side padding, 13px radius, brand
+  background, white 15px/700.
 
 ---
 
-## 11. Motion summary
+## 11. Footer
 
-| Interaction | Effect |
+- 1px `#eceef1` line on top, white background.
+- Max 1160px wide, 40px padding top/bottom, 24px sides, centered text.
+- Company name 15px/700 in header color; 4px below, 12.5px `#8a919c`:
+  "© {Company} · Careers powered by Recruitera".
+
+---
+
+## 12. Interaction and motion summary
+
+| Interaction | Behavior |
 |---|---|
-| Buttons (press) | `scale(.95–.97)`, 150ms |
-| Filled buttons (hover) | `filter: brightness(1.1)` (white buttons `.95`) |
-| Job / value cards (hover) | lift 4px + shadow, 200ms |
-| Mobile menu | fade + 8px slide, `cubic-bezier(.22,1,.36,1)` |
-| Values marquee | linear infinite scroll, pause on hover |
-| Testimonials | 6s auto-advance, 0.35s opacity crossfade |
-| `prefers-reduced-motion` | marquee off, menu fades only |
+| Any button pressed | Shrinks to ~95–97%, quick (~150ms) |
+| Brand-colored button hover | Slightly brighter |
+| White button hover | Slightly darker |
+| Job / value card hover | Moves up 4px + soft shadow (~200ms) |
+| "View openings" | Smooth scroll to the featured jobs panel |
+| Mobile menu | Fade + 8px slide down |
+| Values strip | Constant right-to-left scroll, pauses on hover |
+| Testimonials | Auto-advance every 6s, 0.35s crossfade, pauses on hover / hidden tab |
+| Reduced motion | Values strip stops; menu only fades |
 
-## 12. Icons (lucide)
+## 13. Icons needed (use your own icon set)
 
-Globe, Menu, X (header) · ArrowRight, MapPin, Briefcase, Quote, Play,
-ChevronLeft, ChevronRight (home) · value icons from the
-`CAREER_VALUE_ICONS` list in `useCareerSite.ts` (Target, Gem, MessageSquare, …).
+Globe, hamburger menu, close (✕), arrow right, map pin, briefcase, quote
+mark, play, chevron left, chevron right, plus one icon per value (defaults:
+target, gem, speech bubble).
