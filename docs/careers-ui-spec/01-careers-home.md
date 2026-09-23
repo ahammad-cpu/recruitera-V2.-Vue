@@ -111,11 +111,10 @@ opacity.
 | 12px | Mobile menu items and buttons |
 | 13px | Large buttons ("View openings", "Join Talent Pool") |
 | 14px | Value icon tile |
-| 16px | Value cards |
 | 18px | Job cards |
 | 20px | Culture video frame, CTA box |
 | 22px | Floating header, featured-jobs panel |
-| 24px | Testimonials box, top corners of cover photo |
+| 24px | Value cards, testimonials box, top corners of cover photo |
 
 ### Shadows
 
@@ -335,7 +334,7 @@ wrap onto more lines if needed.
 
 ### Value card (same on all sizes)
 
-- White, 16px radius, 1px `#ececf0` border, 24px padding, everything centered.
+- White, 24px radius, 1px `#ececf0` border, 24px padding, everything centered.
 - Icon tile: 48×48, centered, 14px radius, brand 12% background with a 1px
   brand 24% inner outline. Icon inside: 22px, brand color, thin-medium stroke.
 - Name 20px below the tile, 17px/700, header color.
@@ -365,8 +364,9 @@ value scrolls instead.
   - Mobile (only with 1 value): full width.
   - Tablet: two per row (half the row minus 10px each). With 3 values the
     third card sits alone, centered, on a second line.
-  - Desktop: fixed **344px** each, so 3 cards fit on one centered row
-    (3 × 344 + 2 × 20 = 1072px).
+  - Desktop: fixed **344px** each. 3 cards need 3 × 344 + 2 × 20 = 1072px,
+    so they sit on one centered row only from ~1120px wide; between 1024 and
+    1119px the third card wraps to a second line, centered.
 - No movement.
 
 **Mode B: auto-scrolling strip (marquee)**

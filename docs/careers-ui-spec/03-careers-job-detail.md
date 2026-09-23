@@ -125,11 +125,10 @@ opacity.
 | 12px | Mobile menu items and buttons |
 | 13px | Large buttons ("View openings", "Join Talent Pool") |
 | 14px | Value icon tile |
-| 16px | Value cards |
 | 18px | Job cards |
 | 20px | Culture video frame, CTA box |
 | 22px | Floating header, featured-jobs panel |
-| 24px | Testimonials box, top corners of cover photo |
+| 24px | Value cards, testimonials box, top corners of cover photo |
 
 ### Shadows
 
